@@ -1,10 +1,10 @@
 # Civilis Risk OS
 
-**Civilis Risk OS** is a protection layer for agent commerce on X Layer.
+**Civilis Risk OS** is an installable skill for protected agent commerce on X Layer.
 
 It packages one narrow but reusable pattern:
 
-`risk quote -> challengeable buy -> claim -> evaluator release/refund -> later trust repricing`
+`quote -> buy -> claim -> resolve -> requote`
 
 The goal of this repository is simple:
 
@@ -15,12 +15,12 @@ The goal of this repository is simple:
 
 ## Project Snapshot
 
-- **Project type:** reusable protection Skill with a live reference integration
+- **Project type:** installable skill with a live reference integration
 - **Reference integration:** Civilis Intel Market
 - **Primary chain:** X Layer mainnet (`chainId 196`)
-- **Core official stack in the live reference runtime:** `x402 Payment API`,
+- **Core stack in the live reference runtime:** `x402 Payment API`,
   `Agentic Wallet`, `Security`, `DEX Token Analytics`, `ERC-8183 / ACP`,
-  `ERC-8004`
+  `ERC-8004`, and AI evaluator advisory
 - **Current scope:** a protected commerce flow for agent transactions, not a
   generalized insurance protocol
 
@@ -38,16 +38,15 @@ If someone only has a minute, start here:
 
 If someone only reads one screen, the intended takeaway is:
 
-- **What it is:** a reusable protection Skill for agent commerce on X Layer
-- **What it ships:** installable runtime commands, API contract, schemas, and a
-  live reference integration
-- **What it helps with:** quoting risk, choosing challengeable settlement,
-  opening disputes, resolving outcomes, and repricing the next transaction
+- **What it is:** an installable skill for protected agent commerce on X Layer
+- **What it ships:** bundled local runtime, public hosted bundled runtime, API
+  contract, schemas, and a live reference integration
+- **What it helps with:** `quote -> buy -> claim -> resolve -> requote`
 - **What it is not:** a generalized insurance protocol or decentralized court
 
 The rest of the repo should be read through that frame.
 
-## Live Official Modules
+## Onchain OS Modules
 
 The live reference runtime already uses these official capability surfaces:
 
@@ -126,7 +125,7 @@ for using the package.
 
 ## Public Hosted Runtime
 
-This package also supports a hosted deployment surface for direct public use.
+This package also supports a public hosted bundled runtime for direct use.
 
 For Cloudflare Workers:
 
@@ -150,8 +149,7 @@ configuration and also detects the macOS system proxy automatically for hosted
 runtime calls when needed.
 
 Hosted bundled calls also use a package-managed runtime session so quote, buy,
-claim, resolve, and requote stay isolated and repeatable per caller instead of
-mutating a single shared public demo state.
+claim, resolve, and requote stay isolated and repeatable per caller.
 
 Current public hosted runtime:
 
@@ -222,13 +220,8 @@ npm run verify:hosted-public
 
 ## Runtime Skill
 
-Civilis Risk OS now includes a **runtime-first Skill surface** in the style of
-the official OKX `onchainos-skills` package.
-
-The most important shift is this:
-
-- the repo is no longer only “AI-readable”
-- another AI can now use a narrow runtime tool surface directly
+Civilis Risk OS includes a runtime-first skill surface in the style of the
+official OKX `onchainos-skills` package.
 
 The direct entry is:
 
@@ -250,7 +243,7 @@ Bundled supporting modules remain available for narrower tasks:
 - [civilis-risk-os-integration-check](skills/civilis-risk-os-integration-check/SKILL.md)
 
 These bundled modules sit under the same installable package. Another AI should
-start from the primary `civilis-risk-os` Skill first, then reach for a
+start from the primary `civilis-risk-os` skill first, then reach for a
 supporting module only when a narrower task needs it.
 
 Together they let another AI:
@@ -311,17 +304,16 @@ without first launching a separate Civilis service.
 The same command surface can still point at another compatible hosted runtime by
 passing `--base-url`.
 
-### Current guarantees
+### Current product guarantees
 
 - protected principal is routed through a challengeable `ERC-8183` path
-- claim and evaluator actions are role-gated in the strict mainnet-backed proof
-  environment
+- claim and evaluator actions are role-gated by default
 - unauthenticated claim and evaluator actions are disabled by default; a local
   bypass requires explicit opt-in through `RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true`
 - buyer claim creation can be prepared through a deterministic `claim-proof`
   message that binds the request to the protected purchase buyer wallet
-- evaluator resolution can be authorized either through the strict proof
-  environment token gate or through a wallet-bound signature over a deterministic
+- evaluator resolution can be authorized either through the bundled runtime
+  token gate or through a wallet-bound signature over a deterministic
   resolution-proof message
 - when `RISK_OS_ENABLE_LLM_EVALUATOR=true` and an `LLM_*` configuration is
   present, evaluator proof generation and resolution can also consume an
@@ -340,13 +332,13 @@ passing `--base-url`.
   claim-proof payloads because the current official Agentic Wallet CLI does not
   expose a generic message-sign command
 - the public external-consumer quickstart script has been validated against the
-  live runtime environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
-  `resolve-proof`, `resolve`, and later repricing
+  live runtime for `quote`, `buy`, `claim-proof`, `claim`,
+  `resolve-proof`, `resolve`, and `requote`
 - the public repo also includes a second lightweight reference adapter for
   `The Square` paywalled intel unlocks, so the reusable claim no longer depends
   on a single commerce surface
-- later quotes reflect prior protected outcomes, and the local protected
-  purchase state now records repricing sync status for recovery
+- later quotes reflect prior protected outcomes, and the protected purchase
+  state records repricing sync status for recovery
 
 ### Capability vs Captured Proof
 
@@ -396,7 +388,7 @@ surface that already exists in Civilis.
 
 The loop is:
 
-`quote -> protected buy -> claim -> evaluator release/refund -> repriced later quote`
+`quote -> buy -> claim -> resolve -> requote`
 
 ## Relationship to Civilis
 
@@ -440,10 +432,10 @@ It is **not** presented as:
 
 It **is** presented as:
 
-- a risk quote engine
-- a protected settlement selector
-- a claim and evaluator resolution flow
-- a repricing layer that feeds later transactions
+- an installable skill
+- a public hosted bundled runtime
+- a claim and resolution flow
+- a repricing layer for the next transaction
 
 ## Architecture Overview
 
@@ -495,11 +487,12 @@ It lets another agent app or operator walk the same reusable flow without
 depending on the Civilis dashboard:
 
 - quote
-- challengeable buy
-- buyer claim-proof
+- buy
+- claim-proof
 - claim
-- evaluator resolve-proof
-- release or refund
+- resolve-proof
+- resolve
+- requote
 
 ## External Consumer Story
 
@@ -534,17 +527,13 @@ mainnet-proved live integration.
 
 ## Runtime Environments
 
-The strict runtime used for live references keeps the on-chain path enabled but
-disables unrelated world ticking:
+The public product supports:
 
-- `AUTO_START_WORLD=false`
-- strict mainnet mode enabled
-- `x402` direct-wallet mode enabled
-- `RISK_OS_CLAIMANT_AUTH_TOKEN` and `RISK_OS_EVALUATOR_AUTH_TOKEN` configured
+- bundled local runtime
+- public hosted bundled runtime
+- compatible runtime endpoints that preserve the same contract
 
-This matters because the runtime needs real `Agentic Wallet` and `ERC-8183`
-behavior, but should not let unrelated world ticks mutate staged commerce items
-during integration or verification.
+The external contract stays the same across those deployment modes.
 
 ## Onchain OS Skill Usage
 
@@ -559,7 +548,7 @@ capabilities:
 - `ERC-8004`
 - `X Layer mainnet (chainId 196)`
 
-No Uniswap MVP claim is made in this public snapshot.
+Uniswap integration is not claimed in this public release.
 
 ## How The Official Stack Is Used
 
@@ -617,7 +606,7 @@ See:
 ### `ERC-8004`
 
 - used as the identity, reputation, and validation input surface
-- used to derive quote reasoning and later repricing
+- used to derive quote reasoning and `requote`
 
 ## Working Mechanism
 
@@ -648,7 +637,7 @@ wallet-signature-bound universal auth across every role and surface, but it
 prevents the runtime from running with anonymous claim or resolution
 actions.
 
-Outside the strict runtime mode, unauthenticated role actions remain
+Outside bundled auth mode, unauthenticated role actions remain
 disabled by default. A developer must explicitly opt into a local bypass through
 `RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true`; that bypass is not part of the public
 project claim.
@@ -686,8 +675,8 @@ Layer agent stack:
 - `Agentic Wallet` makes agent execution possible
 - `ERC-8183` makes agent work and escrow legible
 - `ERC-8004` makes identity and trust history queryable
-- **Civilis Risk OS makes that commerce challengeable, refundable, and
-  repriced**
+- **Civilis Risk OS makes that commerce quotable, challengeable, resolvable,
+  and requotable**
 
 This is why the project is expressed as a Skill rather than as a generic app
 feature.
@@ -777,8 +766,11 @@ This repository does **not** claim:
 - generalized protection for every market type
 - partial refunds
 - decentralized arbitration
+- Uniswap integration in this public release
+- generic buyer wallet-signature proof for arbitrary claim payloads
 - wallet-signature-bound universal evaluator auth across every role and surface
 - on-chain premium collection
+- a fully multi-tenant production SaaS
 - a fully capitalized underwriting reserve
 
 Those are future extension directions, not current public facts.
@@ -787,16 +779,15 @@ Those are future extension directions, not current public facts.
 
 - `KB / CivilisAI`: product, architecture, implementation, packaging, and project direction
 
-## Platform Review Appendix
+## Additional Reference Docs
 
-If you are reviewing this repo for Build X specifically, start here:
+For deeper contract, proof, and runtime details, start here:
 
-1. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
-2. [Build X Requirements Mapping](docs/build-x-requirements-mapping.md)
-3. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
+1. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
+2. [Public Reference Pack](docs/public-reference-pack.md)
+3. [Build X Requirements Mapping](docs/build-x-requirements-mapping.md)
 4. [Evaluation Mapping](docs/evaluation-mapping.md)
 5. [Release Readiness Audit](docs/release-readiness-audit.md)
-6. [Public Reference Pack](docs/public-reference-pack.md)
 
 ## License
 

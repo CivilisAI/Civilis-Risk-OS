@@ -4,7 +4,8 @@ Civilis Risk OS is now packaged so another AI can point the same runtime tool
 surface at either:
 
 - a bundled local runtime profile
-- or a hosted compatible base URL
+- a public hosted bundled runtime
+- or a compatible hosted base URL
 
 ## Default Product Path: Bundled Local Profile
 
@@ -31,7 +32,7 @@ This is the default product path:
 
 No extra deployment decision is required for the default local use case.
 
-## Optional Deployment Mode: Hosted Runtime
+## Optional Deployment Mode: Public Hosted Bundled Runtime
 
 The runtime contract should not change just because the deployment surface
 changes.
@@ -55,8 +56,8 @@ Use these commands:
 - `npm install`
 - `npm run runtime:cf:deploy`
 
-That deployment publishes the bundled runtime profile as a public hosted Skill
-surface with the same public `health` and runtime API paths.
+That deployment publishes the bundled runtime profile as a public hosted
+bundled runtime with the same public `health` and runtime API paths.
 
 Current public hosted runtime:
 
@@ -116,10 +117,9 @@ This public repo includes two valid ways to use the same Skill:
 That distinction matters:
 
 - bundled local runtime profile: **yes**
-- hosted-ready: **yes**
-- public hosted production endpoint claimed in this repo: **yes**
-
-Keep that wording strict in demos and docs.
+- public hosted bundled runtime: **yes**
+- compatible hosted runtime contract: **yes**
+- fully multi-tenant production SaaS: **no**
 
 ## Hosted Verification
 

@@ -6,6 +6,10 @@ product scope is broader:
 **another agent app can reuse the same protection pattern without adopting the
 rest of the Civilis world.**
 
+The reusable product contract stays narrow:
+
+`quote -> buy -> claim -> resolve -> requote`
+
 This guide should be read after:
 
 - [Runtime Quickstart](runtime-quickstart.md)
@@ -53,7 +57,7 @@ If risk is low, a client may accept `instant`.
 If risk is elevated, the client should choose `challengeable` so principal is
 funded into the protected `ERC-8183` path instead of becoming instantly final.
 
-### Step 3. Execute the protected buy
+### Step 3. Execute the protected purchase
 
 Call:
 
@@ -106,12 +110,12 @@ Call:
 The evaluator decides whether the seller should receive principal or the buyer
 should be refunded.
 
-### Step 6. Reuse the later repriced quote
+### Step 6. Reuse the next quote
 
 Protected outcomes change later seller risk.
 
 That means the skill does not merely settle one transaction; it changes how the
-next transaction is priced and routed.
+next transaction is priced and routed through `requote`.
 
 ## Why This Matters
 
@@ -131,12 +135,12 @@ This repo now includes a validated external-consumer quickstart script:
 The current live reference path from the public quickstart is:
 
 - quote `34`
-- challengeable protected purchase `11`
+- protected purchase `11`
 - buyer claim-proof for `sage`
 - unauthenticated claim rejected with `403`
 - authenticated claim `10`
 - evaluator refund resolution through `arbiter`
-- later quote `36`
+- requote `36`
 
 This path shows the full reusable flow against independently controlled
 Agentic Wallet actors for buyer, seller, and evaluator.
@@ -182,5 +186,7 @@ It does not yet claim:
 - generalized adapters for every commerce vertical
 - partial refunds
 - decentralized arbitration
+- Uniswap integration in this public release
+- on-chain premium collection
 - wallet-signature-bound universal claimant/evaluator auth across every role and
   surface

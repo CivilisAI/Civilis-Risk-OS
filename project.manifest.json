@@ -1,7 +1,7 @@
 {
   "name": "Civilis Risk OS",
   "arena": "Skills Arena",
-  "projectType": "reusable protection skill with a live reference integration",
+  "projectType": "installable skill with a live reference integration",
   "chain": {
     "name": "X Layer mainnet",
     "chainId": 196
@@ -34,6 +34,12 @@
     "llm-evaluator-advisory: reasoning",
     "llm-evaluator-advisory: confidence"
   ],
+  "productNarrative": {
+    "primaryPositioning": "installable skill",
+    "hostedPositioning": "public hosted bundled runtime",
+    "runtimeFlow": "quote -> buy -> claim -> resolve -> requote",
+    "capabilityStory": "Onchain OS modules + AI evaluator advisory"
+  },
   "canonicalActors": {
     "buyer": {
       "agentId": "sage",
@@ -111,7 +117,10 @@
     "generalizedInsuranceProtocol": false,
     "secondLiveMainnetSettlementLoop": false,
     "llmEvaluatorVendorBackedLiveSettlementProof": false,
-    "publicHostedProductionEndpointClaimed": true
+    "publicHostedProductionEndpointClaimed": false,
+    "publicHostedBundledRuntimePublished": true,
+    "uniswapIntegratedInThisPublicRelease": false,
+    "onChainPremiumCollectionClaimed": false
   },
   "readFirst": [
     "README.md",

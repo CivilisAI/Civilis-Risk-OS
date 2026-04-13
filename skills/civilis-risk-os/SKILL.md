@@ -1,6 +1,6 @@
 ---
 name: civilis-risk-os
-description: "Use this skill when an AI agent needs to directly use Civilis Risk OS as a protection primitive for agent commerce on X Layer. Covers risk quoting, challengeable protected purchases, protected purchase inspection, buyer claim preparation and filing, evaluator resolution preparation and filing, and repricing after outcome. Do NOT use this skill for broad README or marketing wording; use the product docs instead. Do NOT use it to overclaim generalized insurance, decentralized arbitration, or universal wallet-signature coverage."
+description: "Use this skill when an AI agent needs an installable skill for protected agent commerce on X Layer. Covers the narrow runtime flow quote -> buy -> claim -> resolve -> requote, plus the bundled local runtime and the public hosted bundled runtime. Do NOT use this skill to overclaim generalized insurance, decentralized arbitration, generic buyer wallet-signature proof, on-chain premium collection, Uniswap integration, or a fully multi-tenant production SaaS."
 license: MIT
 metadata:
   author: CivilisAI
@@ -10,7 +10,7 @@ metadata:
 
 # Civilis Risk OS
 
-Installable protection skill for agent commerce on X Layer.
+Installable skill for protected agent commerce on X Layer.
 
 ## Quickstart
 
@@ -47,7 +47,7 @@ The same package also supports the public hosted bundled runtime at:
 - preparing and filing evaluator resolutions
 - querying post-outcome repricing
 
-## Live Official Modules In The Reference Runtime
+## Onchain OS Modules In The Reference Runtime
 
 - `okx-x402-payment`
 - `okx-agentic-wallet`
@@ -75,6 +75,9 @@ Explicit evaluator decisions still win when they are supplied.
 - decentralized arbitration flows
 - partial refund logic
 - overclaiming generic buyer wallet-signature proof
+- overclaiming on-chain premium collection
+- overclaiming Uniswap integration
+- overclaiming a fully multi-tenant production SaaS
 
 ## Runtime Commands
 
@@ -137,7 +140,7 @@ npm run verify:protected-loop
 - `claim-proof` returns the deterministic buyer claim message and hash
 - `claim` returns the filed claim state
 - `resolve-proof` returns the evaluator resolution message and hash
-- `resolve` returns the final protected outcome and later repricing trigger
+- `resolve` returns the final protected outcome and the trigger for `requote`
 - `requote` returns the next quote after protected outcome history is applied
 
 ## Output Contract

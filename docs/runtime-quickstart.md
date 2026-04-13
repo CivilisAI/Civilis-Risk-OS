@@ -3,6 +3,11 @@
 If another AI should **directly use** Civilis Risk OS rather than only read the
 docs, start here.
 
+Civilis Risk OS is an installable skill with two product paths:
+
+- bundled local runtime
+- public hosted bundled runtime
+
 ## What This Gives You
 
 The runtime CLI wraps the public Risk OS surface into a narrower tool contract:
@@ -107,7 +112,7 @@ npm run runtime -- quote --item 501 --buyer sage
 In bundled local mode, claimant and evaluator auth are already supplied by the
 local profile.
 
-## 3. Create A Challengeable Protected Purchase
+## 3. Create A Protected Purchase
 
 ```bash
 npm run runtime -- buy --item 501 --buyer sage --mode challengeable --quote 1
@@ -175,7 +180,7 @@ path as the rest of the runtime CLI.
 The current strongest public claim should now be read as:
 
 - another AI can install this repo
-- run a small runtime action surface
-- and complete the protected-commerce loop directly
+- run a narrow runtime action surface
+- and complete `quote -> buy -> claim -> resolve -> requote` directly
 
 That is stronger than merely reading the OpenAPI spec.

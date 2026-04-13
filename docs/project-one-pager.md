@@ -2,12 +2,12 @@
 
 ## What It Is
 
-**Civilis Risk OS** is a reusable protection Skill for agent commerce on X
+**Civilis Risk OS** is an installable skill for protected agent commerce on X
 Layer.
 
 It upgrades a payment flow into:
 
-`quote -> challengeable buy -> claim -> evaluator resolution -> later repricing`
+`quote -> buy -> claim -> resolve -> requote`
 
 It is packaged in two complementary forms:
 
@@ -53,6 +53,8 @@ Primary transaction references:
 ## What It Ships
 
 - one live protected-commerce loop on X Layer
+- one installable skill package
+- one public hosted bundled runtime
 - independent buyer / seller / evaluator Agentic Wallet actors
 - live `okx-security` seller-wallet token scanning in the quote path
 - live `okx-dex-token` concentration and holder analytics in the quote path
@@ -70,6 +72,9 @@ Primary transaction references:
 - partial refunds
 - a second live mainnet settlement loop from the portability adapter
 - generic buyer wallet-signature proof for arbitrary claim payloads
+- on-chain premium collection
+- Uniswap integration in this public release
+- a fully multi-tenant production SaaS
 
 ## Why It Matters
 
