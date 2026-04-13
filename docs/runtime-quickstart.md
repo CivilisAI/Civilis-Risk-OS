@@ -26,7 +26,10 @@ Entry:
 From the public repo:
 
 ```bash
+git clone https://github.com/CivilisAI/Civilis-Risk-OS.git
+cd Civilis-Risk-OS
 npm install
+npm run runtime -- help
 ```
 
 ## 1. Check Runtime Health

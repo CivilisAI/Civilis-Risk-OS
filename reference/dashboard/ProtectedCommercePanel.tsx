@@ -115,6 +115,8 @@ export function ProtectedCommercePanel({
   const [claimantToken, setClaimantToken] = useState('')
   const [evaluatorToken, setEvaluatorToken] = useState('')
   const [evaluatorSignature, setEvaluatorSignature] = useState('')
+  const [showBuyerAuth, setShowBuyerAuth] = useState(false)
+  const [showEvaluatorAuth, setShowEvaluatorAuth] = useState(false)
   const [resolutionProof, setResolutionProof] = useState<IntelProtectionResolutionProof | null>(null)
   const [quoteLoading, setQuoteLoading] = useState(false)
   const [postOutcomeQuoteLoading, setPostOutcomeQuoteLoading] = useState(false)
@@ -144,6 +146,8 @@ export function ProtectedCommercePanel({
     setClaimantToken('')
     setEvaluatorToken('')
     setEvaluatorSignature('')
+    setShowBuyerAuth(false)
+    setShowEvaluatorAuth(false)
     setResolutionProof(null)
     setQuoteError(null)
     setPostOutcomeQuoteError(null)
@@ -474,7 +478,7 @@ export function ProtectedCommercePanel({
             {zh ? '买方角色' : 'Buyer Role'}
           </p>
           <p className="mt-1 font-mono text-sm text-[var(--text-primary)]">
-            {selectedBuyer?.agent_id ?? 'sage'}
+            {selectedBuyer ? `${selectedBuyer.name} (${selectedBuyer.agent_id})` : 'Sage (sage)'}
           </p>
           <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
             {zh
@@ -512,28 +516,10 @@ export function ProtectedCommercePanel({
         <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
           {zh ? '工作流通道' : 'Workflow Lane'}
         </span>
-        <span className="ml-auto text-xs leading-6 text-[var(--text-dim)]">
-          {zh
-            ? '同一时间只展示一个角色工作台；评审路径会在买方成功提交 claim 后才激活。'
-            : 'Only one role workspace is shown at a time; the evaluator path activates only after the buyer successfully opens a claim.'}
-        </span>
-      </div>
-
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         {([
-          [
-            'buyer',
-            zh ? 'Buyer Replay' : 'Buyer Replay',
-            zh ? '先报价、买入，再准备 claim。这里是默认 judge 入口。' : 'Quote first, buy next, then prepare the claim. This is the default judge entry lane.',
-            zh ? '1. Quote  2. Challengeable buy  3. Claim-proof  4. Claim' : '1. Quote  2. Challengeable buy  3. Claim-proof  4. Claim',
-          ],
-          [
-            'evaluator',
-            zh ? 'Evaluator Replay' : 'Evaluator Replay',
-            zh ? '只在 claim 存在后解锁。这里负责 resolve-proof 和最终 release/refund。' : 'Unlocks only after a claim exists. This lane handles resolve-proof and final release/refund.',
-            zh ? '5. Resolve-proof  6. Resolve  7. Re-quote' : '5. Resolve-proof  6. Resolve  7. Re-quote',
-          ],
-        ] as Array<[WorkspaceView, string, string, string]>).map(([mode, title, description, steps]) => {
+          ['buyer', zh ? '买方路径' : 'Buyer Path'],
+          ['evaluator', zh ? '评审路径' : 'Evaluator Path'],
+        ] as Array<[WorkspaceView, string]>).map(([mode, label]) => {
           const active = workspaceView === mode
           const disabled = mode === 'evaluator' && !evaluatorPathReady
           return (
@@ -545,37 +531,23 @@ export function ProtectedCommercePanel({
                 setWorkspaceView(mode)
               }}
               disabled={disabled}
-              className={`rounded-xl border p-4 text-left transition ${
+              className={`rounded-full border px-3 py-1.5 font-mono text-[0.625rem] uppercase tracking-[0.18em] transition ${
                 active
-                  ? 'border-[var(--border-gold)] bg-[var(--gold-wash)]'
+                  ? 'border-[var(--border-gold)] bg-[var(--gold-wash)] text-[var(--gold)]'
                   : disabled
-                    ? 'border-[var(--border-primary)] bg-[var(--bg-tertiary)] opacity-60 cursor-not-allowed'
-                    : 'border-[var(--border-primary)] bg-[var(--bg-tertiary)] hover:border-[var(--border-gold)]'
+                    ? 'border-[var(--border-primary)] text-[var(--text-dim)] opacity-50 cursor-not-allowed'
+                    : 'border-[var(--border-primary)] text-[var(--text-dim)] hover:border-[var(--border-gold)] hover:text-[var(--gold)]'
               }`}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                    {mode === 'buyer' ? (zh ? '默认路径' : 'Default Lane') : (zh ? '后续路径' : 'Follow-on Lane')}
-                  </p>
-                  <h4 className="mt-1 font-display text-lg tracking-wider text-[var(--text-primary)]">
-                    {title}
-                  </h4>
-                </div>
-                <ProtocolBadge
-                  label={active ? (zh ? '当前显示' : 'Active') : disabled ? (zh ? '等待 claim' : 'Waiting for Claim') : (zh ? '可切换' : 'Ready')}
-                  tone={active ? 'gold' : disabled ? 'slate' : 'violet'}
-                />
-              </div>
-              <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
-                {description}
-              </p>
-              <p className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--text-dim)]">
-                {steps}
-              </p>
+              {label}
             </button>
           )
         })}
+        <span className="ml-auto text-xs leading-6 text-[var(--text-dim)]">
+          {zh
+            ? '同一时间只展示一个角色工作台；评审路径会在买方成功提交 claim 后才激活。'
+            : 'Only one role workspace is shown at a time; the evaluator path activates only after the buyer successfully opens a claim.'}
+        </span>
       </div>
 
       <div className="mt-5 grid gap-4">
@@ -802,18 +774,58 @@ export function ProtectedCommercePanel({
                 />
               </label>
 
-              <label className="block">
-                <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-                  {zh ? '买方访问令牌（如需要）' : 'Buyer Access Token (If Required)'}
-                </span>
-                <input
-                  className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
-                  type="password"
-                  value={claimantToken}
-                  onChange={(event) => setClaimantToken(event.target.value)}
-                  placeholder={zh ? '只有 proof 环境启用了买方鉴权时才需要输入' : 'Only needed when the proof server requires buyer-role auth'}
-                />
-              </label>
+              {publicMode ? (
+                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                        {zh ? '高级认证（可选）' : 'Advanced Auth (Optional)'}
+                      </p>
+                      <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
+                        {zh
+                          ? '只有 proof 环境启用了买方鉴权时，才需要展开并填写买方访问令牌。'
+                          : 'Only expand this section when the proof runtime requires buyer-role auth.'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowBuyerAuth((current) => !current)}
+                      className="rounded-lg border border-[var(--border-primary)] px-3 py-2 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)]"
+                    >
+                      {showBuyerAuth
+                        ? (zh ? '隐藏认证输入' : 'Hide Auth Input')
+                        : (zh ? '显示认证输入' : 'Show Auth Input')}
+                    </button>
+                  </div>
+                  {showBuyerAuth ? (
+                    <label className="mt-3 block">
+                      <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                        {zh ? '买方访问令牌（如需要）' : 'Buyer Access Token (If Required)'}
+                      </span>
+                      <input
+                        className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
+                        type="password"
+                        value={claimantToken}
+                        onChange={(event) => setClaimantToken(event.target.value)}
+                        placeholder={zh ? '只有 proof 环境启用了买方鉴权时才需要输入' : 'Only needed when the proof server requires buyer-role auth'}
+                      />
+                    </label>
+                  ) : null}
+                </div>
+              ) : (
+                <label className="block">
+                  <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                    {zh ? '买方访问令牌（如需要）' : 'Buyer Access Token (If Required)'}
+                  </span>
+                  <input
+                    className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
+                    type="password"
+                    value={claimantToken}
+                    onChange={(event) => setClaimantToken(event.target.value)}
+                    placeholder={zh ? '只有 proof 环境启用了买方鉴权时才需要输入' : 'Only needed when the proof server requires buyer-role auth'}
+                  />
+                </label>
+              )}
 
               <div className="flex flex-wrap gap-2">
                 <button
@@ -1038,18 +1050,58 @@ export function ProtectedCommercePanel({
                 ) : null}
 
                 <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
-                  <label className="block">
-                    <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-                      {zh ? '评审访问令牌（如需要）' : 'Evaluator Access Token (If Required)'}
-                    </span>
-                    <input
-                      className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
-                      type="password"
-                      value={evaluatorToken}
-                      onChange={(event) => setEvaluatorToken(event.target.value)}
-                      placeholder={zh ? '只有 proof 环境启用了评审鉴权时才需要输入' : 'Only needed when the proof server requires evaluator-role auth'}
-                    />
-                  </label>
+                  {publicMode ? (
+                    <div>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                            {zh ? '高级认证（可选）' : 'Advanced Auth (Optional)'}
+                          </p>
+                          <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
+                            {zh
+                              ? '只有 proof 环境启用了评审鉴权时，才需要展开并填写评审访问令牌。'
+                              : 'Only expand this section when the proof runtime requires evaluator-role auth.'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowEvaluatorAuth((current) => !current)}
+                          className="rounded-lg border border-[var(--border-primary)] px-3 py-2 font-mono text-[0.65rem] uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)]"
+                        >
+                          {showEvaluatorAuth
+                            ? (zh ? '隐藏认证输入' : 'Hide Auth Input')
+                            : (zh ? '显示认证输入' : 'Show Auth Input')}
+                        </button>
+                      </div>
+                      {showEvaluatorAuth ? (
+                        <label className="mt-3 block">
+                          <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                            {zh ? '评审访问令牌（如需要）' : 'Evaluator Access Token (If Required)'}
+                          </span>
+                          <input
+                            className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
+                            type="password"
+                            value={evaluatorToken}
+                            onChange={(event) => setEvaluatorToken(event.target.value)}
+                            placeholder={zh ? '只有 proof 环境启用了评审鉴权时才需要输入' : 'Only needed when the proof server requires evaluator-role auth'}
+                          />
+                        </label>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <label className="block">
+                      <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                        {zh ? '评审访问令牌（如需要）' : 'Evaluator Access Token (If Required)'}
+                      </span>
+                      <input
+                        className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
+                        type="password"
+                        value={evaluatorToken}
+                        onChange={(event) => setEvaluatorToken(event.target.value)}
+                        placeholder={zh ? '只有 proof 环境启用了评审鉴权时才需要输入' : 'Only needed when the proof server requires evaluator-role auth'}
+                      />
+                    </label>
+                  )}
                   {!publicMode ? (
                     <>
                       <div className="mt-3 h-px bg-[var(--border-primary)]" />

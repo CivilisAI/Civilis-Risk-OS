@@ -81,6 +81,35 @@ If someone only reads one screen, the intended takeaway is:
 
 The rest of the repo should be read through that frame.
 
+## Install And Call The Skill
+
+If another AI should use Risk OS directly, copy this first:
+
+```bash
+git clone https://github.com/CivilisAI/Civilis-Risk-OS.git
+cd Civilis-Risk-OS
+npm install
+npm run runtime -- help
+```
+
+Then the narrow runtime actions are:
+
+- `health`
+- `quote`
+- `buy`
+- `purchase`
+- `claim-proof`
+- `claim`
+- `resolve-proof`
+- `resolve`
+- `requote`
+
+A concrete live-style example:
+
+```bash
+npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 1016 --buyer sage
+```
+
 ## Runtime Skill
 
 Civilis Risk OS now includes a **runtime-first Skill surface** in the style of
