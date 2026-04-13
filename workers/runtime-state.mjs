@@ -256,7 +256,7 @@ export async function handleRuntimeRequest(request) {
         status: 'ok',
         service: 'Civilis Risk OS Hosted Runtime',
         checks: {
-          mode: 'bundled-hosted',
+          mode: 'hosted-bundled',
           network: 'cloudflare-workers',
           acp: 'bundled',
           erc8004: 'bundled',

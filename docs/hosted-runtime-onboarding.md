@@ -83,7 +83,7 @@ For the public bundled hosted runtime, another AI only needs:
 - commerce item id
 - buyer actor id
 
-The package recognizes bundled-hosted mode and supplies bundled claimant and
+The package recognizes hosted-bundled mode and supplies bundled claimant and
 evaluator auth defaults automatically.
 
 For a custom hosted-compatible deployment, an external AI or app still needs:
