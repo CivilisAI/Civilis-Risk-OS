@@ -80,6 +80,47 @@ The current canonical read model for live API verification is:
 
 - `GET /api/risk/purchases/{id}`
 
+## Latest Successful Live Verifier Run
+
+On `2026-04-13`, we re-ran the verifier successfully against a live strict proof
+environment on `http://127.0.0.1:3021`.
+
+Because historical canonical purchase ids are not guaranteed to remain present
+forever in the maintained proof database, the successful live run used a fresh
+runtime replay target while preserving the historical canonical docs and
+on-chain evidence anchors.
+
+Successful runtime replay target:
+
+- replay item: `899`
+- fresh quote: `2`
+- fresh protected purchase: `1`
+
+Successful command:
+
+```bash
+RISK_OS_VERIFY_MODE=full \
+RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_VERIFY_ITEM_ID=899 \
+RISK_OS_VERIFY_QUOTE_ID=2 \
+RISK_OS_VERIFY_PURCHASE_ID=1 \
+node examples/verify-canonical-proof.mjs
+```
+
+What this proves:
+
+- docs remained internally consistent
+- live strict health was reachable
+- the fresh protected purchase read model was reachable and matched the fresh
+  replay target
+- the canonical historical transaction receipts still resolved on X Layer RPC
+
+What it does **not** mean:
+
+- that `899 -> 2 -> 1` replaces the historical canonical submission story
+- that all historical ids remain evergreen in the proof database
+- that buyer claim/resolve auth was re-captured in this specific verifier run
+
 ## Honest Boundary
 
 Use this runbook to describe the proof environment accurately:

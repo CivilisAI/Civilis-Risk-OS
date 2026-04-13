@@ -101,6 +101,30 @@ Then use the quickstart script:
 node examples/external-consumer-quickstart.mjs
 ```
 
+If you want the public verifier to succeed against that fresh runtime replay
+without replacing the historical canonical evidence path, use runtime override
+env vars:
+
+```bash
+RISK_OS_VERIFY_MODE=api \
+RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_VERIFY_ITEM_ID=<fresh_item_id> \
+RISK_OS_VERIFY_QUOTE_ID=<fresh_quote_id> \
+RISK_OS_VERIFY_PURCHASE_ID=<fresh_purchase_id> \
+node examples/verify-canonical-proof.mjs
+```
+
+And for the combined live check:
+
+```bash
+RISK_OS_VERIFY_MODE=full \
+RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_VERIFY_ITEM_ID=<fresh_item_id> \
+RISK_OS_VERIFY_QUOTE_ID=<fresh_quote_id> \
+RISK_OS_VERIFY_PURCHASE_ID=<fresh_purchase_id> \
+node examples/verify-canonical-proof.mjs
+```
+
 ### Step 3. Run the quote or protected buy
 
 First, capture a fresh quote if you want to see the current seller risk:

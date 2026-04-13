@@ -88,6 +88,33 @@ Older hashes are intentionally preserved in some evidence sections to show:
 Those older hashes are **not** accidental drift. They are retained as secondary
 depth evidence, while the canonical path above is the primary submission story.
 
+### Latest live verifier success
+
+The maintained strict proof environment does not guarantee that the historical
+canonical purchase id remains present forever in the live database.
+
+To confirm that the public verifier can still succeed end-to-end against a live
+strict server, we ran a fresh runtime replay verification on `2026-04-13`
+against `http://127.0.0.1:3021` using:
+
+- fresh replay item: `899`
+- fresh quote: `2`
+- fresh protected purchase: `1`
+
+Successful command:
+
+```bash
+RISK_OS_VERIFY_MODE=full \
+RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_VERIFY_ITEM_ID=899 \
+RISK_OS_VERIFY_QUOTE_ID=2 \
+RISK_OS_VERIFY_PURCHASE_ID=1 \
+node examples/verify-canonical-proof.mjs
+```
+
+This is intentionally framed as a **runtime replay override**, not as a
+replacement for the historical canonical evidence path.
+
 ## 3. Championship Readiness
 
 ### Current strengths

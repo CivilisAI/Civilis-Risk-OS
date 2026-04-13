@@ -22,6 +22,14 @@ Optional env:
   RISK_OS_BASE_URL=http://127.0.0.1:3020
   RISK_OS_RPC_URL=https://rpc.xlayer.tech
   RISK_OS_VERIFY_VERBOSE=1
+  RISK_OS_VERIFY_ITEM_ID=899
+  RISK_OS_VERIFY_QUOTE_ID=2
+  RISK_OS_VERIFY_PURCHASE_ID=1
+  RISK_OS_VERIFY_CLAIM_ID=10
+  RISK_OS_VERIFY_LATER_QUOTE_ID=36
+  RISK_OS_VERIFY_FUNDED_TX=0x...
+  RISK_OS_VERIFY_SUBMIT_TX=0x...
+  RISK_OS_VERIFY_REFUND_TX=0x...
 `;
 
 const CANONICAL = {
@@ -33,6 +41,17 @@ const CANONICAL = {
   fundedTx: '0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa',
   submitTx: '0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260',
   refundTx: '0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929'
+};
+
+const VERIFY_TARGET = {
+  item: process.env.RISK_OS_VERIFY_ITEM_ID || CANONICAL.item,
+  quote: process.env.RISK_OS_VERIFY_QUOTE_ID || CANONICAL.quote,
+  purchase: process.env.RISK_OS_VERIFY_PURCHASE_ID || CANONICAL.purchase,
+  claim: process.env.RISK_OS_VERIFY_CLAIM_ID || CANONICAL.claim,
+  laterQuote: process.env.RISK_OS_VERIFY_LATER_QUOTE_ID || CANONICAL.laterQuote,
+  fundedTx: process.env.RISK_OS_VERIFY_FUNDED_TX || CANONICAL.fundedTx,
+  submitTx: process.env.RISK_OS_VERIFY_SUBMIT_TX || CANONICAL.submitTx,
+  refundTx: process.env.RISK_OS_VERIFY_REFUND_TX || CANONICAL.refundTx
 };
 
 const DOCS_TO_CHECK = [
@@ -61,22 +80,27 @@ function checkIncludes(content, needle, file, failures) {
 
 async function verifyDocs() {
   const failures = [];
+  const usingOverrides = JSON.stringify(VERIFY_TARGET) !== JSON.stringify(CANONICAL);
 
   for (const file of DOCS_TO_CHECK) {
     const content = await read(file);
-    checkIncludes(content, CANONICAL.item, file, failures);
-    checkIncludes(content, CANONICAL.quote, file, failures);
-    checkIncludes(content, CANONICAL.purchase, file, failures);
-    checkIncludes(content, CANONICAL.claim, file, failures);
-    checkIncludes(content, CANONICAL.laterQuote, file, failures);
-    checkIncludes(content, CANONICAL.fundedTx, file, failures);
-    checkIncludes(content, CANONICAL.submitTx, file, failures);
-    checkIncludes(content, CANONICAL.refundTx, file, failures);
+    if (!usingOverrides) {
+      checkIncludes(content, CANONICAL.item, file, failures);
+      checkIncludes(content, CANONICAL.quote, file, failures);
+      checkIncludes(content, CANONICAL.purchase, file, failures);
+      checkIncludes(content, CANONICAL.claim, file, failures);
+      checkIncludes(content, CANONICAL.laterQuote, file, failures);
+      checkIncludes(content, CANONICAL.fundedTx, file, failures);
+      checkIncludes(content, CANONICAL.submitTx, file, failures);
+      checkIncludes(content, CANONICAL.refundTx, file, failures);
+    }
   }
 
   return {
     mode: 'offline-docs',
     canonical: CANONICAL,
+    verifyTarget: VERIFY_TARGET,
+    docMode: usingOverrides ? 'historical-canonical-docs-with-runtime-overrides' : 'strict-canonical-docs',
     checkedFiles: DOCS_TO_CHECK,
     ok: failures.length === 0,
     failures
@@ -117,7 +141,7 @@ async function verifyApi() {
   let purchaseView = null;
   let apiError = null;
   try {
-    const response = await fetch(`${baseUrl}/api/risk/purchases/${CANONICAL.purchase}`);
+    const response = await fetch(`${baseUrl}/api/risk/purchases/${VERIFY_TARGET.purchase}`);
     const text = await response.text();
     purchaseView = text ? JSON.parse(text) : null;
     if (!response.ok) {
@@ -128,10 +152,10 @@ async function verifyApi() {
   }
 
   const apiChecks = {
-    purchaseIdMatches: purchaseView?.protected_purchase_id === Number(CANONICAL.purchase),
+    purchaseIdMatches: purchaseView?.protected_purchase_id === Number(VERIFY_TARGET.purchase),
     buyerMatches: purchaseView?.buyer_agent_id === 'sage',
     sellerMatches: purchaseView?.seller_agent_id === 'fox',
-    quoteMatches: purchaseView?.quote_id === Number(CANONICAL.quote)
+    quoteMatches: purchaseView?.quote_id === Number(VERIFY_TARGET.quote)
   };
   const apiFailures = Object.entries(apiChecks)
     .filter(([, ok]) => !ok)
@@ -172,9 +196,9 @@ async function rpc(method, params) {
 async function verifyOnchain() {
   const docs = await verifyDocs();
   const txEntries = Object.entries({
-    fundedPrincipal: CANONICAL.fundedTx,
-    deliverySubmit: CANONICAL.submitTx,
-    rejectRefund: CANONICAL.refundTx
+    fundedPrincipal: VERIFY_TARGET.fundedTx,
+    deliverySubmit: VERIFY_TARGET.submitTx,
+    rejectRefund: VERIFY_TARGET.refundTx
   });
 
   const receipts = {};
