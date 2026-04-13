@@ -54,13 +54,14 @@ If a reviewer only has a minute, read in this order:
 3. [Proof Surface Matrix](docs/proof-surface-matrix.md)
 4. [External Consumer Schema](docs/external-consumer-schema.md)
 5. [External Consumer Guide](docs/external-consumer-guide.md)
-6. [Submission Reference](docs/submission-reference.md)
-7. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-8. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-9. [Mainnet Evidence](docs/mainnet-evidence.md)
-10. [API Examples](docs/api-examples.md)
-11. [Championship Replay Mode](docs/championship-replay-mode.md)
-12. [Judge Demo Script](docs/judge-demo-script.md)
+6. [OnchainOS Skills Application Map](docs/onchainos-skills-application-map.md)
+7. [Submission Reference](docs/submission-reference.md)
+8. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+9. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+10. [Mainnet Evidence](docs/mainnet-evidence.md)
+11. [API Examples](docs/api-examples.md)
+12. [Championship Replay Mode](docs/championship-replay-mode.md)
+13. [Judge Demo Script](docs/judge-demo-script.md)
 
 ## Judge 30-Second Read
 
@@ -363,8 +364,10 @@ mutate the staged intel item during judge validation.
 Civilis Risk OS is built around the live X Layer stack and current OKX
 capabilities:
 
-- `x402 Payment API`
-- `Agentic Wallet`
+- `okx-x402-payment`
+- `okx-agentic-wallet`
+- `okx-onchain-gateway` as the next most natural observability extension
+- `okx-security` as the next most natural hardening extension
 - `ERC-8183 / ACP`
 - `ERC-8004`
 - `X Layer mainnet (chainId 196)`
@@ -377,11 +380,31 @@ No Uniswap MVP claim is made in this submission snapshot.
 
 - used as the payment-facing rail for intel purchases
 - differentiates simple payable flow from protected purchase orchestration
+- aligned to the official `okx-x402-payment` capability surface
 
 ### `Agentic Wallet`
 
 - used to create and operate the buyer, seller, and evaluator proof actors
 - used as the chain identity surface for the staged mainnet proof loops
+- aligned to the official `okx-agentic-wallet` capability surface
+
+### Why the official skill package matters here
+
+The official `okx/onchainos-skills` package makes the capability boundaries much
+clearer:
+
+- `okx-agentic-wallet` owns wallet identity and wallet-controlled execution
+- `okx-x402-payment` owns x402 proof signing and payment replay
+- `okx-onchain-gateway` owns simulation / gas / broadcast observability
+- `okx-security` owns token / tx / signature scanning
+
+That separation helps this repo stay rigorous. It lets us say exactly what this
+submission already uses, what it could extend next, and what it does **not**
+yet claim.
+
+See:
+
+- [OnchainOS Skills Application Map](docs/onchainos-skills-application-map.md)
 
 ### `ERC-8183 / ACP`
 
