@@ -50,14 +50,34 @@ submission rules:
 If a reviewer only has a minute, read in this order:
 
 1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
-2. [External Consumer Guide](docs/external-consumer-guide.md)
-3. [Submission Reference](docs/submission-reference.md)
-4. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-5. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-6. [Mainnet Evidence](docs/mainnet-evidence.md)
-7. [API Examples](docs/api-examples.md)
-8. [Championship Replay Mode](docs/championship-replay-mode.md)
-9. [Judge Demo Script](docs/judge-demo-script.md)
+2. [Final Championship Audit](docs/final-championship-audit.md)
+3. [External Consumer Guide](docs/external-consumer-guide.md)
+4. [Submission Reference](docs/submission-reference.md)
+5. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+6. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+7. [Mainnet Evidence](docs/mainnet-evidence.md)
+8. [API Examples](docs/api-examples.md)
+9. [Championship Replay Mode](docs/championship-replay-mode.md)
+10. [Judge Demo Script](docs/judge-demo-script.md)
+
+## Canonical Evidence Policy
+
+This repo keeps one **canonical** proof path and may also retain older
+historical loops as secondary depth evidence.
+
+Canonical submission path:
+
+- `16 -> 34 -> 11 -> 10 -> 36`
+- funded principal:
+  `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- delivery submit:
+  `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
+- reject/refund:
+  `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
+
+Older hashes may still appear in evidence docs as historical depth loops. They
+are preserved intentionally, but the path above is the primary submission
+story.
 
 ## Skill Contract
 
