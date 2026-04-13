@@ -509,10 +509,28 @@ export function ProtectedCommercePanel({
         <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
           {zh ? '角色路径' : 'Role Path'}
         </span>
+        <span className="ml-auto text-xs leading-6 text-[var(--text-dim)]">
+          {zh
+            ? '同一时间只展示一个角色工作台；评审路径会在买方成功提交 claim 后才激活。'
+            : 'Only one role workspace is shown at a time; the evaluator path activates only after the buyer successfully opens a claim.'}
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
         {([
-          ['buyer', zh ? '买方路径' : 'Buyer Path'],
-          ['evaluator', zh ? '评审路径' : 'Evaluator Path'],
-        ] as Array<[WorkspaceView, string]>).map(([mode, label]) => {
+          [
+            'buyer',
+            zh ? 'Buyer Replay' : 'Buyer Replay',
+            zh ? '先报价、买入，再准备 claim。这里是默认 judge 入口。' : 'Quote first, buy next, then prepare the claim. This is the default judge entry lane.',
+            zh ? '1. Quote  2. Challengeable buy  3. Claim-proof  4. Claim' : '1. Quote  2. Challengeable buy  3. Claim-proof  4. Claim',
+          ],
+          [
+            'evaluator',
+            zh ? 'Evaluator Replay' : 'Evaluator Replay',
+            zh ? '只在 claim 存在后解锁。这里负责 resolve-proof 和最终 release/refund。' : 'Unlocks only after a claim exists. This lane handles resolve-proof and final release/refund.',
+            zh ? '5. Resolve-proof  6. Resolve  7. Re-quote' : '5. Resolve-proof  6. Resolve  7. Re-quote',
+          ],
+        ] as Array<[WorkspaceView, string, string, string]>).map(([mode, title, description, steps]) => {
           const active = workspaceView === mode
           const disabled = mode === 'evaluator' && !evaluatorPathReady
           return (
@@ -524,23 +542,37 @@ export function ProtectedCommercePanel({
                 setWorkspaceView(mode)
               }}
               disabled={disabled}
-              className={`rounded-full border px-3 py-1.5 font-mono text-[0.625rem] uppercase tracking-[0.18em] transition ${
+              className={`rounded-xl border p-4 text-left transition ${
                 active
-                  ? 'border-[var(--border-gold)] bg-[var(--gold-wash)] text-[var(--gold)]'
+                  ? 'border-[var(--border-gold)] bg-[var(--gold-wash)]'
                   : disabled
-                    ? 'border-[var(--border-primary)] text-[var(--text-dim)] opacity-50 cursor-not-allowed'
-                    : 'border-[var(--border-primary)] text-[var(--text-dim)] hover:border-[var(--border-gold)] hover:text-[var(--gold)]'
+                    ? 'border-[var(--border-primary)] bg-[var(--bg-tertiary)] opacity-60 cursor-not-allowed'
+                    : 'border-[var(--border-primary)] bg-[var(--bg-tertiary)] hover:border-[var(--border-gold)]'
               }`}
             >
-              {label}
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                    {mode === 'buyer' ? (zh ? '默认路径' : 'Default Lane') : (zh ? '后续路径' : 'Follow-on Lane')}
+                  </p>
+                  <h4 className="mt-1 font-display text-lg tracking-wider text-[var(--text-primary)]">
+                    {title}
+                  </h4>
+                </div>
+                <ProtocolBadge
+                  label={active ? (zh ? '当前显示' : 'Active') : disabled ? (zh ? '等待 claim' : 'Waiting for Claim') : (zh ? '可切换' : 'Ready')}
+                  tone={active ? 'gold' : disabled ? 'slate' : 'violet'}
+                />
+              </div>
+              <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
+                {description}
+              </p>
+              <p className="mt-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--text-dim)]">
+                {steps}
+              </p>
             </button>
           )
         })}
-        <span className="ml-auto text-xs leading-6 text-[var(--text-dim)]">
-          {zh
-            ? '同一时间只展示一个角色工作台；评审路径会在买方成功提交 claim 后才激活。'
-            : 'Only one role workspace is shown at a time; the evaluator path activates only after the buyer successfully opens a claim.'}
-        </span>
       </div>
 
       <div className="mt-5 grid gap-4">

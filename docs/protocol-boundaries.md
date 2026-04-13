@@ -53,11 +53,18 @@ current Civilis snapshot.
 
 - the runtime uses OKX Agentic Wallet / TEE-backed execution paths where the
   current live flow supports them
+- the currently exposed official CLI surface does include wallet login,
+  switching, balance, send, contract-call, payment, and x402-linked paths
+- the current submission can therefore claim real Agentic Wallet execution and
+  x402-linked signing capability where captured proof exists
 
 ### What is not claimed
 
 - every possible contract call path is already generalized across the entire
   product surface
+- the current official public CLI surface does **not** expose a generic
+  `message-sign` command for arbitrary buyer claim payloads, so this repo does
+  not claim a captured generic buyer wallet-signature proof loop
 
 ## Public Claim Rule
 

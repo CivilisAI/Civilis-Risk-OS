@@ -52,14 +52,15 @@ If a reviewer only has a minute, read in this order:
 1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
 2. [Final Championship Audit](docs/final-championship-audit.md)
 3. [Proof Surface Matrix](docs/proof-surface-matrix.md)
-4. [External Consumer Guide](docs/external-consumer-guide.md)
-5. [Submission Reference](docs/submission-reference.md)
-6. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-7. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-8. [Mainnet Evidence](docs/mainnet-evidence.md)
-9. [API Examples](docs/api-examples.md)
-10. [Championship Replay Mode](docs/championship-replay-mode.md)
-11. [Judge Demo Script](docs/judge-demo-script.md)
+4. [External Consumer Schema](docs/external-consumer-schema.md)
+5. [External Consumer Guide](docs/external-consumer-guide.md)
+6. [Submission Reference](docs/submission-reference.md)
+7. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+8. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+9. [Mainnet Evidence](docs/mainnet-evidence.md)
+10. [API Examples](docs/api-examples.md)
+11. [Championship Replay Mode](docs/championship-replay-mode.md)
+12. [Judge Demo Script](docs/judge-demo-script.md)
 
 ## Judge 30-Second Read
 

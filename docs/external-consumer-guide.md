@@ -9,6 +9,7 @@ rest of the Civilis world.**
 This guide should be read after:
 
 - [Proof Surface Matrix](proof-surface-matrix.md)
+- [External Consumer Schema](external-consumer-schema.md)
 - [Championship Replay Mode](championship-replay-mode.md)
 
 ## Who This Is For
