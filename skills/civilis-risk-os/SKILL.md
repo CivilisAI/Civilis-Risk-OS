@@ -45,7 +45,7 @@ The same package also supports the public hosted bundled runtime at:
 - creating protected purchases
 - preparing and filing buyer claims
 - preparing and filing evaluator resolutions
-- querying post-outcome repricing
+- running `requote` after outcome history is applied
 
 ## Onchain OS Modules In The Reference Runtime
 

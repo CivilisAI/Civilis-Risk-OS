@@ -261,7 +261,6 @@ Quick index:
 - [Project One Pager](docs/project-one-pager.md)
 - [`npm run runtime -- help`](package.json)
 - [OpenAPI Contract](openapi/risk-os.openapi.yaml)
-- [Runtime Environment Guide](docs/proof-environment-runbook.md)
 - [Live X Layer References](docs/canonical-proof-evidence.md)
 
 ### Inputs
@@ -279,7 +278,7 @@ Quick index:
 - `premium`
 - `claim window`
 - `release` or `refund` resolution outcome
-- later quote repricing
+- `requote`
 
 ### Supported actions in the current public release
 
@@ -288,6 +287,7 @@ Quick index:
 - file a buyer claim
 - resolve the claim as the evaluator
 - query the protected purchase state
+- run `requote` after outcome history is applied
 
 ### Bundled local runtime profile
 
@@ -618,7 +618,7 @@ See:
 4. Seller delivery is submitted and the purchase enters a challenge window.
 5. Buyer may file a claim if the intel is misleading or invalid.
 6. Evaluator resolves the claim to `release` or `refund`.
-7. The outcome changes later quote results for the same seller.
+7. The outcome changes the next quote for the same seller.
 
 The reusable public surface is the API and orchestration flow above. The
 included dashboard files are a **role-scoped reference UI** used
@@ -785,9 +785,8 @@ For deeper contract, proof, and runtime details, start here:
 
 1. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
 2. [Public Reference Pack](docs/public-reference-pack.md)
-3. [Build X Requirements Mapping](docs/build-x-requirements-mapping.md)
-4. [Evaluation Mapping](docs/evaluation-mapping.md)
-5. [Release Readiness Audit](docs/release-readiness-audit.md)
+3. [API Examples](docs/api-examples.md)
+4. [Integration Checklist](docs/integration-checklist.md)
 
 ## License
 

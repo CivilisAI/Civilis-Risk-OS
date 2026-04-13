@@ -9,9 +9,10 @@ It upgrades a payment flow into:
 
 `quote -> buy -> claim -> resolve -> requote`
 
-It is packaged in two complementary forms:
+It is packaged in three complementary forms:
 
 - a direct runtime surface another AI can call
+- a public hosted bundled runtime
 - a live reference integration that shows the protection loop end to end
 
 ## Why It Matters
@@ -62,7 +63,7 @@ Primary transaction references:
 - deterministic buyer claim preparation
 - evaluator-driven refund / release
 - optional AI evaluator advisory with `decision`, `reasoning`, and `confidence`
-- later quote repricing after protected outcomes
+- `requote` after protected outcomes
 - one second portability adapter for another commerce surface
 
 ## What Is Not Claimed

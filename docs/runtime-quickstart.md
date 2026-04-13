@@ -10,7 +10,7 @@ Civilis Risk OS is an installable skill with two product paths:
 
 ## What This Gives You
 
-The runtime CLI wraps the public Risk OS surface into a narrower tool contract:
+The runtime CLI wraps the public Risk OS surface into a narrow tool contract:
 
 - `health`
 - `quote`
