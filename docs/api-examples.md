@@ -280,7 +280,7 @@ Typical response fields:
 - `evaluator_address`
 - `claim`
 
-This is the aggregation surface used by the judge-facing proof console.
+This is the aggregation surface used by the reviewer-facing proof console.
 
 ## Evidence Note
 
@@ -305,5 +305,5 @@ Historical complementary loops remain documented elsewhere in this repo:
 
 See:
 
-- [Skills Arena Evidence](skills-arena-risk-os-evidence.md)
+- [Canonical Proof Evidence](canonical-proof-evidence.md)
 - [Mainnet Evidence](mainnet-evidence.md)

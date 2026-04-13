@@ -1,11 +1,11 @@
 # Public Reference Pack
 
-This document is the public-safe reference pack for hackathon submission,
+This document is the public-safe reference pack for Build X submission,
 review, and demo prep.
 
 For the Skills Arena-specific protection loop proof, see:
 
-- [Civilis Risk OS Evidence](skills-arena-risk-os-evidence.md)
+- [Civilis Risk OS Evidence](canonical-proof-evidence.md)
 
 ## Project Description
 

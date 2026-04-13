@@ -56,7 +56,7 @@ categories.
 
 - [Replay Lanes](replay-lanes.md)
 - [AI Skill Pack](ai-skill-pack.md)
-- [Judge Demo Script](judge-demo-script.md)
+- [Demo Walkthrough](demo-walkthrough.md)
 
 ## 4. Product Completeness (25%)
 
@@ -71,7 +71,7 @@ categories.
 
 ### Strongest Evidence
 
-- [Judge One Pager](judge-one-pager.md)
+- [Project One Pager](project-one-pager.md)
 - [Canonical Proof Verifier](../examples/verify-canonical-proof.mjs)
 - [OpenAPI Contract](../openapi/risk-os.openapi.yaml)
 - [Integration Checklist](integration-checklist.md)

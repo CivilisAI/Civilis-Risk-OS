@@ -56,12 +56,12 @@ const VERIFY_TARGET = {
 
 const DOCS_TO_CHECK = [
   'README.md',
-  'docs/judge-one-pager.md',
+  'docs/project-one-pager.md',
   'docs/championship-replay-mode.md',
   'docs/proof-surface-matrix.md',
   'docs/mainnet-evidence.md',
-  'docs/final-championship-audit.md',
-  'docs/submission-reference.md',
+  'docs/release-readiness-audit.md',
+  'docs/public-reference-pack.md',
   'docs/external-consumer-schema.md',
   'skills/civilis-risk-os-canonical-replay/references/canonical-replay.md',
   'skills/civilis-risk-os-proof-boundaries/references/proof-classification.md',

@@ -65,7 +65,7 @@ RISK_OS_VERIFY_MODE=onchain node examples/verify-canonical-proof.mjs
 RISK_OS_VERIFY_MODE=full RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
 ```
 
-If you want a shorter reproducibility entrypoint, the public submission pack now
+If you want a shorter reproducibility entrypoint, the public repo now
 ships a minimal `package.json` with matching scripts:
 
 ```bash

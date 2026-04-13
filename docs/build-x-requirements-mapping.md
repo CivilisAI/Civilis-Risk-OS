@@ -10,7 +10,7 @@ the materials in this submission repo.
 Covered by:
 
 - [README.md](../README.md#agentic-wallet-roles-used-in-proof)
-- [docs/skills-arena-risk-os-evidence.md](skills-arena-risk-os-evidence.md)
+- [docs/canonical-proof-evidence.md](canonical-proof-evidence.md)
 
 Submission proof actors:
 
@@ -41,7 +41,7 @@ No Uniswap MVP claim is made in this snapshot.
 
 ### 3. Publish code to a public GitHub repo with a README containing the required fields
 
-This public repo is the submission pack:
+This public repo is the public reference repo:
 
 - [CivilisAI/Civilis-Risk-OS](https://github.com/CivilisAI/Civilis-Risk-OS)
 
@@ -67,8 +67,8 @@ README coverage:
 This repo prepares the materials needed for submission:
 
 - [README.md](../README.md)
-- [docs/submission-reference.md](submission-reference.md)
-- [docs/skills-arena-risk-os-evidence.md](skills-arena-risk-os-evidence.md)
+- [docs/public-reference-pack.md](public-reference-pack.md)
+- [docs/canonical-proof-evidence.md](canonical-proof-evidence.md)
 - [docs/mainnet-evidence.md](mainnet-evidence.md)
 
 ## Bonus-Point Readiness
@@ -84,10 +84,10 @@ Covered by:
 
 Covered by:
 
-- [docs/judge-demo-script.md](judge-demo-script.md)
+- [docs/demo-walkthrough.md](demo-walkthrough.md)
 - [docs/api-examples.md](api-examples.md)
 - [docs/championship-replay-mode.md](championship-replay-mode.md)
-- [docs/skills-arena-risk-os-evidence.md](skills-arena-risk-os-evidence.md)
+- [docs/canonical-proof-evidence.md](canonical-proof-evidence.md)
 - [examples/external-consumer-quickstart.mjs](../examples/external-consumer-quickstart.mjs)
 
 Current proof surfaces shown in this repo:
@@ -117,7 +117,7 @@ Covered by:
 Covered by:
 
 - [README.md](../README.md#how-the-official-stack-is-used)
-- [docs/skills-arena-risk-os-evidence.md](skills-arena-risk-os-evidence.md)
+- [docs/canonical-proof-evidence.md](canonical-proof-evidence.md)
 
 ### Clean X Layer proof environment
 

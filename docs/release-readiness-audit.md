@@ -33,8 +33,8 @@ requirements:
 
 Additional rule-mapping material:
 
-- [Skills Arena Checklist](skills-arena-checklist.md)
-- [Submission Reference](submission-reference.md)
+- [Build X Requirements Mapping](build-x-requirements-mapping.md)
+- [Public Reference Pack](public-reference-pack.md)
 - [Mainnet Evidence](mainnet-evidence.md)
 
 ## 2. Canonical Evidence Policy
@@ -120,7 +120,7 @@ replacement for the historical canonical evidence path.
 ### Current strengths
 
 - strong Onchain OS / X Layer integration story
-- public repo is now a standalone Skills Arena submission pack
+- public repo is now a standalone public reference repo for the Build X review
 - canonical actor model reflects independent Agentic Wallet roles
 - mainnet-backed protected buy, claim, resolution, and repricing are all
   evidenced
@@ -149,7 +149,7 @@ This is an acceptable boundary if we keep stating it honestly.
 
 The repo now includes several final-stage strengthening assets:
 
-- [Judge One Pager](judge-one-pager.md)
+- [Project One Pager](project-one-pager.md)
 - [Integration Checklist](integration-checklist.md)
 - [AI Skill Pack](ai-skill-pack.md)
 - [Canonical Proof Verifier](../examples/verify-canonical-proof.mjs)

@@ -24,9 +24,9 @@ function assertIncludes(text, needle, label, failures) {
 }
 
 async function main() {
-  const manifest = await readJson('submission.manifest.json');
+  const manifest = await readJson('project.manifest.json');
   const readme = await readText('README.md');
-  const onePager = await readText('docs/judge-one-pager.md');
+  const onePager = await readText('docs/project-one-pager.md');
 
   const failures = [];
 

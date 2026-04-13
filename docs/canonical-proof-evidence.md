@@ -13,7 +13,7 @@ It focuses on one narrow reference integration:
 
 It should be read together with:
 
-- [Submission Reference](submission-reference.md)
+- [Public Reference Pack](public-reference-pack.md)
 - [Mainnet Evidence](mainnet-evidence.md)
 - [Second Adapter: The Square Paywalled Intel Unlock](second-adapter-paywalled-intel-unlock.md)
 - [Protocol Boundaries](protocol-boundaries.md)

@@ -7,22 +7,22 @@ turning the whole repository into a hackathon-only artifact.
 ## Read In This Order
 
 1. [README](../README.md)
-2. [Project One Pager](judge-one-pager.md)
-3. [Canonical Proof Evidence](skills-arena-risk-os-evidence.md)
-4. [Evaluation Mapping](scorecard.md)
-5. [Release Readiness Audit](final-championship-audit.md)
+2. [Project One Pager](project-one-pager.md)
+3. [Canonical Proof Evidence](canonical-proof-evidence.md)
+4. [Evaluation Mapping](evaluation-mapping.md)
+5. [Release Readiness Audit](release-readiness-audit.md)
 
 ## Requirement Mapping
 
 - Agentic Wallet roles and proof actors:
-  [Build X Requirements Mapping](skills-arena-checklist.md)
+  [Build X Requirements Mapping](build-x-requirements-mapping.md)
 - Onchain OS stack usage:
   [README: Onchain OS Skill Usage](../README.md#onchain-os-skill-usage)
 - Project introduction, architecture, deployment addresses, mechanism, team,
   and ecosystem positioning:
   [README coverage](../README.md#repository-coverage)
 - Public machine-readable surfaces:
-  [Project Manifest](../submission.manifest.json),
+  [Project Manifest](../project.manifest.json),
   [OpenAPI Contract](../openapi/risk-os.openapi.yaml),
   [Schemas](../schemas)
 

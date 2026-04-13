@@ -274,6 +274,6 @@ Additional depth already captured in this repo:
 
 See:
 
-- [Skills Arena Evidence](skills-arena-risk-os-evidence.md)
+- [Canonical Proof Evidence](canonical-proof-evidence.md)
 - [Mainnet Evidence](mainnet-evidence.md)
 - [API Examples](api-examples.md)

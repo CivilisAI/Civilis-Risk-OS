@@ -52,17 +52,17 @@ the Build X public-repo requirement:
 
 If someone only has a minute, read in this order:
 
-1. [Project One Pager](docs/judge-one-pager.md)
+1. [Project One Pager](docs/project-one-pager.md)
 2. [Proof Surface Matrix](docs/proof-surface-matrix.md)
 3. [Replay Lanes](docs/replay-lanes.md)
 4. [External Consumer Schema](docs/external-consumer-schema.md)
 5. [External Consumer Guide](docs/external-consumer-guide.md)
 6. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
-7. [Canonical Proof Evidence](docs/skills-arena-risk-os-evidence.md)
+7. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
 8. [Mainnet Evidence](docs/mainnet-evidence.md)
-9. [Project FAQ](docs/judge-faq.md)
-10. [Release Readiness Audit](docs/final-championship-audit.md)
-11. [Project Manifest](submission.manifest.json)
+9. [Project FAQ](docs/project-faq.md)
+10. [Release Readiness Audit](docs/release-readiness-audit.md)
+11. [Project Manifest](project.manifest.json)
 12. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
 
 ## Project 30-Second Read
@@ -101,13 +101,13 @@ Quick index:
 
 - [AI Skill Pack](docs/ai-skill-pack.md)
 - [Integration Checklist](docs/integration-checklist.md)
-- [Project One Pager](docs/judge-one-pager.md)
+- [Project One Pager](docs/project-one-pager.md)
 - [Canonical Proof Verifier](examples/verify-canonical-proof.mjs)
 - minimal verifier scripts live in [`package.json`](package.json):
   `verify:canonical-docs`, `verify:canonical-api`, `verify:canonical-onchain`,
   `verify:canonical-full`, `verify:manifest`
-- [Project Manifest](submission.manifest.json)
-- [Project Manifest Verifier](examples/verify-submission-manifest.mjs)
+- [Project Manifest](project.manifest.json)
+- [Project Manifest Verifier](examples/verify-project-manifest.mjs)
 - [OpenAPI Contract](openapi/risk-os.openapi.yaml)
 - [Replay Lanes](docs/replay-lanes.md)
 - [Proof Environment Runbook](docs/proof-environment-runbook.md)
@@ -641,11 +641,11 @@ Those are future extension directions, not current public facts.
 If you are reviewing this repo for Build X specifically, start here:
 
 1. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
-2. [Build X Requirements Mapping](docs/skills-arena-checklist.md)
-3. [Canonical Proof Evidence](docs/skills-arena-risk-os-evidence.md)
-4. [Evaluation Mapping](docs/scorecard.md)
-5. [Release Readiness Audit](docs/final-championship-audit.md)
-6. [Public Reference Pack](docs/submission-reference.md)
+2. [Build X Requirements Mapping](docs/build-x-requirements-mapping.md)
+3. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
+4. [Evaluation Mapping](docs/evaluation-mapping.md)
+5. [Release Readiness Audit](docs/release-readiness-audit.md)
+6. [Public Reference Pack](docs/public-reference-pack.md)
 
 ## License
 

@@ -57,7 +57,7 @@
       "examples/external-consumer-quickstart.mjs",
       "examples/paywalled-intel-unlock-adapter.mjs",
       "examples/verify-canonical-proof.mjs",
-      "examples/verify-submission-manifest.mjs"
+      "examples/verify-project-manifest.mjs"
     ],
     "skills": [
       "skills/civilis-risk-os-canonical-replay/SKILL.md",
@@ -76,7 +76,7 @@
   "readFirst": [
     "README.md",
     "docs/build-x-reviewer-guide.md",
-    "docs/judge-one-pager.md",
+    "docs/project-one-pager.md",
     "docs/proof-surface-matrix.md",
     "docs/integration-checklist.md",
     "docs/replay-lanes.md"
