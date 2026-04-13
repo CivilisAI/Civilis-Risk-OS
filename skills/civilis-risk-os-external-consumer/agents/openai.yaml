@@ -1,0 +1,4 @@
+interface:
+  display_name: "Risk OS Consumer"
+  short_description: "Integrate another app against the Risk OS protection flow"
+  default_prompt: "Use the Civilis Risk OS external-consumer skill to map this commerce surface into buyer, seller, evaluator roles and the canonical protection flow."

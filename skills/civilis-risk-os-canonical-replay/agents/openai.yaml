@@ -1,0 +1,4 @@
+interface:
+  display_name: "Risk OS Replay"
+  short_description: "Replay the canonical protected-commerce proof path"
+  default_prompt: "Use the canonical Civilis Risk OS replay skill to restage or verify the protected-commerce loop and report only evidence-backed conclusions."

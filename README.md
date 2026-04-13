@@ -55,13 +55,14 @@ If a reviewer only has a minute, read in this order:
 4. [External Consumer Schema](docs/external-consumer-schema.md)
 5. [External Consumer Guide](docs/external-consumer-guide.md)
 6. [OnchainOS Skills Application Map](docs/onchainos-skills-application-map.md)
-7. [Submission Reference](docs/submission-reference.md)
-8. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-9. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-10. [Mainnet Evidence](docs/mainnet-evidence.md)
-11. [API Examples](docs/api-examples.md)
-12. [Championship Replay Mode](docs/championship-replay-mode.md)
-13. [Judge Demo Script](docs/judge-demo-script.md)
+7. [AI Skill Pack](docs/ai-skill-pack.md)
+8. [Submission Reference](docs/submission-reference.md)
+9. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+10. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+11. [Mainnet Evidence](docs/mainnet-evidence.md)
+12. [API Examples](docs/api-examples.md)
+13. [Championship Replay Mode](docs/championship-replay-mode.md)
+14. [Judge Demo Script](docs/judge-demo-script.md)
 
 ## Judge 30-Second Read
 
@@ -76,6 +77,27 @@ If a reviewer only reads one screen, the intended takeaway is:
   decentralized arbitration, or a captured generic buyer wallet-signature proof
 
 The rest of the repo should be read through that frame.
+
+## AI Skill Pack
+
+This repo now includes an AI-readable skill pack in the style of the official
+OKX `onchainos-skills` project.
+
+The current pack is intentionally narrow:
+
+- [civilis-risk-os-canonical-replay](skills/civilis-risk-os-canonical-replay/SKILL.md)
+- [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
+- [civilis-risk-os-proof-boundaries](skills/civilis-risk-os-proof-boundaries/SKILL.md)
+
+These skills are designed so another AI can:
+
+- replay the strongest public proof path
+- integrate another commerce surface against the Risk OS contract
+- keep claims, demos, and docs strictly evidence-backed
+
+Quick index:
+
+- [AI Skill Pack](docs/ai-skill-pack.md)
 
 ## Canonical Evidence Policy
 

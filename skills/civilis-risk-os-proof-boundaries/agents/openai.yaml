@@ -1,0 +1,4 @@
+interface:
+  display_name: "Risk OS Proof Review"
+  short_description: "Keep Risk OS claims evidence-backed and strict"
+  default_prompt: "Use the Civilis Risk OS proof-boundaries skill to classify what is canonical, historical, prepared, unverified, or not claimed before writing or reviewing submission text."

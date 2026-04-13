@@ -47,6 +47,10 @@ exactly:
 - what it could integrate next
 - what it should **not** overclaim
 
+It also shaped how this repo now packages its own reusable AI-readable skills:
+
+- [AI Skill Pack](ai-skill-pack.md)
+
 ## What Civilis Risk OS Already Uses
 
 ### 1. `okx-agentic-wallet`
