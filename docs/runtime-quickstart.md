@@ -37,9 +37,13 @@ npm run runtime -- help
 From another workspace:
 
 ```bash
-npm install github:CivilisAI/Civilis-Risk-OS
+npm install /path/to/Civilis-Risk-OS
 npx civilis-risk-os-runtime help
 ```
+
+The local clone path and a fresh local package install were both verified for
+this submission. A direct GitHub package install is left as an expected consumer
+path, not a claimed verified path.
 
 ## Fastest Demo
 

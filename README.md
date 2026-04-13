@@ -88,9 +88,13 @@ npm run runtime -- help
 Or install the package into another workspace and call the runtime directly:
 
 ```bash
-npm install github:CivilisAI/Civilis-Risk-OS
+npm install /path/to/Civilis-Risk-OS
 npx civilis-risk-os-runtime help
 ```
+
+The clone-and-run path above and a fresh local package install were both
+verified for this submission. A direct GitHub package install is a natural next
+consumer path, but it is not claimed as verified evidence here.
 
 Then the narrow runtime actions are:
 
