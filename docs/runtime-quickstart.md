@@ -37,13 +37,12 @@ npm run runtime -- help
 From another workspace:
 
 ```bash
-npm install /path/to/Civilis-Risk-OS
+npm install github:CivilisAI/Civilis-Risk-OS
 npx civilis-risk-os-runtime help
 ```
 
-The local clone path and a fresh local package install were both verified for
-this submission. A direct GitHub package install is left as an expected consumer
-path, not a claimed verified path.
+The local clone path, a fresh local package install, and a direct GitHub
+package install were all verified for this public repo.
 
 ## Fastest Demo
 
@@ -59,6 +58,8 @@ This performs:
 - runtime health
 - one live quote call
 - one structured JSON output
+- runtime auto-discovery and auto-start when a linked local Civilis workspace is
+  available
 
 Environment overrides:
 
@@ -66,59 +67,83 @@ Environment overrides:
 RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3011
 RISK_OS_DEMO_ITEM_ID=1016
 RISK_OS_DEMO_BUYER=sage
+RISK_OS_RUNTIME_ROOT=/absolute/path/to/Civilis
 ```
 
 If `RISK_OS_DEMO_ITEM_ID` is omitted, the demo automatically picks the first
 live reference item returned by the runtime.
 
+If `RISK_OS_DEMO_BASE_URL` is not reachable, the demo will try to auto-start a
+compatible runtime from:
+
+- `RISK_OS_RUNTIME_ROOT`
+- or a sibling `../Civilis` checkout if present
+
+If neither is available, the demo exits with a clear runtime discovery error
+instead of silently falling back to mock data.
+
 ## 1. Check Runtime Health
 
 ```bash
-npm run runtime -- health --base-url http://127.0.0.1:3021
+npm run runtime -- health --base-url http://127.0.0.1:3011
 ```
 
 ## 2. Quote A Listing
 
 ```bash
-npm run runtime -- quote --base-url http://127.0.0.1:3021 --item 16 --buyer sage
+npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
 ```
+
+## Command Parameter Table
+
+| Command | Required flags | Optional flags |
+| --- | --- | --- |
+| `health` | `--base-url` | none |
+| `quote` | `--base-url`, `--item`, `--buyer` | none |
+| `buy` | `--base-url`, `--item`, `--buyer`, `--quote`, `--mode` | none |
+| `purchase` | `--base-url`, `--purchase` | none |
+| `claim-proof` | `--base-url`, `--purchase`, `--reason` | `--claim-type` |
+| `claim` | `--base-url`, `--purchase`, `--reason` | `--claim-type`, `--claimant-token`, `--claimant-signature` |
+| `resolve-proof` | `--base-url`, `--claim`, `--decision`, `--reason` | none |
+| `resolve` | `--base-url`, `--claim`, `--decision`, `--reason` | `--evaluator-token`, `--evaluator-signature` |
+| `requote` | `--base-url`, `--item`, `--buyer` | none |
 
 ## 3. Create A Challengeable Protected Purchase
 
 ```bash
-npm run runtime -- buy --base-url http://127.0.0.1:3021 --item 16 --buyer sage --mode challengeable --quote 34
+npm run runtime -- buy --base-url http://127.0.0.1:3011 --item 16 --buyer sage --mode challengeable --quote 34
 ```
 
 ## 4. Inspect Protected Purchase State
 
 ```bash
-npm run runtime -- purchase --base-url http://127.0.0.1:3021 --purchase 11
+npm run runtime -- purchase --base-url http://127.0.0.1:3011 --purchase 11
 ```
 
 ## 5. Prepare And Open A Claim
 
 ```bash
-npm run runtime -- claim-proof --base-url http://127.0.0.1:3021 --purchase 11 --reason "delivery was misleading"
+npm run runtime -- claim-proof --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading"
 ```
 
 ```bash
-npm run runtime -- claim --base-url http://127.0.0.1:3021 --purchase 11 --reason "delivery was misleading" --claimant-token <token>
+npm run runtime -- claim --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading" --claimant-token <token>
 ```
 
 ## 6. Prepare And Resolve As Evaluator
 
 ```bash
-npm run runtime -- resolve-proof --base-url http://127.0.0.1:3021 --claim 10 --decision refund --reason "quality below threshold"
+npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold"
 ```
 
 ```bash
-npm run runtime -- resolve --base-url http://127.0.0.1:3021 --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token>
+npm run runtime -- resolve --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token>
 ```
 
 ## 7. Requote After Outcome
 
 ```bash
-npm run runtime -- requote --base-url http://127.0.0.1:3021 --item 16 --buyer sage
+npm run runtime -- requote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
 ```
 
 ## Why This Matters

@@ -20,7 +20,7 @@ Commands:
   requote
 
 Common flags:
-  --base-url <url>              API base URL (default: http://127.0.0.1:3020)
+  --base-url <url>              API base URL (default: http://127.0.0.1:3011)
   --item <intelItemId>          Intel item id
   --buyer <agentId>             Buyer agent id (default: sage)
   --purchase <protectedId>      Protected purchase id
@@ -36,15 +36,15 @@ Common flags:
   --json                        Reserved for explicit machine output (JSON is already the default)
 
 Examples:
-  node examples/risk-os-runtime.mjs health --base-url http://127.0.0.1:3021
-  node examples/risk-os-runtime.mjs quote --item 16 --buyer sage --base-url http://127.0.0.1:3021
-  node examples/risk-os-runtime.mjs buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url http://127.0.0.1:3021
-  node examples/risk-os-runtime.mjs claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url http://127.0.0.1:3021
-  node examples/risk-os-runtime.mjs resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url http://127.0.0.1:3021
+  node examples/risk-os-runtime.mjs health --base-url http://127.0.0.1:3011
+  node examples/risk-os-runtime.mjs quote --item 16 --buyer sage --base-url http://127.0.0.1:3011
+  node examples/risk-os-runtime.mjs buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url http://127.0.0.1:3011
+  node examples/risk-os-runtime.mjs claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url http://127.0.0.1:3011
+  node examples/risk-os-runtime.mjs resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url http://127.0.0.1:3011
 `;
 
 const DEFAULTS = {
-  baseUrl: process.env.RISK_OS_BASE_URL || 'http://127.0.0.1:3020',
+  baseUrl: process.env.RISK_OS_BASE_URL || 'http://127.0.0.1:3011',
   buyerAgentId: process.env.RISK_OS_BUYER_AGENT_ID || 'sage',
   purchaseMode: process.env.RISK_OS_PURCHASE_MODE || 'challengeable',
   claimType: process.env.RISK_OS_CLAIM_TYPE || 'misleading_or_invalid_intel',

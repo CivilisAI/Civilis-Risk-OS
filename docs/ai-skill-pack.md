@@ -12,12 +12,30 @@ The strongest path is now:
 - install the repo
 - run the runtime CLI
 - call `quote / buy / claim / resolve / requote`
-- then fall back to narrower skills for replay, proof discipline, or adapter
-  design
+- then fall back to narrower supporting skills only when the primary product
+  skill is not enough
 
 ## Included Skills
 
-### 1. `civilis-risk-os-runtime`
+### 1. `civilis-risk-os`
+
+Use when an AI needs one primary, installable Skill entry for Civilis Risk OS.
+
+It is the product-facing skill and should be the default starting point for:
+
+- install
+- runtime command discovery
+- parameter rules
+- auth selection
+- direct buyer / evaluator workflow calls
+
+Entry:
+
+- [../skills/civilis-risk-os/SKILL.md](../skills/civilis-risk-os/SKILL.md)
+- [runtime-quickstart.md](runtime-quickstart.md)
+- [runtime-tool-surface.md](runtime-tool-surface.md)
+
+### 2. Supporting: `civilis-risk-os-runtime`
 
 Use when an AI needs to:
 
@@ -32,7 +50,7 @@ Entry:
 - [runtime-quickstart.md](runtime-quickstart.md)
 - [runtime-tool-surface.md](runtime-tool-surface.md)
 
-### 2. `civilis-risk-os-canonical-replay`
+### 3. Supporting: `civilis-risk-os-canonical-replay`
 
 Use when an AI needs to:
 
@@ -45,7 +63,7 @@ Entry:
 
 - [../skills/civilis-risk-os-canonical-replay/SKILL.md](../skills/civilis-risk-os-canonical-replay/SKILL.md)
 
-### 3. `civilis-risk-os-external-consumer`
+### 4. Supporting: `civilis-risk-os-external-consumer`
 
 Use when an AI needs to:
 
@@ -58,7 +76,7 @@ Entry:
 
 - [../skills/civilis-risk-os-external-consumer/SKILL.md](../skills/civilis-risk-os-external-consumer/SKILL.md)
 
-### 4. `civilis-risk-os-proof-boundaries`
+### 5. Supporting: `civilis-risk-os-proof-boundaries`
 
 Use when an AI needs to:
 
@@ -71,7 +89,7 @@ Entry:
 
 - [../skills/civilis-risk-os-proof-boundaries/SKILL.md](../skills/civilis-risk-os-proof-boundaries/SKILL.md)
 
-### 5. `civilis-risk-os-integration-check`
+### 6. Supporting: `civilis-risk-os-integration-check`
 
 Use when an AI needs to:
 
@@ -91,11 +109,8 @@ rigorous protected-commerce workflow without re-deriving the whole project.
 
 That is why the package is now split into:
 
-- one runtime skill for direct usage
-- one skill for replay
-- one skill for integration
-- one skill for proof discipline
-- one skill for integration classification
+- one primary product skill
+- a small set of supporting skills for replay, integration, and proof discipline
 
 This mirrors the most useful lesson from the official OKX package:
 

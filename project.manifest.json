@@ -68,6 +68,7 @@
       "examples/verify-project-manifest.mjs"
     ],
     "skills": [
+      "skills/civilis-risk-os/SKILL.md",
       "skills/civilis-risk-os-runtime/SKILL.md",
       "skills/civilis-risk-os-canonical-replay/SKILL.md",
       "skills/civilis-risk-os-external-consumer/SKILL.md",
@@ -84,6 +85,7 @@
   },
   "readFirst": [
     "README.md",
+    "skills/civilis-risk-os/SKILL.md",
     "docs/project-one-pager.md",
     "docs/runtime-quickstart.md",
     "docs/external-consumer-guide.md",

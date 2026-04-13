@@ -62,13 +62,17 @@ npm run runtime -- help
 Or install the package into another workspace and call the runtime directly:
 
 ```bash
-npm install /path/to/Civilis-Risk-OS
+npm install github:CivilisAI/Civilis-Risk-OS
 npx civilis-risk-os-runtime help
 ```
 
-The clone-and-run path above and a fresh local package install were both
-verified in this public repo. A direct GitHub package install is a natural next
-consumer path, but it is not claimed as verified evidence here.
+The clone-and-run path above, a fresh local package install, and a direct
+GitHub package install were all verified in this public repo.
+
+`npm run demo` is the zero-friction check. If the configured runtime endpoint is
+not already reachable, the demo will try to auto-discover and auto-start a
+compatible local Civilis runtime through `RISK_OS_RUNTIME_ROOT` or a sibling
+`../Civilis` checkout. It never falls back to mock data.
 
 Then the narrow runtime actions are:
 
@@ -81,6 +85,20 @@ Then the narrow runtime actions are:
 - `resolve-proof`
 - `resolve`
 - `requote`
+
+### Command parameters
+
+| Command | Required flags | Optional flags |
+| --- | --- | --- |
+| `health` | `--base-url` | none |
+| `quote` | `--base-url`, `--item`, `--buyer` | none |
+| `buy` | `--base-url`, `--item`, `--buyer`, `--quote`, `--mode` | none |
+| `purchase` | `--base-url`, `--purchase` | none |
+| `claim-proof` | `--base-url`, `--purchase`, `--reason` | `--claim-type` |
+| `claim` | `--base-url`, `--purchase`, `--reason` | `--claim-type`, `--claimant-token`, `--claimant-signature` |
+| `resolve-proof` | `--base-url`, `--claim`, `--decision`, `--reason` | none |
+| `resolve` | `--base-url`, `--claim`, `--decision`, `--reason` | `--evaluator-token`, `--evaluator-signature` |
+| `requote` | `--base-url`, `--item`, `--buyer` | none |
 
 A concrete live-style example:
 
@@ -107,6 +125,7 @@ The most important shift is this:
 
 The direct entry is:
 
+- [civilis-risk-os](skills/civilis-risk-os/SKILL.md)
 - [Runtime Quickstart](docs/runtime-quickstart.md)
 - [Runtime Tool Surface](docs/runtime-tool-surface.md)
 - [Hosted Runtime Onboarding](docs/hosted-runtime-onboarding.md)
@@ -114,6 +133,10 @@ The direct entry is:
 - [`examples/risk-os-runtime.mjs`](examples/risk-os-runtime.mjs)
 
 The current package is intentionally narrow:
+
+- [civilis-risk-os](skills/civilis-risk-os/SKILL.md)
+
+Supporting skill references remain available for narrower tasks:
 
 - [civilis-risk-os-runtime](skills/civilis-risk-os-runtime/SKILL.md)
 - [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
