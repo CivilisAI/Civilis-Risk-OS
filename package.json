@@ -55,6 +55,7 @@
     "test:runtime": "node --test tests/runtime-cli.test.mjs",
     "verify:runtime": "node examples/runtime-demo.mjs && node examples/risk-os-runtime.mjs help",
     "verify:protected-loop": "RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3402 node examples/runtime-full-loop.mjs",
+    "verify:hosted-public": "node examples/verify-hosted-runtime.mjs",
     "verify:canonical-docs": "node examples/verify-canonical-proof.mjs",
     "verify:canonical-health": "RISK_OS_VERIFY_MODE=health node examples/verify-canonical-proof.mjs",
     "verify:canonical-api": "RISK_OS_VERIFY_MODE=api node examples/verify-canonical-proof.mjs",

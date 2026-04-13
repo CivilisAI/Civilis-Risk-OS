@@ -105,6 +105,10 @@ npx civilis-risk-os-runtime quote --base-url https://civilis-risk-os-runtime.ceo
 When hosted in this bundled profile, the public runtime keeps the same
 zero-friction command surface as the local bundled mode.
 
+The runtime client supports standard `HTTP_PROXY` / `HTTPS_PROXY` style
+configuration and also detects the macOS system proxy automatically for hosted
+runtime calls when needed.
+
 Current public hosted runtime:
 
 - `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
@@ -165,6 +169,12 @@ That command executes the full protected-commerce runtime path:
 
 In bundled local mode it reuses the same auto-start runtime and bundled auth as
 `npm run demo` and `npm run runtime`.
+
+The strongest public hosted acceptance check is:
+
+```bash
+npm run verify:hosted-public
+```
 
 ## Runtime Skill
 

@@ -86,6 +86,11 @@ For the public bundled hosted runtime, another AI only needs:
 The package recognizes hosted-bundled mode and supplies bundled claimant and
 evaluator auth defaults automatically.
 
+The runtime client also supports hosted access through standard proxy
+environment variables and macOS system proxy detection, so the same command
+surface works in proxy-routed environments without requiring a separate manual
+network setup step.
+
 For a custom hosted-compatible deployment, an external AI or app still needs:
 
 - `base-url`
@@ -111,3 +116,15 @@ That distinction matters:
 - public hosted production endpoint claimed in this repo: **yes**
 
 Keep that wording strict in demos and docs.
+
+## Hosted Verification
+
+This repo includes a direct public verification command:
+
+- `npm run verify:hosted-public`
+
+That command checks the published hosted runtime through:
+
+- `GET /health`
+- `POST /api/risk/quote/intel`
+- `quote -> buy -> purchase -> claim-proof -> claim -> resolve-proof -> resolve -> requote`

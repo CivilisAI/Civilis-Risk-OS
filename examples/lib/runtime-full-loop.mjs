@@ -1,4 +1,5 @@
-import { ensureRuntime, requestJson, withDefaultRuntimeAuth } from './runtime-bootstrap.mjs';
+import { ensureRuntime, withDefaultRuntimeAuth } from './runtime-bootstrap.mjs';
+import { requestJson } from './http-client.mjs';
 
 function pickString(value, fallback) {
   const normalized = String(value ?? fallback ?? '').trim();

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BUNDLED_RUNTIME_AUTH, BUNDLED_RUNTIME_BASE_URL, isLocalRuntimeUrl } from './bundled-runtime-profile.mjs';
+import { requestJson } from './http-client.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,17 +11,6 @@ const repoRoot = path.resolve(__dirname, '..', '..');
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export async function requestJson(url, init) {
-  const response = await fetch(url, init);
-  const text = await response.text();
-  const body = text ? JSON.parse(text) : null;
-  if (!response.ok) {
-    const message = body?.error || body?.message || response.statusText;
-    throw new Error(`${response.status} ${message}`);
-  }
-  return body;
 }
 
 export async function getRuntimeHealth(baseUrl) {

@@ -2,6 +2,7 @@
 
 import { ensureRuntime, withDefaultRuntimeAuth } from './lib/runtime-bootstrap.mjs';
 import { BUNDLED_RUNTIME_BASE_URL } from './lib/bundled-runtime-profile.mjs';
+import { requestJson } from './lib/http-client.mjs';
 import { runProtectedLoop } from './lib/runtime-full-loop.mjs';
 
 const HELP = `Civilis Risk OS Runtime CLI
@@ -100,15 +101,7 @@ function getString(value, fallback, label) {
 
 async function request(baseUrl, path, options = {}) {
   const normalizedBase = baseUrl.replace(/\/$/, '');
-  const response = await fetch(`${normalizedBase}${path}`, options);
-  const text = await response.text();
-  const body = text ? JSON.parse(text) : null;
-
-  if (!response.ok) {
-    throw new Error(`${response.status} ${response.statusText}: ${JSON.stringify(body)}`);
-  }
-
-  return body;
+  return requestJson(`${normalizedBase}${path}`, options);
 }
 
 async function run(command, flags) {
