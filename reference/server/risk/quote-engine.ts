@@ -88,7 +88,7 @@ export async function createIntelRiskQuote(params: RiskQuoteInput): Promise<Risk
         )
       : Promise.resolve({ count: 0, averageValue: 0, onChainCount: 0, onChainAverageValue: 0 }),
     seed.seller_token_id
-      ? validationRegistry.getProducerValidationSummary(seed.seller_token_id, { localOnly: true })
+      ? validationRegistry.getProducerValidationSummary(seed.seller_token_id)
       : Promise.resolve({
           totalValidations: 0,
           averageScore: 50,

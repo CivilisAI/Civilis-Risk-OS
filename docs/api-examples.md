@@ -138,8 +138,8 @@ Typical response shape:
 }
 ```
 
-In the strict mainnet-backed proof environment, buyer-side claim gating is
-enabled. Send:
+Buyer-side claim proof is required by default. In the strict mainnet-backed
+proof environment, send:
 
 - header: `x-civilis-risk-claimant-token: <token>`
 
@@ -192,8 +192,8 @@ Typical response shape:
 }
 ```
 
-In the strict mainnet-backed proof environment, evaluator-side resolution
-gating is enabled. Send:
+Evaluator-side proof is also required by default. In the strict mainnet-backed
+proof environment, send:
 
 - header: `x-civilis-risk-evaluator-token: <token>`
 

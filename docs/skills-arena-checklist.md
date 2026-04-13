@@ -96,6 +96,8 @@ Current proof surfaces shown in this repo:
 - buyer-side `claim-proof` message generation
 - evaluator-side `resolve-proof` message generation
 - challengeable buy / refund / release / repricing loops
+- auth-hardening replay where unauthenticated claimant access is rejected with
+  `403` and the authenticated path still completes
 
 ### X post-ready positioning
 

@@ -139,6 +139,7 @@ Use these hashes as the primary public-safe evidence set.
 - Risk OS signature-proof validation buy / funded job `1959`: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
 - Risk OS buyer claim-proof rerun buy / funded job `1960`: `0x8b0d5ffc9977b857e192a24f95fc9b7ea44b1d399bb328896f59d00fa5a9e2d1`
 - Risk OS public quickstart buy / funded job `1961`: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
+- Risk OS auth-hardening buy / funded job `1962`: `0x90d21480a595a56f51c700af86a6478cdbb3f3a5f60137eb6a377b7e4f47ad8d`
 
 ## Public Claim Boundaries
 
@@ -185,6 +186,10 @@ For claimant-side proof depth, the current additional proof is:
 For public reusable-consumer depth, the current additional proof is:
 
 - external quickstart buy: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
+
+For auth-hardening depth, the current additional proof is:
+
+- authenticated claimant rerun buy: `0x90d21480a595a56f51c700af86a6478cdbb3f3a5f60137eb6a377b7e4f47ad8d`
 
 ### Recommended `X Layer Contract or Wallet Address`
 

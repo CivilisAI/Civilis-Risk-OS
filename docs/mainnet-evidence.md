@@ -50,6 +50,7 @@ The project currently has public-safe evidence for:
 - challengeable funded purchase / on-chain job `1959`: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
 - challengeable funded purchase / on-chain job `1960`: `0x8b0d5ffc9977b857e192a24f95fc9b7ea44b1d399bb328896f59d00fa5a9e2d1`
 - challengeable funded purchase / on-chain job `1961`: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
+- challengeable funded purchase / on-chain job `1962`: `0x90d21480a595a56f51c700af86a6478cdbb3f3a5f60137eb6a377b7e4f47ad8d`
 
 ## Evidence Boundary
 
@@ -59,6 +60,7 @@ claims without overstating the current runtime:
 - arena currently proves `ERC-8183` job-anchor usage
 - intel purchase proves funded `ERC-8183` usage
 - protected intel proof currently demonstrates clean `challengeable -> claim -> refund -> repricing` and `challengeable -> claim -> release -> repricing` loops
+- auth-hardening proof currently demonstrates that an unauthenticated buyer claim is rejected with `403`, while the authenticated claimant token path still succeeds and later repricing reaches a persisted `synced` state
 - wallet-signature proof currently demonstrates the evaluator authorization path, but this repo does not yet claim a captured settlement tx hash for that specific proof loop
 - buyer-side claim-proof currently demonstrates deterministic claimant message generation on top of a mainnet-backed protected purchase, but this repo does not yet claim a captured buyer wallet signature proof loop
 - public quickstart proof currently demonstrates that a standalone external-consumer script can drive the protected buy and claim/resolution flow, but this repo does not yet claim a second generalized commerce adapter beyond the intel reference integration

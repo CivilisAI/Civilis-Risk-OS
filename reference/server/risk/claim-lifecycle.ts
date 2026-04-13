@@ -146,23 +146,16 @@ function readConfiguredToken(kind: 'claimant' | 'evaluator'): string | null {
   return trimmed ? trimmed : null;
 }
 
-function isProtectedTokenRequired(): boolean {
-  return isStrictOnchainMode() && getXLayerNetwork() === 'mainnet';
+function isAuthBypassExplicitlyAllowed(): boolean {
+  const value = process.env.RISK_OS_ALLOW_UNAUTHENTICATED_DEV?.trim().toLowerCase();
+  return value === '1' || value === 'true' || value === 'yes';
 }
 
-function assertTokenGate(kind: 'claimant' | 'evaluator', providedToken?: string | null): void {
-  const configured = readConfiguredToken(kind);
-  if (!configured && isProtectedTokenRequired()) {
-    throw new Error(`${kind} auth token is required in strict mainnet mode`);
+function isRoleProofRequired(): boolean {
+  if (isAuthBypassExplicitlyAllowed()) {
+    return false;
   }
-
-  if (!configured) {
-    return;
-  }
-
-  if (!providedToken || providedToken !== configured) {
-    throw new Error(`Invalid ${kind} auth token`);
-  }
+  return true;
 }
 
 interface ClaimResolutionContext {
@@ -174,6 +167,15 @@ interface ClaimResolutionContext {
 interface ClaimCreationContext {
   purchase: ProtectedIntelPurchaseRecord;
   claimantAddress: string;
+}
+
+interface ProtectedOutcomeRepricingContext {
+  protectedPurchaseId: number;
+  buyerAgentId: string;
+  sellerAgentId: string;
+  outcome: 'release' | 'refund';
+  claimId?: number | null;
+  requestedBy: 'claim_resolution' | 'challenge_window_worker';
 }
 
 async function loadClaimResolutionContext(claimId: number): Promise<ClaimResolutionContext> {
@@ -316,16 +318,16 @@ function assertClaimantAuthorization(params: {
     return proof;
   }
 
-  if (configuredToken && isProtectedTokenRequired()) {
-    throw new Error('A valid claimant auth token or claimant signature is required in strict mainnet mode');
+  if (configuredToken && isRoleProofRequired()) {
+    throw new Error('A valid claimant auth token or claimant signature is required');
   }
 
   if (configuredToken) {
     throw new Error('Invalid claimant auth token');
   }
 
-  if (isProtectedTokenRequired()) {
-    throw new Error('A valid claimant signature is required in strict mainnet mode when no claimant auth token is configured');
+  if (isRoleProofRequired()) {
+    throw new Error('A valid claimant signature is required when no claimant auth token is configured');
   }
 
   return proof;
@@ -368,16 +370,16 @@ function assertEvaluatorAuthorization(params: {
     return proof;
   }
 
-  if (configuredToken && isProtectedTokenRequired()) {
-    throw new Error('A valid evaluator auth token or evaluator signature is required in strict mainnet mode');
+  if (configuredToken && isRoleProofRequired()) {
+    throw new Error('A valid evaluator auth token or evaluator signature is required');
   }
 
   if (configuredToken) {
     throw new Error('Invalid evaluator auth token');
   }
 
-  if (isProtectedTokenRequired()) {
-    throw new Error('A valid evaluator signature is required in strict mainnet mode when no evaluator auth token is configured');
+  if (isRoleProofRequired()) {
+    throw new Error('A valid evaluator signature is required when no evaluator auth token is configured');
   }
 
   return proof;
@@ -426,6 +428,75 @@ async function loadSellerToken(producerAgentId: string): Promise<number | null> 
   return result.rows[0]?.erc8004_token_id ?? null;
 }
 
+async function markProtectedOutcomeRepricingQueued(context: ProtectedOutcomeRepricingContext): Promise<void> {
+  await updateProtectedIntelPurchaseRecord({
+    protectedPurchaseId: context.protectedPurchaseId,
+    metadata: {
+      repricingState: 'pending',
+      repricingOutcome: context.outcome,
+      repricingClaimId: context.claimId ?? null,
+      repricingQueuedAt: new Date().toISOString(),
+      repricingRequestedBy: context.requestedBy,
+      repricingLastError: null,
+      repricingSyncedAt: null,
+    },
+  });
+}
+
+async function syncProtectedOutcomeRepricing(context: ProtectedOutcomeRepricingContext): Promise<boolean> {
+  const sellerTokenId = await loadSellerToken(context.sellerAgentId);
+  if (!sellerTokenId) {
+    await updateProtectedIntelPurchaseRecord({
+      protectedPurchaseId: context.protectedPurchaseId,
+      metadata: {
+        repricingState: 'skipped_missing_token',
+        repricingOutcome: context.outcome,
+        repricingClaimId: context.claimId ?? null,
+        repricingRequestedBy: context.requestedBy,
+        repricingSyncedAt: new Date().toISOString(),
+        repricingLastError: null,
+      },
+    }).catch(() => undefined);
+    return false;
+  }
+
+  try {
+    await reputationRegistry.reportProtectedIntelOutcome({
+      buyerAgentId: context.buyerAgentId,
+      producerAgentId: context.sellerAgentId,
+      producerTokenId: sellerTokenId,
+      outcome: context.outcome,
+      protectedPurchaseId: context.protectedPurchaseId,
+      claimId: context.claimId ?? undefined,
+    });
+
+    await updateProtectedIntelPurchaseRecord({
+      protectedPurchaseId: context.protectedPurchaseId,
+      metadata: {
+        repricingState: 'synced',
+        repricingOutcome: context.outcome,
+        repricingClaimId: context.claimId ?? null,
+        repricingRequestedBy: context.requestedBy,
+        repricingSyncedAt: new Date().toISOString(),
+        repricingLastError: null,
+      },
+    });
+    return true;
+  } catch (error) {
+    await updateProtectedIntelPurchaseRecord({
+      protectedPurchaseId: context.protectedPurchaseId,
+      metadata: {
+        repricingState: 'error',
+        repricingOutcome: context.outcome,
+        repricingClaimId: context.claimId ?? null,
+        repricingRequestedBy: context.requestedBy,
+        repricingLastError: error instanceof Error ? error.message : String(error),
+      },
+    }).catch(() => undefined);
+    return false;
+  }
+}
+
 async function persistClaimSettlementOutcome(params: {
   claimId: number;
   protectedPurchaseId: number;
@@ -462,16 +533,23 @@ async function persistClaimSettlementOutcome(params: {
       [params.protectedPurchaseId, settlementStatus],
     );
 
-    await updateProtectedIntelPurchaseRecord({
-      protectedPurchaseId: params.protectedPurchaseId,
-      metadata: {
-        settlementOutcome,
-        settlementRequestedBy: 'claim_resolution',
-        settlementRequestedAt: new Date().toISOString(),
-        settlementLastError: null,
-        settlementFinalizedAt: new Date().toISOString(),
-      },
-    }, client);
+      await updateProtectedIntelPurchaseRecord({
+        protectedPurchaseId: params.protectedPurchaseId,
+        metadata: {
+          settlementOutcome,
+          settlementRequestedBy: 'claim_resolution',
+          settlementRequestedAt: new Date().toISOString(),
+          settlementLastError: null,
+          settlementFinalizedAt: new Date().toISOString(),
+          repricingState: 'pending',
+          repricingOutcome: settlementOutcome,
+          repricingClaimId: params.claimId,
+          repricingQueuedAt: new Date().toISOString(),
+          repricingRequestedBy: 'claim_resolution',
+          repricingLastError: null,
+          repricingSyncedAt: null,
+        },
+      }, client);
   });
 }
 
@@ -702,17 +780,14 @@ export async function resolveProtectedPurchaseClaim(params: {
     evaluatorAddress: proof.evaluatorAddress.toLowerCase(),
   });
 
-  const sellerTokenId = await loadSellerToken(purchase.sellerAgentId);
-  if (sellerTokenId) {
-    await reputationRegistry.reportProtectedIntelOutcome({
-      buyerAgentId: purchase.buyerAgentId,
-      producerAgentId: purchase.sellerAgentId,
-      producerTokenId: sellerTokenId,
-      outcome: settlementOutcome,
-      protectedPurchaseId: purchase.id,
-      claimId: claim.id,
-    });
-  }
+  await syncProtectedOutcomeRepricing({
+    protectedPurchaseId: purchase.id,
+    buyerAgentId: purchase.buyerAgentId,
+    sellerAgentId: purchase.sellerAgentId,
+    outcome: settlementOutcome,
+    claimId: claim.id,
+    requestedBy: 'claim_resolution',
+  });
 
   const view = await getProtectedIntelPurchaseView(purchase.id);
   if (!view) {
@@ -807,19 +882,24 @@ export async function runChallengeWindowReleaseCycle(): Promise<number> {
           settlementRequestedAt: new Date().toISOString(),
           settlementLastError: null,
           settlementFinalizedAt: new Date().toISOString(),
+          repricingState: 'pending',
+          repricingOutcome: 'release',
+          repricingClaimId: null,
+          repricingQueuedAt: new Date().toISOString(),
+          repricingRequestedBy: 'challenge_window_worker',
+          repricingLastError: null,
+          repricingSyncedAt: null,
         },
       });
 
-      const sellerTokenId = await loadSellerToken(row.seller_agent_id);
-      if (sellerTokenId) {
-        await reputationRegistry.reportProtectedIntelOutcome({
-          buyerAgentId: row.buyer_agent_id,
-          producerAgentId: row.seller_agent_id,
-          producerTokenId: sellerTokenId,
-          outcome: 'release',
-          protectedPurchaseId: row.id,
-        });
-      }
+      await syncProtectedOutcomeRepricing({
+        protectedPurchaseId: row.id,
+        buyerAgentId: row.buyer_agent_id,
+        sellerAgentId: row.seller_agent_id,
+        outcome: 'release',
+        claimId: null,
+        requestedBy: 'challenge_window_worker',
+      });
 
       released += 1;
     } catch (error) {
@@ -1001,17 +1081,14 @@ export async function runClaimResolutionRecoveryCycle(): Promise<number> {
         evaluatorAddress: row.evaluator_address,
       });
 
-      const sellerTokenId = await loadSellerToken(row.seller_agent_id);
-      if (sellerTokenId) {
-        await reputationRegistry.reportProtectedIntelOutcome({
-          buyerAgentId: row.buyer_agent_id,
-          producerAgentId: row.seller_agent_id,
-          producerTokenId: sellerTokenId,
-          outcome: row.decision === 'refund' ? 'refund' : 'release',
-          protectedPurchaseId: row.protected_purchase_id,
-          claimId: row.claim_id,
-        });
-      }
+      await syncProtectedOutcomeRepricing({
+        protectedPurchaseId: row.protected_purchase_id,
+        buyerAgentId: row.buyer_agent_id,
+        sellerAgentId: row.seller_agent_id,
+        outcome: row.decision === 'refund' ? 'refund' : 'release',
+        claimId: row.claim_id,
+        requestedBy: 'claim_resolution',
+      });
 
       recovered += 1;
     } catch (error) {
@@ -1026,6 +1103,52 @@ export async function runClaimResolutionRecoveryCycle(): Promise<number> {
         },
       }).catch(() => undefined);
       console.warn('[RiskOS] claim resolution recovery failed:', row.claim_id, error);
+    }
+  }
+
+  return recovered;
+}
+
+export async function runRepricingRecoveryCycle(): Promise<number> {
+  const pool = getPool();
+  const pending = await pool.query<{
+    protected_purchase_id: number;
+    buyer_agent_id: string;
+    seller_agent_id: string;
+    status: 'released' | 'refunded';
+    repricing_outcome: 'release' | 'refund' | null;
+    repricing_claim_id: string | null;
+    repricing_requested_by: 'claim_resolution' | 'challenge_window_worker' | null;
+  }>(
+    `SELECT
+       id AS protected_purchase_id,
+       buyer_agent_id,
+       seller_agent_id,
+       status,
+       NULLIF(metadata->>'repricingOutcome', '') AS repricing_outcome,
+       NULLIF(metadata->>'repricingClaimId', '') AS repricing_claim_id,
+       NULLIF(metadata->>'repricingRequestedBy', '') AS repricing_requested_by
+     FROM protected_intel_purchases
+     WHERE status IN ('released', 'refunded')
+       AND COALESCE(metadata->>'repricingState', 'pending') IN ('pending', 'error')
+     ORDER BY id ASC
+     LIMIT 20`,
+  );
+
+  let recovered = 0;
+  for (const row of pending.rows) {
+    const outcome = row.repricing_outcome ?? (row.status === 'refunded' ? 'refund' : 'release');
+    const requestedBy = row.repricing_requested_by ?? (outcome === 'refund' ? 'claim_resolution' : 'challenge_window_worker');
+    const synced = await syncProtectedOutcomeRepricing({
+      protectedPurchaseId: row.protected_purchase_id,
+      buyerAgentId: row.buyer_agent_id,
+      sellerAgentId: row.seller_agent_id,
+      outcome,
+      claimId: row.repricing_claim_id ? Number(row.repricing_claim_id) : null,
+      requestedBy,
+    });
+    if (synced) {
+      recovered += 1;
     }
   }
 

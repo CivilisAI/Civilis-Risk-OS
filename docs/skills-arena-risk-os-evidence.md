@@ -48,6 +48,10 @@ It now also includes a pure external-consumer replay:
 
 `public quickstart script -> quote -> challengeable buy -> claim-proof -> claim -> resolve-proof -> refund -> later quote repricing`
 
+And an auth-hardening replay:
+
+`quote -> challengeable buy -> unauthenticated claim rejected -> authenticated claim -> refund -> later quote repricing`
+
 ## Reference Actors
 
 The clean proof loops used the following staged submission actors:

@@ -93,16 +93,21 @@ live reference integration.
 - protected principal is routed through a challengeable `ERC-8183` path
 - claim and evaluator actions are role-gated in the strict mainnet-backed proof
   environment
+- unauthenticated claim and evaluator actions are disabled by default; a local
+  bypass requires explicit opt-in through `RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true`
 - buyer claim creation can be prepared through a deterministic `claim-proof`
   message that binds the request to the protected purchase buyer wallet
 - evaluator resolution can be authorized either through the strict proof
   environment token gate or through a wallet-bound signature over a deterministic
   resolution-proof message
+- risk quotes read mixed local + on-chain `ERC-8004` validation summaries when
+  the validation registry is configured
 - refund and release both have captured mainnet-backed proof loops
 - the public external-consumer quickstart script has been validated against the
   live proof environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
   `resolve-proof`, `resolve`, and later repricing
-- later quotes reflect prior protected outcomes
+- later quotes reflect prior protected outcomes, and the local protected
+  purchase state now records repricing sync status for recovery
 
 ### Non-goals in this submission
 
@@ -329,6 +334,11 @@ wallet-signature-bound universal auth across every role and surface, but it
 prevents the proof environment from running with anonymous claim or resolution
 actions.
 
+Outside the strict proof environment, unauthenticated role actions remain
+disabled by default. A developer must explicitly opt into a local bypass through
+`RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true`; that bypass is not part of the public
+submission claim.
+
 ## Deployment Addresses
 
 | Contract | Address |
@@ -372,7 +382,8 @@ feature.
 ## Verified Mainnet Proof
 
 This repository currently includes two clean mainnet-backed proof loops, plus a
-third wallet-signature-bound evaluator validation loop.
+third wallet-signature-bound evaluator validation loop and a fourth auth-hardening
+rerun that proves default claimant gating and repricing durability.
 
 ### Refund Loop
 
@@ -407,6 +418,20 @@ third wallet-signature-bound evaluator validation loop.
 - signature-backed resolve status: `200`
 - repriced quote id: `20`
 - seller risk: `71 -> 87`
+
+### Auth-Hardening Refund Loop
+
+- quote id: `27`
+- protected purchase id: `9`
+- local ACP job id: `11`
+- on-chain job id: `1962`
+- buy tx: `0x90d21480a595a56f51c700af86a6478cdbb3f3a5f60137eb6a377b7e4f47ad8d`
+- unauthenticated claim status: `403`
+- authenticated claim id: `8`
+- refund resolution status: `200`
+- repriced quote id: `28`
+- seller risk: `73 -> 89`
+- protected purchase metadata repricing state: `synced`
 
 The strongest current proof claim is:
 

@@ -61,6 +61,10 @@ The buyer side now has two integration paths:
 - or fetch a deterministic `claim-proof` message and sign it with the buyer
   wallet
 
+By default, one of those proof paths is required. An unauthenticated buyer claim
+is not accepted unless a developer explicitly enables
+`RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true` in a non-submission environment.
+
 Call:
 
 - `POST /api/risk/claims`
@@ -74,6 +78,9 @@ An external evaluator has two integration paths:
 - use the strict proof-environment evaluator token
 - or fetch a deterministic `resolve-proof` message and sign it with the
   evaluator wallet
+
+By default, one of those evaluator proof paths is also required. The submission
+does not rely on an open resolver endpoint.
 
 Optional preparation call:
 
@@ -116,6 +123,15 @@ environment through:
 - claim `7`
 - evaluator refund resolution
 - later quote `24`
+
+It has also been rerun after auth hardening on a fresh staged item:
+
+- quote `27`
+- challengeable protected purchase `9`
+- unauthenticated claim rejected with `403`
+- authenticated claim `8`
+- evaluator refund resolution
+- later quote `28`
 
 ## Current Scope Boundaries
 

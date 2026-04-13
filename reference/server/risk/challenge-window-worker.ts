@@ -2,6 +2,7 @@ import {
   runPendingDeliveryRecoveryCycle,
   runChallengeWindowReleaseCycle,
   runClaimResolutionRecoveryCycle,
+  runRepricingRecoveryCycle,
 } from './claim-lifecycle.js';
 
 const WORKER_INTERVAL_MS = 30_000;
@@ -13,6 +14,7 @@ async function runWorkerCycle(): Promise<void> {
   const pendingDeliveryRecovered = await runPendingDeliveryRecoveryCycle();
   const released = await runChallengeWindowReleaseCycle();
   const recovered = await runClaimResolutionRecoveryCycle();
+  const repriced = await runRepricingRecoveryCycle();
   if (pendingDeliveryRecovered > 0) {
     console.log(`[RiskOS] Recovered ${pendingDeliveryRecovered} pending-delivery protected purchase(s)`);
   }
@@ -21,6 +23,9 @@ async function runWorkerCycle(): Promise<void> {
   }
   if (recovered > 0) {
     console.log(`[RiskOS] Recovered ${recovered} claim settlement(s)`);
+  }
+  if (repriced > 0) {
+    console.log(`[RiskOS] Recovered ${repriced} protected repricing sync(s)`);
   }
 }
 
