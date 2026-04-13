@@ -1,0 +1,82 @@
+{
+  "name": "Civilis Risk OS",
+  "arena": "Skills Arena",
+  "projectType": "reusable protection skill with a live reference integration",
+  "chain": {
+    "name": "X Layer mainnet",
+    "chainId": 196
+  },
+  "referenceIntegration": "Civilis Intel Market",
+  "secondAdapter": {
+    "name": "The Square paywalled intel unlock",
+    "classification": "portability_adapter",
+    "liveMainnetSettlementProven": false
+  },
+  "officialStack": [
+    "okx-agentic-wallet",
+    "okx-x402-payment",
+    "ERC-8183",
+    "ERC-8004"
+  ],
+  "canonicalActors": {
+    "buyer": {
+      "agentId": "sage",
+      "address": "0x3dba0d4e682be54be41b48cbe9572a81d14e94c9"
+    },
+    "seller": {
+      "agentId": "fox",
+      "address": "0x4f5dc690f366116bf6bc22f29e44f8d141bf38de"
+    },
+    "evaluator": {
+      "agentId": "arbiter",
+      "address": "0x400ea2f2af2732c4e2af9fb2f8616468ad49023d"
+    }
+  },
+  "canonicalProof": {
+    "replayItemId": 16,
+    "quoteId": 34,
+    "protectedPurchaseId": 11,
+    "claimId": 10,
+    "laterQuoteId": 36,
+    "hashes": {
+      "fundedPrincipal": "0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa",
+      "deliverySubmit": "0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260",
+      "rejectRefund": "0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929"
+    }
+  },
+  "surfaces": {
+    "openapi": "openapi/risk-os.openapi.yaml",
+    "schemas": [
+      "schemas/risk-quote.response.json",
+      "schemas/protected-purchase.response.json",
+      "schemas/claim.request.json",
+      "schemas/resolve.request.json"
+    ],
+    "examples": [
+      "examples/external-consumer-quickstart.mjs",
+      "examples/paywalled-intel-unlock-adapter.mjs",
+      "examples/verify-canonical-proof.mjs",
+      "examples/verify-submission-manifest.mjs"
+    ],
+    "skills": [
+      "skills/civilis-risk-os-canonical-replay/SKILL.md",
+      "skills/civilis-risk-os-external-consumer/SKILL.md",
+      "skills/civilis-risk-os-proof-boundaries/SKILL.md",
+      "skills/civilis-risk-os-integration-check/SKILL.md"
+    ]
+  },
+  "boundaries": {
+    "genericBuyerWalletSignatureCapturedProof": false,
+    "decentralizedArbitration": false,
+    "partialRefunds": false,
+    "generalizedInsuranceProtocol": false,
+    "secondLiveMainnetSettlementLoop": false
+  },
+  "readFirst": [
+    "docs/judge-one-pager.md",
+    "docs/final-championship-audit.md",
+    "docs/proof-surface-matrix.md",
+    "docs/integration-checklist.md",
+    "docs/replay-lanes.md"
+  ]
+}
