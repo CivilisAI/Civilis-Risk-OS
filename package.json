@@ -46,6 +46,7 @@
     "demo": "node examples/runtime-demo.mjs",
     "demo:full": "RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3402 node examples/runtime-full-loop.mjs",
     "runtime:bundled": "node examples/bundled-runtime.mjs",
+    "runtime:hosted": "HOST=0.0.0.0 node examples/bundled-runtime.mjs",
     "runtime": "node examples/risk-os-runtime.mjs",
     "runtime:help": "node examples/risk-os-runtime.mjs help",
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",

@@ -44,6 +44,22 @@ That means:
 - same proof expectations
 - only `--base-url` changes
 
+## Render Web Service
+
+This repo includes a ready deployment file for Render:
+
+- [render.yaml](../render.yaml)
+
+Use these settings if you configure the service manually:
+
+- build command: `npm install`
+- start command: `npm run runtime:hosted`
+- health check path: `/health`
+- runtime: Node 20
+
+That deployment publishes the bundled runtime profile as a public hosted Skill
+surface.
+
 ## Minimal Hosted Requirements
 
 A hosted Risk OS runtime should expose:

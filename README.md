@@ -84,6 +84,28 @@ The default installable product path is therefore self-contained for local
 direct use. Hosted mode is an optional deployment surface, not a requirement
 for using the package.
 
+## Public Hosted Runtime
+
+This package also supports a hosted deployment surface for direct public use.
+
+For Render:
+
+```bash
+build command: npm install
+start command: npm run runtime:hosted
+health check: /health
+```
+
+The same runtime command surface works against the hosted URL:
+
+```bash
+npx civilis-risk-os-runtime health --base-url <public-runtime-url>
+npx civilis-risk-os-runtime quote --base-url <public-runtime-url> --item 501 --buyer sage
+```
+
+When hosted in this bundled profile, the public runtime keeps the same
+zero-friction command surface as the local bundled mode.
+
 Then the narrow runtime actions are:
 
 - `health`
