@@ -51,6 +51,18 @@ Entry:
 
 - [../skills/civilis-risk-os-proof-boundaries/SKILL.md](../skills/civilis-risk-os-proof-boundaries/SKILL.md)
 
+### 4. `civilis-risk-os-integration-check`
+
+Use when an AI needs to:
+
+- classify whether a proposed consumer is truly a live protected integration
+- distinguish quote-only consumers from portability adapters
+- identify the exact missing pieces before a new adapter is called complete
+
+Entry:
+
+- [../skills/civilis-risk-os-integration-check/SKILL.md](../skills/civilis-risk-os-integration-check/SKILL.md)
+
 ## Why This Matters
 
 The strongest long-term value of Civilis Risk OS is not only the demo UI or the
@@ -62,6 +74,7 @@ That is why the skill pack is split into:
 - one skill for replay
 - one skill for integration
 - one skill for proof discipline
+- one skill for integration classification
 
 This mirrors the most useful lesson from the official OKX package:
 

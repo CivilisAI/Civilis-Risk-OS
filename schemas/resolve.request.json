@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CivilisAI/Civilis-Risk-OS/schemas/resolve.request.json",
+  "title": "ResolveRequest",
+  "type": "object",
+  "required": ["decision", "decisionReason"],
+  "properties": {
+    "decision": { "type": "string", "enum": ["release", "refund"] },
+    "decisionReason": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}

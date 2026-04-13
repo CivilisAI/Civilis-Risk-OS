@@ -50,19 +50,24 @@ submission rules:
 If a reviewer only has a minute, read in this order:
 
 1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
-2. [Final Championship Audit](docs/final-championship-audit.md)
-3. [Proof Surface Matrix](docs/proof-surface-matrix.md)
-4. [External Consumer Schema](docs/external-consumer-schema.md)
-5. [External Consumer Guide](docs/external-consumer-guide.md)
-6. [OnchainOS Skills Application Map](docs/onchainos-skills-application-map.md)
-7. [AI Skill Pack](docs/ai-skill-pack.md)
-8. [Submission Reference](docs/submission-reference.md)
-9. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-10. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-11. [Mainnet Evidence](docs/mainnet-evidence.md)
-12. [API Examples](docs/api-examples.md)
-13. [Championship Replay Mode](docs/championship-replay-mode.md)
-14. [Judge Demo Script](docs/judge-demo-script.md)
+2. [Judge One Pager](docs/judge-one-pager.md)
+3. [Final Championship Audit](docs/final-championship-audit.md)
+4. [Proof Surface Matrix](docs/proof-surface-matrix.md)
+5. [Integration Checklist](docs/integration-checklist.md)
+6. [External Consumer Schema](docs/external-consumer-schema.md)
+7. [External Consumer Guide](docs/external-consumer-guide.md)
+8. [OnchainOS Skills Application Map](docs/onchainos-skills-application-map.md)
+9. [Security Preflight Extension](docs/security-preflight-extension.md)
+10. [Gateway Observability Extension](docs/gateway-observability-extension.md)
+11. [AI Skill Pack](docs/ai-skill-pack.md)
+12. [Submission Reference](docs/submission-reference.md)
+13. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+14. [Why The Second Adapter Matters](docs/why-second-adapter-matters.md)
+15. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+16. [Mainnet Evidence](docs/mainnet-evidence.md)
+17. [API Examples](docs/api-examples.md)
+18. [Championship Replay Mode](docs/championship-replay-mode.md)
+19. [Judge Demo Script](docs/judge-demo-script.md)
 
 ## Judge 30-Second Read
 
@@ -88,6 +93,7 @@ The current pack is intentionally narrow:
 - [civilis-risk-os-canonical-replay](skills/civilis-risk-os-canonical-replay/SKILL.md)
 - [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
 - [civilis-risk-os-proof-boundaries](skills/civilis-risk-os-proof-boundaries/SKILL.md)
+- [civilis-risk-os-integration-check](skills/civilis-risk-os-integration-check/SKILL.md)
 
 These skills are designed so another AI can:
 
@@ -98,6 +104,9 @@ These skills are designed so another AI can:
 Quick index:
 
 - [AI Skill Pack](docs/ai-skill-pack.md)
+- [Integration Checklist](docs/integration-checklist.md)
+- [Judge One Pager](docs/judge-one-pager.md)
+- [Canonical Proof Verifier](examples/verify-canonical-proof.mjs)
 
 ## Canonical Evidence Policy
 
@@ -219,6 +228,10 @@ It **does** prove something still important for Skills Arena:
 
 That is why the repo presents the second adapter as a **portability proof**,
 not as a second mainnet-proved live integration.
+
+For the shortest explanation of why it still matters, see:
+
+- [Why The Second Adapter Matters](docs/why-second-adapter-matters.md)
 
 ## Project Introduction
 

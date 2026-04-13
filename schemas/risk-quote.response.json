@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CivilisAI/Civilis-Risk-OS/schemas/risk-quote.response.json",
+  "title": "RiskQuoteResponse",
+  "type": "object",
+  "required": ["quote_id", "intel_item_id", "buyer_agent_id", "seller_agent_id", "risk_score", "recommended_mode", "premium_bps", "premium_amount", "claim_window_seconds", "reasons", "expires_at"],
+  "properties": {
+    "quote_id": { "type": "integer", "minimum": 1 },
+    "intel_item_id": { "type": "integer", "minimum": 1 },
+    "buyer_agent_id": { "type": "string", "minLength": 1 },
+    "seller_agent_id": { "type": "string", "minLength": 1 },
+    "risk_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "recommended_mode": { "type": "string", "enum": ["instant", "challengeable"] },
+    "premium_bps": { "type": "integer", "minimum": 0 },
+    "premium_amount": { "type": ["number", "string"] },
+    "claim_window_seconds": { "type": "integer", "minimum": 0 },
+    "reasons": { "type": "array", "items": { "type": "string" } },
+    "expires_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

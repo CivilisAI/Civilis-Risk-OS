@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CivilisAI/Civilis-Risk-OS/schemas/protected-purchase.response.json",
+  "title": "ProtectedPurchaseResponse",
+  "type": "object",
+  "required": ["success", "purchaseMode", "protectedPurchaseId"],
+  "properties": {
+    "success": { "type": "boolean" },
+    "purchaseMode": { "type": "string", "enum": ["instant", "challengeable"] },
+    "protectedPurchaseId": { "type": "integer", "minimum": 1 },
+    "intelPurchaseId": { "type": ["integer", "null"], "minimum": 1 },
+    "principalAcpJobId": { "type": ["integer", "null"], "minimum": 1 },
+    "challengeDeadline": { "type": ["string", "null"] },
+    "content": {}
+  },
+  "additionalProperties": true
+}

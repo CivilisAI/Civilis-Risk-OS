@@ -120,7 +120,23 @@ This is an acceptable boundary if we keep stating it honestly.
 
 ## 4. Upgrade Map Before Submission Freeze
 
-These are the highest-value remaining improvements.
+The repo now includes several final-stage strengthening assets:
+
+- [Judge One Pager](judge-one-pager.md)
+- [Integration Checklist](integration-checklist.md)
+- [AI Skill Pack](ai-skill-pack.md)
+- [Canonical Proof Verifier](../examples/verify-canonical-proof.mjs)
+- [Security Preflight Extension](security-preflight-extension.md)
+- [Gateway Observability Extension](gateway-observability-extension.md)
+
+These are intended to increase:
+
+- judge comprehension speed
+- evidence consistency
+- external integration clarity
+- future official-stack extension clarity
+
+The highest-value remaining improvements after these additions are:
 
 ### Product
 

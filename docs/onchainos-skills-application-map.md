@@ -51,6 +51,11 @@ It also shaped how this repo now packages its own reusable AI-readable skills:
 
 - [AI Skill Pack](ai-skill-pack.md)
 
+And it now anchors two explicit next-step extension documents:
+
+- [Security Preflight Extension](security-preflight-extension.md)
+- [Gateway Observability Extension](gateway-observability-extension.md)
+
 ## What Civilis Risk OS Already Uses
 
 ### 1. `okx-agentic-wallet`

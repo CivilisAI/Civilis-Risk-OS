@@ -1,0 +1,4 @@
+interface:
+  display_name: "Risk OS Integration Check"
+  short_description: "Classify whether a proposed integration is truly complete"
+  default_prompt: "Use the Civilis Risk OS integration-check skill to classify this consumer as live challengeable settlement, quote-only, portability adapter, or UNVERIFIED."

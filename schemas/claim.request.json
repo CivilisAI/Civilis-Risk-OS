@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CivilisAI/Civilis-Risk-OS/schemas/claim.request.json",
+  "title": "ClaimRequest",
+  "type": "object",
+  "required": ["protectedPurchaseId", "claimType", "reasonText"],
+  "properties": {
+    "protectedPurchaseId": { "type": "integer", "minimum": 1 },
+    "claimType": { "type": "string", "enum": ["misleading_or_invalid_intel"] },
+    "reasonText": { "type": "string", "minLength": 1 },
+    "evidence": { "type": "object" }
+  },
+  "additionalProperties": true
+}

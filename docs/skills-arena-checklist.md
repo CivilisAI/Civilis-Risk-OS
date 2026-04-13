@@ -98,6 +98,12 @@ Current proof surfaces shown in this repo:
 - auth-hardening replay where unauthenticated claimant access is rejected with
   `403` and the authenticated path still completes
 - a second lightweight reference adapter for The Square paywalled intel unlocks
+- a public canonical proof verifier script:
+  [../examples/verify-canonical-proof.mjs](../examples/verify-canonical-proof.mjs)
+- machine-readable response and request schemas:
+  [../schemas/](../schemas)
+- AI-readable reusable skill pack:
+  [ai-skill-pack.md](ai-skill-pack.md)
 
 ### X post-ready positioning
 
