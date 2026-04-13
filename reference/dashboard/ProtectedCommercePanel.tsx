@@ -23,6 +23,8 @@ import {
 const DEFAULT_CLAIM_REASON = 'The delivered intel is misleading, incomplete, or not delivered as quoted.'
 const DEFAULT_RESOLUTION_REASON = 'Evaluator reviewed the protected purchase outcome.'
 const CLAIM_TYPE = 'misleading_or_invalid_intel'
+const PROOF_BUYER_AGENT_IDS = ['oracle', 'sage']
+type WorkspaceView = 'split' | 'buyer' | 'evaluator'
 
 function getModeTone(mode: IntelProtectionPurchaseMode | undefined) {
   if (mode === 'instant') return 'emerald'
@@ -98,6 +100,7 @@ export function ProtectedCommercePanel({
   zh: boolean
 }) {
   const [buyerAgentId, setBuyerAgentId] = useState('')
+  const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('buyer')
   const [buyerOptions, setBuyerOptions] = useState<Agent[]>([])
   const [purchaseMode, setPurchaseMode] = useState<IntelProtectionPurchaseMode>('auto')
   const [quote, setQuote] = useState<IntelProtectionQuote | null>(null)
@@ -122,6 +125,7 @@ export function ProtectedCommercePanel({
 
   useEffect(() => {
     setBuyerAgentId('')
+    setWorkspaceView('buyer')
     setBuyerOptions([])
     setPurchaseMode('auto')
     setQuote(null)
@@ -147,11 +151,23 @@ export function ProtectedCommercePanel({
         const agents = await api.getAgents()
         if (cancelled) return
 
-        const options = agents.filter((agent) => agent.is_alive && agent.agent_id !== detail.item.producer_agent_id)
+        const options = agents
+          .filter((agent) => agent.is_alive && agent.agent_id !== detail.item.producer_agent_id)
+          .sort((left, right) => {
+            const leftRank = PROOF_BUYER_AGENT_IDS.indexOf(left.agent_id)
+            const rightRank = PROOF_BUYER_AGENT_IDS.indexOf(right.agent_id)
+            if (leftRank !== -1 || rightRank !== -1) {
+              return (leftRank === -1 ? Number.POSITIVE_INFINITY : leftRank)
+                - (rightRank === -1 ? Number.POSITIVE_INFINITY : rightRank)
+            }
+            return left.name.localeCompare(right.name)
+          })
         setBuyerOptions(options)
         setBuyerAgentId((current) => {
           if (current && options.some((agent) => agent.agent_id === current)) return current
-          return options[0]?.agent_id ?? ''
+          return options.find((agent) => PROOF_BUYER_AGENT_IDS.includes(agent.agent_id))?.agent_id
+            ?? options[0]?.agent_id
+            ?? ''
         })
       } catch (error) {
         if (cancelled) return
@@ -375,6 +391,8 @@ export function ProtectedCommercePanel({
   const postOutcomeQuoteLabel = claimResolved
     ? (postOutcomeQuote ? (zh ? '已刷新 post-resolution re-quote' : 'Post-resolution Re-Quote Ready') : (zh ? '可刷新 post-resolution re-quote' : 'Ready to Refresh Post-resolution Re-Quote'))
     : (zh ? '等待 claim 裁决后再刷新' : 'Waiting for claim resolution')
+  const showBuyerWorkspace = workspaceView !== 'evaluator'
+  const showEvaluatorWorkspace = workspaceView !== 'buyer'
 
   return (
     <section className="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface)] p-4">
@@ -410,7 +428,35 @@ export function ProtectedCommercePanel({
         </span>
       </div>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-[1.05fr,0.95fr]">
+      <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
+        <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+          {zh ? '工作台视角' : 'Workspace View'}
+        </span>
+        {([
+          ['split', zh ? '双视角' : 'Split'],
+          ['buyer', zh ? '仅买方' : 'Buyer Only'],
+          ['evaluator', zh ? '仅评审' : 'Evaluator Only'],
+        ] as Array<[WorkspaceView, string]>).map(([mode, label]) => {
+          const active = workspaceView === mode
+          return (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setWorkspaceView(mode)}
+              className={`rounded-full border px-3 py-1.5 font-mono text-[0.625rem] uppercase tracking-[0.18em] transition ${
+                active
+                  ? 'border-[var(--border-gold)] bg-[var(--gold-wash)] text-[var(--gold)]'
+                  : 'border-[var(--border-primary)] text-[var(--text-dim)] hover:border-[var(--border-gold)] hover:text-[var(--gold)]'
+              }`}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className={`mt-5 grid gap-4 ${showBuyerWorkspace && showEvaluatorWorkspace ? 'xl:grid-cols-[1.05fr,0.95fr]' : ''}`}>
+        {showBuyerWorkspace ? (
         <div className="space-y-4">
           <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -446,7 +492,7 @@ export function ProtectedCommercePanel({
                   <option value="">{zh ? '选择买方 Agent' : 'Select buyer agent'}</option>
                   {buyerOptions.map((agent) => (
                     <option key={agent.agent_id} value={agent.agent_id}>
-                      {agent.name} ({agent.agent_id})
+                      {agent.name} ({agent.agent_id}){PROOF_BUYER_AGENT_IDS.includes(agent.agent_id) ? (zh ? ' - 证明角色' : ' - proof actor') : ''}
                     </option>
                   ))}
                 </select>
@@ -672,7 +718,9 @@ export function ProtectedCommercePanel({
             </div>
           </div>
         </div>
+        ) : null}
 
+        {showEvaluatorWorkspace ? (
         <div className="space-y-4">
           <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -865,6 +913,7 @@ export function ProtectedCommercePanel({
             )}
           </div>
         </div>
+        ) : null}
       </div>
 
       <div className="mt-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-4">

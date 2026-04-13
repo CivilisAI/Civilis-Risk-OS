@@ -84,17 +84,24 @@ Typical response shape:
 
 ```json
 {
-  "claim": {
-    "claim_id": 3,
-    "status": "open",
-    "claim_type": "misleading_or_invalid_intel"
-  },
-  "purchase": {
-    "protected_purchase_id": 3,
-    "status": "claimed"
-  }
+  "claim_id": 3,
+  "protected_purchase_id": 3,
+  "claimant_agent_id": "oracle",
+  "claim_type": "misleading_or_invalid_intel",
+  "status": "open",
+  "reason_text": "The delivered intel did not meet the protected quality threshold.",
+  "decision": null,
+  "decision_reason": null,
+  "evaluator_address": null,
+  "created_at": "2026-04-13T16:03:44.244Z",
+  "resolved_at": null
 }
 ```
+
+In the strict mainnet-backed proof environment, buyer-side claim gating is
+enabled. Send:
+
+- header: `x-civilis-risk-claimant-token: <token>`
 
 ## 4. Resolve The Claim As The Evaluator
 
@@ -103,8 +110,7 @@ Typical response shape:
 ```json
 {
   "decision": "refund",
-  "decisionReason": "The delivered intel was not reliable enough for protected settlement.",
-  "evaluatorAddress": "0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87"
+  "decisionReason": "The delivered intel was not reliable enough for protected settlement."
 }
 ```
 
@@ -120,13 +126,17 @@ Typical response shape:
 }
 ```
 
+In the strict mainnet-backed proof environment, evaluator-side resolution
+gating is enabled. Send:
+
+- header: `x-civilis-risk-evaluator-token: <token>`
+
 Release uses the same endpoint with:
 
 ```json
 {
   "decision": "release",
-  "decisionReason": "The delivered intel met the protected quality threshold.",
-  "evaluatorAddress": "0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8d87"
+  "decisionReason": "The delivered intel met the protected quality threshold."
 }
 ```
 

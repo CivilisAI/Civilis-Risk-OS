@@ -1,4 +1,5 @@
 import {
+  runPendingDeliveryRecoveryCycle,
   runChallengeWindowReleaseCycle,
   runClaimResolutionRecoveryCycle,
 } from './claim-lifecycle.js';
@@ -9,8 +10,12 @@ let intervalHandle: NodeJS.Timeout | null = null;
 let bootstrapping: Promise<void> | null = null;
 
 async function runWorkerCycle(): Promise<void> {
+  const pendingDeliveryRecovered = await runPendingDeliveryRecoveryCycle();
   const released = await runChallengeWindowReleaseCycle();
   const recovered = await runClaimResolutionRecoveryCycle();
+  if (pendingDeliveryRecovered > 0) {
+    console.log(`[RiskOS] Recovered ${pendingDeliveryRecovered} pending-delivery protected purchase(s)`);
+  }
   if (released > 0) {
     console.log(`[RiskOS] Auto-released ${released} protected intel purchase(s)`);
   }

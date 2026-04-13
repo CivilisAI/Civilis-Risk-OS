@@ -85,6 +85,8 @@ app.get('/health', async (_req, res) => {
   const x402Configured = x402Target.kind !== 'missing';
   const paymentMode = getX402PaymentMode();
   const soulArchiveMode = getSoulArchiveMode();
+  const riskClaimantTokenConfigured = Boolean(process.env.RISK_OS_CLAIMANT_AUTH_TOKEN?.trim());
+  const riskEvaluatorTokenConfigured = Boolean(process.env.RISK_OS_EVALUATOR_AUTH_TOKEN?.trim());
 
   const resolveConfiguredSurfaceStatus = (configured: boolean): string => {
     if (!configured) {
@@ -115,6 +117,11 @@ app.get('/health', async (_req, res) => {
         : 'invalid_target'
     : 'mock';
   checks.commerce = resolveConfiguredSurfaceStatus(commerceConfigured);
+  checks.riskAuth = riskClaimantTokenConfigured && riskEvaluatorTokenConfigured
+    ? 'claimant+evaluator_token_configured'
+    : riskClaimantTokenConfigured || riskEvaluatorTokenConfigured
+      ? 'partially_configured'
+      : 'disabled';
   checks.soul = soulArchiveMode === 'onchain_mint'
     ? 'onchain_archive'
     : isSoulArchiveModeExplicit()

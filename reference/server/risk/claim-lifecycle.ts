@@ -1,4 +1,5 @@
 import { getPool, withTransaction } from '../db/postgres.js';
+import { getXLayerNetwork, isStrictOnchainMode } from '../config/xlayer.js';
 import { finalizeIntelPurchaseSettlement } from '../erc8183/hooks/intel-hook.js';
 import { reputationRegistry } from '../erc8004/reputation-registry.js';
 import {
@@ -53,8 +54,16 @@ function readConfiguredToken(kind: 'claimant' | 'evaluator'): string | null {
   return trimmed ? trimmed : null;
 }
 
+function isProtectedTokenRequired(): boolean {
+  return isStrictOnchainMode() && getXLayerNetwork() === 'mainnet';
+}
+
 function assertTokenGate(kind: 'claimant' | 'evaluator', providedToken?: string | null): void {
   const configured = readConfiguredToken(kind);
+  if (!configured && isProtectedTokenRequired()) {
+    throw new Error(`${kind} auth token is required in strict mainnet mode`);
+  }
+
   if (!configured) {
     return;
   }
@@ -492,6 +501,112 @@ export async function runChallengeWindowReleaseCycle(): Promise<number> {
   }
 
   return released;
+}
+
+export async function runPendingDeliveryRecoveryCycle(): Promise<number> {
+  const pool = getPool();
+  const pending = await pool.query<{
+    id: number;
+    intel_item_id: number;
+    seller_agent_id: string;
+    principal_acp_job_id: number | null;
+    deliverable_hash: string | null;
+  }>(
+    `SELECT id, intel_item_id, seller_agent_id, principal_acp_job_id, deliverable_hash
+     FROM protected_intel_purchases
+     WHERE status = 'pending_delivery'
+     ORDER BY created_at ASC
+     LIMIT 20`,
+  );
+
+  let recovered = 0;
+  for (const row of pending.rows) {
+    try {
+      if (row.principal_acp_job_id == null) {
+        throw new Error('Protected purchase is missing an ACP job id');
+      }
+
+      const acpResult = await pool.query<{ status: string }>(
+        'SELECT status FROM acp_jobs WHERE id = $1',
+        [row.principal_acp_job_id],
+      );
+      const acpStatus = acpResult.rows[0]?.status ?? null;
+      if (!acpStatus) {
+        throw new Error('ACP job not found for protected purchase');
+      }
+
+      if (acpStatus === 'submitted') {
+        await updateProtectedIntelPurchaseRecord({
+          protectedPurchaseId: row.id,
+          status: 'challenge_window',
+          metadata: {
+            deliverySubmissionState: 'submitted',
+            deliveryRecoveredBy: 'pending_delivery_worker',
+            deliveryRecoveredAt: new Date().toISOString(),
+            deliveryError: null,
+          },
+        });
+        recovered += 1;
+        continue;
+      }
+
+      if (acpStatus === 'completed') {
+        await updateProtectedIntelPurchaseRecord({
+          protectedPurchaseId: row.id,
+          status: 'released',
+          metadata: {
+            deliverySubmissionState: 'submitted',
+            deliveryRecoveredBy: 'pending_delivery_worker',
+            deliveryRecoveredAt: new Date().toISOString(),
+            settlementRecoveredFromAcpStatus: 'completed',
+            deliveryError: null,
+          },
+        });
+        recovered += 1;
+        continue;
+      }
+
+      if (acpStatus === 'rejected') {
+        await updateProtectedIntelPurchaseRecord({
+          protectedPurchaseId: row.id,
+          status: 'refunded',
+          metadata: {
+            deliverySubmissionState: 'submitted',
+            deliveryRecoveredBy: 'pending_delivery_worker',
+            deliveryRecoveredAt: new Date().toISOString(),
+            settlementRecoveredFromAcpStatus: 'rejected',
+            deliveryError: null,
+          },
+        });
+        recovered += 1;
+        continue;
+      }
+
+      await updateProtectedIntelPurchaseRecord({
+        protectedPurchaseId: row.id,
+        status: 'delivery_failed',
+        metadata: {
+          deliverySubmissionState: 'unrecovered',
+          deliveryRecoveredBy: 'pending_delivery_worker',
+          deliveryRecoveredAt: new Date().toISOString(),
+          deliveryError: `ACP job is still ${acpStatus}; manual replay required`,
+        },
+      });
+    } catch (error) {
+      await updateProtectedIntelPurchaseRecord({
+        protectedPurchaseId: row.id,
+        status: 'delivery_failed',
+        metadata: {
+          deliveryRecoveredBy: 'pending_delivery_worker',
+          deliveryRecoveredAt: new Date().toISOString(),
+          deliveryError: error instanceof Error ? error.message : String(error),
+        },
+      }).catch(() => undefined);
+      console.warn('[RiskOS] pending delivery recovery failed:', row.id, error);
+    }
+  }
+
+  return recovered;
 }
 
 export async function runClaimResolutionRecoveryCycle(): Promise<number> {

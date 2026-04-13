@@ -30,6 +30,78 @@ It intentionally contains only the materials needed to review this Skill:
 - **Submission claim:** a protected commerce flow for agent transactions, not a
   generalized insurance protocol
 
+## README Compliance Snapshot
+
+This README explicitly includes the fields requested by the Skills Arena
+submission rules:
+
+- **Project Introduction:** see [Project Introduction](#project-introduction)
+- **Architecture Overview:** see [Architecture Overview](#architecture-overview)
+- **Deployment Addresses:** see [Deployment Addresses](#deployment-addresses)
+- **Onchain OS Skill or Uniswap Skill Usage:** see
+  [Onchain OS Skill Usage](#onchain-os-skill-usage)
+- **Working Mechanism:** see [Working Mechanism](#working-mechanism)
+- **Team Members:** see [Team Members](#team-members)
+- **Positioning in the X Layer Ecosystem:** see
+  [Positioning in the X Layer Ecosystem](#positioning-in-the-x-layer-ecosystem)
+
+## Judge Quick Path
+
+If a reviewer only has a minute, read in this order:
+
+1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
+2. [External Consumer Guide](docs/external-consumer-guide.md)
+3. [Submission Reference](docs/submission-reference.md)
+4. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+5. [Mainnet Evidence](docs/mainnet-evidence.md)
+6. [API Examples](docs/api-examples.md)
+7. [Judge Demo Script](docs/judge-demo-script.md)
+
+## Skill Contract
+
+Civilis Risk OS is submitted as a **reusable protection Skill** with one narrow,
+live reference integration.
+
+### Inputs
+
+- buyer agent identity
+- seller agent identity
+- commerce item and price context
+- `ERC-8004` reputation and validation summaries
+- prior protected outcome history
+
+### Outputs
+
+- `risk score`
+- `recommended mode`
+- `premium`
+- `claim window`
+- `release` or `refund` resolution outcome
+- later quote repricing
+
+### Supported actions in this submission
+
+- quote a protected intel purchase
+- execute a challengeable protected purchase
+- file a buyer claim
+- resolve the claim as the evaluator
+- query the protected purchase state
+
+### Current guarantees
+
+- protected principal is routed through a challengeable `ERC-8183` path
+- claim and evaluator actions are role-gated in the strict mainnet-backed proof
+  environment
+- refund and release both have captured mainnet-backed proof loops
+- later quotes reflect prior protected outcomes
+
+### Non-goals in this submission
+
+- partial refunds
+- decentralized arbitration
+- generalized protection across every commerce surface
+- wallet-signature-bound universal evaluator auth
+
 ## Project Introduction
 
 Civilis Risk OS addresses a missing layer in agent commerce: what happens after
@@ -128,7 +200,26 @@ The route names are intel-scoped in the current working implementation. The
 reusable claim is the **protection pattern**, not that every market type is
 already generalized.
 
-## Official Stack Used
+## External Consumer Story
+
+The reference integration in this repo is Civilis Intel Market, but the skill is
+packaged so that another agent application could reuse the same pattern without
+adopting the rest of Civilis.
+
+An external consumer would:
+
+1. call `POST /api/risk/quote/intel` before settling an agent commerce action
+2. choose `instant` or `challengeable` based on the returned risk output
+3. create the protected purchase through `POST /api/intel/items/:id/buy`
+4. open a claim only if delivery quality fails the protected threshold
+5. let the evaluator resolve to `release` or `refund`
+6. reuse the next repriced quote for the same seller
+
+That is the reusable skill claim for this submission:
+
+`any agent commerce app can wrap payment with a challengeable protection loop`
+
+## Onchain OS Skill Usage
 
 Civilis Risk OS is built around the live X Layer stack and current OKX
 capabilities:
@@ -181,7 +272,13 @@ included dashboard files are a **judge-facing proof console** used to make the
 flow legible during review, not a claim that production role separation is
 already fully packaged as a standalone front-end product.
 
-## Mainnet Deployment Surfaces
+For the strict mainnet-backed proof loops in this submission, buyer-side claim
+filing and evaluator-side resolution are role-gated through dedicated Risk OS
+auth tokens. This is still weaker than wallet-signature-bound universal auth,
+but it prevents the proof environment from running with anonymous claim or
+resolution actions.
+
+## Deployment Addresses
 
 | Contract | Address |
 | --- | --- |
@@ -206,7 +303,7 @@ The clean submission proof loops use staged Agentic Wallet actors:
 These are **submission-scoped proof actors**. They do not replace the broader
 live wallet map of the original Civilis world.
 
-## X Layer Ecosystem Positioning
+## Positioning in the X Layer Ecosystem
 
 Civilis Risk OS is positioned as a reusable protection primitive inside the X
 Layer agent stack:
@@ -283,21 +380,23 @@ This repository does **not** claim:
 
 Those are future extension directions, not current submission facts.
 
-## Team
+## Team Members
 
 - `kb / CivilisAI`: product, architecture, submission direction
 - `Codex`: implementation, review, packaging, and evidence support
 
 ## Recommended Reading Order
 
-1. [PRD](specs/PRD.md)
-2. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-3. [Mainnet Evidence](docs/mainnet-evidence.md)
-4. [Submission Reference](docs/submission-reference.md)
-5. [API Examples](docs/api-examples.md)
-6. [Judge Demo Script](docs/judge-demo-script.md)
-7. [Implementation Plan](specs/IMPLEMENTATION_PLAN.md)
-8. [Reference Pack Notes](reference/README.md)
+1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
+2. [External Consumer Guide](docs/external-consumer-guide.md)
+3. [PRD](specs/PRD.md)
+4. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+5. [Mainnet Evidence](docs/mainnet-evidence.md)
+6. [Submission Reference](docs/submission-reference.md)
+7. [API Examples](docs/api-examples.md)
+8. [Judge Demo Script](docs/judge-demo-script.md)
+9. [Implementation Plan](specs/IMPLEMENTATION_PLAN.md)
+10. [Reference Pack Notes](reference/README.md)
 
 ## License
 
