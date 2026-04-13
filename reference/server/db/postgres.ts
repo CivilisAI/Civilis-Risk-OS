@@ -867,7 +867,7 @@ const MIGRATIONS = [
     buyer_agent_id TEXT NOT NULL REFERENCES agents(agent_id),
     seller_agent_id TEXT NOT NULL REFERENCES agents(agent_id),
     mode VARCHAR(20) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'challenge_window',
+    status VARCHAR(32) NOT NULL DEFAULT 'challenge_window',
     principal_amount DECIMAL(20,6) NOT NULL,
     premium_amount DECIMAL(20,6) NOT NULL DEFAULT 0,
     premium_tx_id INTEGER REFERENCES x402_transactions(id),
@@ -899,6 +899,11 @@ const MIGRATIONS = [
   )`,
   `CREATE INDEX IF NOT EXISTS idx_purchase_claims_purchase ON purchase_claims(protected_purchase_id, created_at DESC)`,
   `CREATE INDEX IF NOT EXISTS idx_purchase_claims_status ON purchase_claims(status, created_at DESC)`,
+  `DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='protected_intel_purchases' AND column_name='status') THEN
+      ALTER TABLE protected_intel_purchases ALTER COLUMN status TYPE VARCHAR(32);
+    END IF;
+  END $$`,
 
   `CREATE TABLE IF NOT EXISTS counter_intel_events (
     id SERIAL PRIMARY KEY,

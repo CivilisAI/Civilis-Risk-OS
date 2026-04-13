@@ -51,6 +51,16 @@ after delivery is submitted.
 
 ### Step 4. File a claim only if the delivery fails the protected threshold
 
+Optional preparation call:
+
+- `GET /api/risk/purchases/:id/claim-proof`
+
+The buyer side now has two integration paths:
+
+- use the strict proof-environment claimant token
+- or fetch a deterministic `claim-proof` message and sign it with the buyer
+  wallet
+
 Call:
 
 - `POST /api/risk/claims`
@@ -58,6 +68,16 @@ Call:
 This opens the evaluator-driven resolution path.
 
 ### Step 5. Resolve to `release` or `refund`
+
+An external evaluator has two integration paths:
+
+- use the strict proof-environment evaluator token
+- or fetch a deterministic `resolve-proof` message and sign it with the
+  evaluator wallet
+
+Optional preparation call:
+
+- `GET /api/risk/claims/:id/resolve-proof`
 
 Call:
 
@@ -84,6 +104,19 @@ The reusable claim is:
 - **“this is a protection primitive any agent commerce app can wrap around
   payment and delivery.”**
 
+This repo now includes a validated external-consumer quickstart script:
+
+- [../examples/external-consumer-quickstart.mjs](../examples/external-consumer-quickstart.mjs)
+
+The quickstart has already been run against the strict mainnet-backed proof
+environment through:
+
+- quote `23`
+- challengeable protected purchase `8`
+- claim `7`
+- evaluator refund resolution
+- later quote `24`
+
 ## Current Scope Boundaries
 
 This repo currently proves the pattern through one live reference integration:
@@ -95,4 +128,5 @@ It does not yet claim:
 - generalized adapters for every commerce vertical
 - partial refunds
 - decentralized arbitration
-- wallet-signature-bound universal evaluator auth
+- wallet-signature-bound universal claimant/evaluator auth across every role and
+  surface

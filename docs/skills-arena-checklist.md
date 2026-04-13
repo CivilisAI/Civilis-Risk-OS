@@ -19,6 +19,10 @@ Submission proof actors:
 - seller: `fox`
 - evaluator: ACP evaluator wallet
 
+Repro support:
+
+- [reference/server/scripts/stage-risk-os-demo.ts](../reference/server/scripts/stage-risk-os-demo.ts)
+
 ## 2. Use at least one core Onchain OS Skill or Uniswap Skill module
 
 Covered by:
@@ -83,6 +87,15 @@ Covered by:
 
 - [docs/judge-demo-script.md](judge-demo-script.md)
 - [docs/api-examples.md](api-examples.md)
+- [docs/championship-replay-mode.md](championship-replay-mode.md)
+- [docs/skills-arena-risk-os-evidence.md](skills-arena-risk-os-evidence.md)
+- [examples/external-consumer-quickstart.mjs](../examples/external-consumer-quickstart.mjs)
+
+Current proof surfaces shown in this repo:
+
+- buyer-side `claim-proof` message generation
+- evaluator-side `resolve-proof` message generation
+- challengeable buy / refund / release / repricing loops
 
 ### X post-ready positioning
 
@@ -98,13 +111,21 @@ Covered by:
 - [README.md](../README.md#how-the-official-stack-is-used)
 - [docs/skills-arena-risk-os-evidence.md](skills-arena-risk-os-evidence.md)
 
+### Clean X Layer proof environment
+
+Covered by:
+
+- [README.md](../README.md#clean-proof-environment)
+- [reference/server/scripts/stage-risk-os-demo.ts](../reference/server/scripts/stage-risk-os-demo.ts)
+
 ## Submission Boundaries
 
 This repo intentionally does **not** claim:
 
 - a generalized insurance protocol
 - decentralized arbitration
-- wallet-signature-bound universal evaluator auth
+- wallet-signature-bound universal claimant/evaluator auth across every role and
+  surface
 - generalized protection across every commerce type
 
 See:

@@ -7,6 +7,7 @@ It focuses on one narrow reference integration:
 
 - domain: `intel_purchase`
 - buyer actor: `oracle`
+- buyer actor: `sage`
 - seller actor: `fox`
 - protection mode: `challengeable`
 - evaluator path: shared ACP evaluator
@@ -34,6 +35,18 @@ The strongest current proof is now a paired mainnet-backed set that reaches:
 and
 
 `quote -> challengeable buy -> claim -> release -> later quote repricing`
+
+It also includes a stricter external-integration proof:
+
+`quote -> challengeable buy -> claim -> resolve-proof message -> evaluator wallet signature -> refund -> later quote repricing`
+
+And a buyer-side proof surface for external integrations:
+
+`quote -> challengeable buy -> claim-proof message -> claim -> evaluator resolution`
+
+It now also includes a pure external-consumer replay:
+
+`public quickstart script -> quote -> challengeable buy -> claim-proof -> claim -> resolve-proof -> refund -> later quote repricing`
 
 ## Reference Actors
 
@@ -243,6 +256,212 @@ After the release was resolved, a later quote for the same seller returned:
 This matters because it shows the release path does not erase the prior refund
 history, but it does move pricing back down after a clean successful outcome.
 
+## Wallet-Signature Evaluator Resolution Proof
+
+This third loop exists to prove that evaluator resolution is not limited to the
+server-side evaluator token in the proof environment.
+
+### 1. Risk Quote
+
+- buyer actor: `sage`
+- intel item id: `10`
+- quote id: `19`
+- seller risk score: `71`
+- recommended mode: `challengeable`
+- premium amount: `0.012500`
+
+### 2. Protected Buy
+
+- protected purchase id: `6`
+- local ACP job id: `8`
+- on-chain job id: `1959`
+- funded / submitted tx: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
+
+### 3. Claim
+
+- claim id: `5`
+- claimant: `sage`
+- claim type: `misleading_or_invalid_intel`
+
+### 4. Resolve-Proof Message
+
+The submission exposes a deterministic evaluator message through:
+
+- `GET /api/risk/claims/5/resolve-proof?decision=refund&decisionReason=signature-path-validation`
+
+The proof payload identifies:
+
+- claim id: `5`
+- protected purchase id: `6`
+- evaluator address: `0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87`
+- decision: `refund`
+
+### 5. Wallet-Bound Evaluator Resolution
+
+The returned message was signed with the ACP evaluator wallet key, and the
+signature-backed resolve request succeeded without sending the evaluator token
+header.
+
+Observed proof facts:
+
+- signing wallet: `0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87`
+- proof evaluator address: `0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87`
+- signature length: `132`
+- resolve response status: `200`
+- resolved decision: `refund`
+
+### 6. Resulting State
+
+After the signature-backed evaluator resolution:
+
+- protected purchase `6` moved to `refunded`
+- claim `5` moved to `resolved`
+- local ACP job `8` moved to `rejected`
+
+### 7. Repricing Proof
+
+After the refund outcome was written back, a later quote for the same seller
+returned:
+
+- quote id: `20`
+- seller risk score: `87`
+
+This proves that the external-integration path still feeds the same risk
+repricing loop as the core refund and release paths.
+
+## Buyer Claim-Proof Surface
+
+This fourth proof does not yet claim a captured buyer wallet signature, but it
+does prove that the submission now exposes a deterministic buyer-side
+claim-preparation surface for an external integration.
+
+### 1. Risk Quote
+
+- buyer actor: `sage`
+- intel item id: `11`
+- quote id: `21`
+- seller risk score: `72`
+- recommended mode: `challengeable`
+
+### 2. Protected Buy
+
+- protected purchase id: `7`
+- local ACP job id: `9`
+- on-chain job id: `1960`
+- funded / submitted tx: `0x8b0d5ffc9977b857e192a24f95fc9b7ea44b1d399bb328896f59d00fa5a9e2d1`
+
+### 3. Claim-Proof Message
+
+The submission now exposes:
+
+- `GET /api/risk/purchases/7/claim-proof?claimType=misleading_or_invalid_intel&reasonText=claim-proof-path`
+
+Observed proof facts:
+
+- claimant agent: `sage`
+- claimant wallet: `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9`
+- claim type: `misleading_or_invalid_intel`
+- deterministic reason hash:
+  `0xa9a34a43cec619554892b582165adb09cc16d72506c7b46ea0b2e8ed46ed3f46`
+
+### 4. Claim Creation Regression Check
+
+After the claim-proof surface was added, the strict token-gated claimant path
+still succeeded for the same protected purchase:
+
+- claim id: `6`
+- protected purchase id: `7`
+- claim type: `misleading_or_invalid_intel`
+- claimant: `sage`
+
+This matters because it shows the new buyer-side proof surface did not break the
+existing strict proof environment.
+
+## Public External-Consumer Quickstart Proof
+
+This fifth proof uses the standalone public script:
+
+- `examples/external-consumer-quickstart.mjs`
+
+It demonstrates that another agent application can drive the protected-commerce
+loop without using the Civilis dashboard.
+
+### 1. Quote
+
+The public quickstart script was run with:
+
+- `RISK_OS_ACTION=quote`
+- `RISK_OS_INTEL_ITEM_ID=12`
+- `RISK_OS_BUYER_AGENT_ID=sage`
+
+Observed result:
+
+- quote id: `22`
+- seller risk score: `72`
+- recommended mode: `challengeable`
+
+### 2. Challengeable Buy
+
+The same quickstart script was then run with:
+
+- `RISK_OS_ACTION=quote-buy`
+
+Observed result:
+
+- quote id: `23`
+- protected purchase id: `8`
+- local ACP job id: `10`
+- on-chain job id: `1961`
+- funded / submitted tx: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
+
+### 3. Buyer Claim-Proof
+
+The same public script was then used to fetch:
+
+- `RISK_OS_ACTION=claim-proof`
+
+Observed result:
+
+- protected purchase id: `8`
+- claimant agent: `sage`
+- claimant wallet: `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9`
+- reason hash:
+  `0x068f1edde1221da1ace9f3c24a0d55f0b63f3269f1c100020ebb557b7dae71ad`
+
+### 4. Claim
+
+The same public quickstart script then filed the claim with the strict proof
+environment claimant token:
+
+- claim id: `7`
+- protected purchase id: `8`
+- claimant agent: `sage`
+
+### 5. Resolve-Proof And Refund Resolution
+
+The same public quickstart script then fetched:
+
+- evaluator resolve-proof for claim `7`
+
+and completed a refund resolution through the evaluator token path.
+
+Observed result:
+
+- claim id: `7`
+- decision: `refund`
+- claim status: `resolved`
+
+### 6. Later Quote Repricing
+
+After the public quickstart refund loop completed, a later quote returned:
+
+- quote id: `24`
+- seller risk score: `88`
+
+and the reasons now include:
+
+- `seller_claim_refund_rate_elevated`
+
 ## Local Persistence Proof
 
 After the refund path completed:
@@ -266,6 +485,7 @@ This document supports these claims:
 
 - challengeable protected intel purchases are implemented
 - clean refund and release paths have mainnet-backed proof
+- evaluator resolution can also be driven through a deterministic wallet-signature proof path
 - resolved refund and release outcomes both change later pricing
 
 This document does **not** support stronger claims such as:
@@ -274,7 +494,7 @@ This document does **not** support stronger claims such as:
 - partial refunds
 - decentralized arbitration
 - premium-backed underwriting reserves
-- a fully wallet-signature-bound evaluator authorization model
+- a fully universal wallet-signature authorization model across every role and surface
 
 ## Recommended Public Citation Pair
 

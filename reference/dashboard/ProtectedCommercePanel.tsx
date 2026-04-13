@@ -6,6 +6,7 @@ import {
   type Agent,
   type IntelItemV2Detail,
   type IntelProtectionDecision,
+  type IntelProtectionResolutionProof,
   type IntelProtectionPurchaseMode,
   type IntelProtectionQuote,
   type IntelProtectedPurchase,
@@ -110,17 +111,21 @@ export function ProtectedCommercePanel({
   const [resolutionReason, setResolutionReason] = useState(DEFAULT_RESOLUTION_REASON)
   const [claimantToken, setClaimantToken] = useState('')
   const [evaluatorToken, setEvaluatorToken] = useState('')
+  const [evaluatorSignature, setEvaluatorSignature] = useState('')
+  const [resolutionProof, setResolutionProof] = useState<IntelProtectionResolutionProof | null>(null)
   const [quoteLoading, setQuoteLoading] = useState(false)
   const [postOutcomeQuoteLoading, setPostOutcomeQuoteLoading] = useState(false)
   const [purchaseLoading, setPurchaseLoading] = useState(false)
   const [statusLoading, setStatusLoading] = useState(false)
   const [claimLoading, setClaimLoading] = useState(false)
   const [resolveLoading, setResolveLoading] = useState(false)
+  const [resolutionProofLoading, setResolutionProofLoading] = useState(false)
   const [quoteError, setQuoteError] = useState<string | null>(null)
   const [postOutcomeQuoteError, setPostOutcomeQuoteError] = useState<string | null>(null)
   const [purchaseError, setPurchaseError] = useState<string | null>(null)
   const [statusError, setStatusError] = useState<string | null>(null)
   const [claimError, setClaimError] = useState<string | null>(null)
+  const [resolutionProofError, setResolutionProofError] = useState<string | null>(null)
   const [agentLoadError, setAgentLoadError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -135,11 +140,14 @@ export function ProtectedCommercePanel({
     setResolutionReason(DEFAULT_RESOLUTION_REASON)
     setClaimantToken('')
     setEvaluatorToken('')
+    setEvaluatorSignature('')
+    setResolutionProof(null)
     setQuoteError(null)
     setPostOutcomeQuoteError(null)
     setPurchaseError(null)
     setStatusError(null)
     setClaimError(null)
+    setResolutionProofError(null)
     setAgentLoadError(null)
   }, [detail.item.id])
 
@@ -162,11 +170,13 @@ export function ProtectedCommercePanel({
             }
             return left.name.localeCompare(right.name)
           })
-        setBuyerOptions(options)
+        const proofScopedOptions = options.filter((agent) => PROOF_BUYER_AGENT_IDS.includes(agent.agent_id))
+        const activeOptions = proofScopedOptions.length > 0 ? proofScopedOptions : options
+        setBuyerOptions(activeOptions)
         setBuyerAgentId((current) => {
-          if (current && options.some((agent) => agent.agent_id === current)) return current
-          return options.find((agent) => PROOF_BUYER_AGENT_IDS.includes(agent.agent_id))?.agent_id
-            ?? options[0]?.agent_id
+          if (current && activeOptions.some((agent) => agent.agent_id === current)) return current
+          return activeOptions.find((agent) => PROOF_BUYER_AGENT_IDS.includes(agent.agent_id))?.agent_id
+            ?? activeOptions[0]?.agent_id
             ?? ''
         })
       } catch (error) {
@@ -212,9 +222,10 @@ export function ProtectedCommercePanel({
 
     try {
       const nextQuote = await fetchQuote(setQuoteError)
-      if (!nextQuote) return
+      if (!nextQuote) return null
       setQuote(nextQuote)
       setPostOutcomeQuote(null)
+      return nextQuote
     } finally {
       setQuoteLoading(false)
     }
@@ -349,7 +360,7 @@ export function ProtectedCommercePanel({
       const nextClaim = await api.resolveIntelProtectionClaim(purchase.claim.claim_id, {
         decision,
         decisionReason: resolutionReason.trim() || DEFAULT_RESOLUTION_REASON,
-      }, evaluatorToken.trim() || undefined)
+      }, evaluatorToken.trim() || undefined, evaluatorSignature.trim() || undefined)
       setPurchase((current) => current ? { ...current, claim: nextClaim } : current)
       const latestPurchase = await api.getIntelProtectedPurchase(purchase.protected_purchase_id)
       setPurchase(latestPurchase)
@@ -359,6 +370,29 @@ export function ProtectedCommercePanel({
       setClaimError(message)
     } finally {
       setResolveLoading(false)
+    }
+  }
+
+  async function previewResolutionProof(decision: IntelProtectionDecision) {
+    if (!purchase?.claim?.claim_id) {
+      setResolutionProofError(zh ? '先生成 claim，再预览 evaluator proof。' : 'Create a claim before previewing evaluator proof.')
+      return
+    }
+
+    setResolutionProofLoading(true)
+    setResolutionProofError(null)
+
+    try {
+      const proof = await api.getIntelProtectionResolutionProof(purchase.claim.claim_id, {
+        decision,
+        decisionReason: resolutionReason.trim() || DEFAULT_RESOLUTION_REASON,
+      })
+      setResolutionProof(proof)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : zh ? '加载 evaluator proof 失败。' : 'Failed to load evaluator proof.'
+      setResolutionProofError(message)
+    } finally {
+      setResolutionProofLoading(false)
     }
   }
 
@@ -385,6 +419,7 @@ export function ProtectedCommercePanel({
         decision: 'release',
         decisionReason: resolutionReason.trim() || DEFAULT_RESOLUTION_REASON,
         evaluatorToken: evaluatorToken ? 'provided' : 'required_if_server_gate_enabled',
+        evaluatorSignature: evaluatorSignature ? 'provided' : 'optional_if_using_wallet_signature',
       }
     : null
   const currentQuoteLabel = quote ? (zh ? '当前 quote' : 'Current Quote') : (zh ? '尚未生成 quote' : 'No current quote yet')
@@ -890,6 +925,8 @@ export function ProtectedCommercePanel({
                       evaluatorAddress: purchase?.evaluator_address ?? null,
                       decision: 'release',
                       decisionReason: resolutionReason.trim() || DEFAULT_RESOLUTION_REASON,
+                      evaluatorToken: evaluatorToken ? 'provided' : 'required_if_server_gate_enabled',
+                      evaluatorSignature: evaluatorSignature ? 'provided' : 'optional_if_using_wallet_signature',
                     })}
                   </pre>
                 </div>
@@ -909,6 +946,60 @@ export function ProtectedCommercePanel({
                   </label>
 
                   <div className="mt-3 h-px bg-[var(--border-primary)]" />
+
+                  <label className="mt-3 block">
+                    <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                      {zh ? 'Evaluator Signature（可选）' : 'Evaluator Signature (Optional)'}
+                    </span>
+                    <textarea
+                      className="textarea mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
+                      value={evaluatorSignature}
+                      onChange={(event) => setEvaluatorSignature(event.target.value)}
+                      placeholder={zh ? '如果外部接入方使用钱包签名，这里粘贴 evaluator 签名。' : 'Paste the evaluator signature here when using wallet-bound proof.'}
+                    />
+                  </label>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void previewResolutionProof('release')}
+                      disabled={resolutionProofLoading || !purchase?.claim?.claim_id}
+                      className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {resolutionProofLoading ? (zh ? '生成中…' : 'Preparing…') : (zh ? '预览 Release 签名消息' : 'Preview Release Proof')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void previewResolutionProof('refund')}
+                      disabled={resolutionProofLoading || !purchase?.claim?.claim_id}
+                      className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {resolutionProofLoading ? (zh ? '生成中…' : 'Preparing…') : (zh ? '预览 Refund 签名消息' : 'Preview Refund Proof')}
+                    </button>
+                  </div>
+
+                  {resolutionProofError ? <NoticeBanner title={zh ? 'Proof 错误' : 'Proof Error'} message={resolutionProofError} tone="warning" /> : null}
+
+                  {resolutionProof ? (
+                    <div className="mt-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                          {zh ? '可签名的裁决消息' : 'Signable Resolution Proof'}
+                        </p>
+                        <span className="font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
+                          {labelDecision(resolutionProof.decision, zh)}
+                        </span>
+                      </div>
+                      <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--surface)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
+                        {resolutionProof.message}
+                      </pre>
+                      <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
+                        {zh
+                          ? '如果不用 evaluator token，外部接入方可以先签这条消息，再把签名随裁决请求一起提交。'
+                          : 'If an external integrator does not use an evaluator token, they can sign this message and attach the signature to the resolution request.'}
+                      </p>
+                    </div>
+                  ) : null}
 
                   <label className="block">
                     <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
@@ -950,8 +1041,8 @@ export function ProtectedCommercePanel({
 
                   <p className="mt-3 text-xs leading-6 text-[var(--text-secondary)]">
                     {zh
-                      ? '这里仅应由 ACP 中配置的 evaluator 操作；若服务端启用了 evaluator 令牌门控，还需要提供该令牌。买方在左侧发 claim，裁决和重定价在这里完成。'
-                      : 'Only the evaluator configured in ACP should act here; if the server enables evaluator-token gating, that token is also required. The buyer files the claim on the left, and resolution plus repricing happens here.'}
+                      ? '这里仅应由 ACP 中配置的 evaluator 操作；严格证明环境可继续使用 evaluator token，更通用的接入方则可以切到 evaluator 钱包签名模式。买方在左侧发 claim，裁决和重定价在这里完成。'
+                      : 'Only the evaluator configured in ACP should act here. The strict proof environment can continue using an evaluator token, while more general integrations can switch to a wallet-bound evaluator signature. The buyer files the claim on the left, and resolution plus repricing happens here.'}
                   </p>
                 </div>
               </div>

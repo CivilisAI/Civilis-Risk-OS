@@ -38,6 +38,11 @@ The reusable Skill claim in this repo is anchored in the protected-commerce API
 surface and orchestration logic, not in a claim that a fully generalized
 multi-role front-end package is already complete.
 
+For a non-dashboard consumer path, see:
+
+- [`../examples/external-consumer-quickstart.mjs`](../examples/external-consumer-quickstart.mjs)
+- [`../docs/championship-replay-mode.md`](../docs/championship-replay-mode.md)
+
 Reviewers should treat these files as the extracted implementation evidence for
 the submission claim:
 

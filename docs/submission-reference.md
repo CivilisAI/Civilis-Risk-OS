@@ -136,6 +136,9 @@ Use these hashes as the primary public-safe evidence set.
 - Risk OS reject + refund / same job `1955`: `0x0d943594e006228b83f2fc45fdab1f6322e36ee1e6143d593f6c6b63b5175263`
 - Risk OS challengeable buy / funded job `1956`: `0x092af96f5cd02bd7690103b0dbbd5681b6057dc7ec7ed5b34bc3d854ab324535`
 - Risk OS complete + release / same job `1956`: `0x3d6a7cc98592ff9b814dc315fd23458998c54b2a89795c7ad1f26939b85f5d1c`
+- Risk OS signature-proof validation buy / funded job `1959`: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
+- Risk OS buyer claim-proof rerun buy / funded job `1960`: `0x8b0d5ffc9977b857e192a24f95fc9b7ea44b1d399bb328896f59d00fa5a9e2d1`
+- Risk OS public quickstart buy / funded job `1961`: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
 
 ## Public Claim Boundaries
 
@@ -170,6 +173,18 @@ The strongest expanded quartet is:
 - protected refund: `0x0d943594e006228b83f2fc45fdab1f6322e36ee1e6143d593f6c6b63b5175263`
 - protected buy / release loop: `0x092af96f5cd02bd7690103b0dbbd5681b6057dc7ec7ed5b34bc3d854ab324535`
 - protected release: `0x3d6a7cc98592ff9b814dc315fd23458998c54b2a89795c7ad1f26939b85f5d1c`
+
+For evaluator-auth depth, the current additional proof is:
+
+- signature-proof validation buy: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
+
+For claimant-side proof depth, the current additional proof is:
+
+- buyer claim-proof rerun buy: `0x8b0d5ffc9977b857e192a24f95fc9b7ea44b1d399bb328896f59d00fa5a9e2d1`
+
+For public reusable-consumer depth, the current additional proof is:
+
+- external quickstart buy: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
 
 ### Recommended `X Layer Contract or Wallet Address`
 

@@ -1161,6 +1161,26 @@ export interface IntelProtectionClaim {
   resolved_at?: string | null
 }
 
+export interface IntelProtectionClaimProof {
+  protected_purchase_id: number
+  claimant_agent_id: string
+  claimant_address: string
+  claim_type: string
+  reason_text: string
+  reason_text_hash: string
+  message: string
+}
+
+export interface IntelProtectionResolutionProof {
+  claim_id: number
+  protected_purchase_id: number
+  evaluator_address: string
+  decision: IntelProtectionDecision
+  decision_reason: string
+  decision_reason_hash: string
+  message: string
+}
+
 export interface IntelProtectedPurchase {
   protected_purchase_id: number | null
   quote_id: number | null
@@ -1556,12 +1576,23 @@ export const api = {
     claimType: string
     reasonText: string
     evidence?: Record<string, unknown>
-  }, claimantAuthToken?: string) =>
+  }, claimantAuthToken?: string, claimantSignature?: string) =>
     postJSON<IntelProtectionClaim>(
       '/api/risk/claims',
       body,
-      claimantAuthToken ? { 'x-civilis-risk-claimant-token': claimantAuthToken } : undefined,
+      {
+        ...(claimantAuthToken ? { 'x-civilis-risk-claimant-token': claimantAuthToken } : {}),
+        ...(claimantSignature ? { 'x-civilis-risk-claimant-signature': claimantSignature } : {}),
+      },
     ),
+  getIntelProtectionClaimProof: (
+    protectedPurchaseId: number,
+    params: {
+      claimType: string
+      reasonText?: string
+    },
+  ) =>
+    getJSON<IntelProtectionClaimProof>(`/api/risk/purchases/${protectedPurchaseId}/claim-proof`, params),
   resolveIntelProtectionClaim: (
     claimId: number,
     body: {
@@ -1569,12 +1600,24 @@ export const api = {
       decisionReason: string
     },
     evaluatorAuthToken?: string,
+    evaluatorSignature?: string,
   ) =>
     postJSON<IntelProtectionClaim>(
       `/api/risk/claims/${claimId}/resolve`,
       body,
-      evaluatorAuthToken ? { 'x-civilis-risk-evaluator-token': evaluatorAuthToken } : undefined,
+      {
+        ...(evaluatorAuthToken ? { 'x-civilis-risk-evaluator-token': evaluatorAuthToken } : {}),
+        ...(evaluatorSignature ? { 'x-civilis-risk-evaluator-signature': evaluatorSignature } : {}),
+      },
     ),
+  getIntelProtectionResolutionProof: (
+    claimId: number,
+    params: {
+      decision: IntelProtectionDecision
+      decisionReason?: string
+    },
+  ) =>
+    getJSON<IntelProtectionResolutionProof>(`/api/risk/claims/${claimId}/resolve-proof`, params),
   // ── Fate Knowledge Map ──
   getFateKnowledgeMap: (agentId: string, viewerId?: string) =>
     getJSON<FateKnowledgeMap>(`/api/fate/${agentId}/knowledge-map`, viewerId ? { viewerId } : undefined),

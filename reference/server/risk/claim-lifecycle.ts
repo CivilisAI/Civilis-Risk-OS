@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { getPool, withTransaction } from '../db/postgres.js';
 import { getXLayerNetwork, isStrictOnchainMode } from '../config/xlayer.js';
 import { finalizeIntelPurchaseSettlement } from '../erc8183/hooks/intel-hook.js';
@@ -10,6 +11,7 @@ import {
 import type {
   ClaimDecision,
   ClaimType,
+  ProtectedIntelPurchaseRecord,
   ProtectedIntelPurchaseView,
   PurchaseClaimRecord,
 } from './risk-types.js';
@@ -29,6 +31,26 @@ interface ClaimRow {
   created_at: string;
 }
 
+export interface EvaluatorResolutionProof {
+  claimId: number;
+  protectedPurchaseId: number;
+  evaluatorAddress: string;
+  decision: ClaimDecision;
+  decisionReason: string;
+  decisionReasonHash: string;
+  message: string;
+}
+
+export interface ClaimCreationProof {
+  protectedPurchaseId: number;
+  claimantAgentId: string;
+  claimantAddress: string;
+  claimType: ClaimType;
+  reasonText: string;
+  reasonTextHash: string;
+  message: string;
+}
+
 function mapClaimRow(row: ClaimRow): PurchaseClaimRecord {
   return {
     id: row.id,
@@ -43,6 +65,76 @@ function mapClaimRow(row: ClaimRow): PurchaseClaimRecord {
     evaluatorAddress: row.evaluator_address,
     resolvedAt: row.resolved_at,
     createdAt: row.created_at,
+  };
+}
+
+function normalizeDecisionReason(value?: string | null): string {
+  return value?.trim() ?? '';
+}
+
+function normalizeClaimReason(value?: string | null): string {
+  return value?.trim() ?? '';
+}
+
+export function buildEvaluatorResolutionProof(params: {
+  claimId: number;
+  protectedPurchaseId: number;
+  evaluatorAddress: string;
+  decision: ClaimDecision;
+  decisionReason?: string | null;
+}): EvaluatorResolutionProof {
+  const evaluatorAddress = ethers.getAddress(params.evaluatorAddress);
+  const decisionReason = normalizeDecisionReason(params.decisionReason);
+  const decisionReasonHash = ethers.id(decisionReason || 'NO_REASON');
+  const message = [
+    'Civilis Risk OS Evaluator Resolution',
+    `claimId:${params.claimId}`,
+    `protectedPurchaseId:${params.protectedPurchaseId}`,
+    `decision:${params.decision}`,
+    `decisionReasonHash:${decisionReasonHash}`,
+    `evaluator:${evaluatorAddress}`,
+    'chainId:196',
+  ].join('\n');
+
+  return {
+    claimId: params.claimId,
+    protectedPurchaseId: params.protectedPurchaseId,
+    evaluatorAddress,
+    decision: params.decision,
+    decisionReason,
+    decisionReasonHash,
+    message,
+  };
+}
+
+export function buildClaimCreationProof(params: {
+  protectedPurchaseId: number;
+  claimantAgentId: string;
+  claimantAddress: string;
+  claimType: ClaimType;
+  reasonText?: string | null;
+}): ClaimCreationProof {
+  const claimantAddress = ethers.getAddress(params.claimantAddress);
+  const reasonText = normalizeClaimReason(params.reasonText);
+  const reasonTextHash = ethers.id(reasonText || 'NO_REASON');
+  const message = [
+    'Civilis Risk OS Claim Creation',
+    `protectedPurchaseId:${params.protectedPurchaseId}`,
+    `claimantAgentId:${params.claimantAgentId}`,
+    `claimant:${claimantAddress}`,
+    `claimType:${params.claimType}`,
+    `reasonTextHash:${reasonTextHash}`,
+    'chainId:196',
+  ].join('\n');
+
+  return {
+    protectedPurchaseId: params.protectedPurchaseId,
+    claimantAgentId: params.claimantAgentId,
+    claimantAddress,
+    claimType: params.claimType,
+    reasonText,
+    reasonTextHash,
+    message,
   };
 }
 
@@ -71,6 +163,258 @@ function assertTokenGate(kind: 'claimant' | 'evaluator', providedToken?: string 
   if (!providedToken || providedToken !== configured) {
     throw new Error(`Invalid ${kind} auth token`);
   }
+}
+
+interface ClaimResolutionContext {
+  claim: PurchaseClaimRecord;
+  purchase: ProtectedIntelPurchaseRecord;
+  configuredEvaluatorAddress: string;
+}
+
+interface ClaimCreationContext {
+  purchase: ProtectedIntelPurchaseRecord;
+  claimantAddress: string;
+}
+
+async function loadClaimResolutionContext(claimId: number): Promise<ClaimResolutionContext> {
+  const pool = getPool();
+  const claimResult = await pool.query<ClaimRow>(
+    'SELECT * FROM purchase_claims WHERE id = $1',
+    [claimId],
+  );
+
+  if (claimResult.rows.length === 0) {
+    throw new Error('Claim not found');
+  }
+
+  const claim = mapClaimRow(claimResult.rows[0]);
+  const purchase = await getProtectedIntelPurchaseRecord(claim.protectedPurchaseId);
+  if (!purchase) {
+    throw new Error('Protected purchase not found');
+  }
+
+  const acpJobResult = await pool.query<{ evaluator_address: string }>(
+    `SELECT evaluator_address
+     FROM acp_jobs
+     WHERE id = $1`,
+    [purchase.principalAcpJobId ?? null],
+  );
+  const configuredEvaluatorAddress = acpJobResult.rows[0]?.evaluator_address?.toLowerCase() ?? null;
+
+  if (!configuredEvaluatorAddress) {
+    throw new Error('Protected purchase is missing an evaluator address');
+  }
+
+  return {
+    claim,
+    purchase,
+    configuredEvaluatorAddress,
+  };
+}
+
+async function loadClaimCreationContext(protectedPurchaseId: number): Promise<ClaimCreationContext> {
+  const purchase = await getProtectedIntelPurchaseRecord(protectedPurchaseId);
+  if (!purchase) {
+    throw new Error('Protected purchase not found');
+  }
+
+  const pool = getPool();
+  const buyerResult = await pool.query<{ wallet_address: string | null }>(
+    `SELECT wallet_address
+     FROM agents
+     WHERE agent_id = $1`,
+    [purchase.buyerAgentId],
+  );
+
+  const claimantAddress = buyerResult.rows[0]?.wallet_address;
+  if (!claimantAddress) {
+    throw new Error('Protected purchase buyer is missing a wallet address');
+  }
+
+  return {
+    purchase,
+    claimantAddress,
+  };
+}
+
+function verifyEvaluatorSignature(params: {
+  signature?: string | null;
+  configuredEvaluatorAddress: string;
+  proof: EvaluatorResolutionProof;
+}): void {
+  if (!params.signature) {
+    throw new Error('A valid evaluator signature is required when no evaluator auth token is supplied');
+  }
+
+  let recoveredAddress: string;
+  try {
+    recoveredAddress = ethers.verifyMessage(params.proof.message, params.signature).toLowerCase();
+  } catch (error) {
+    throw new Error(`Invalid evaluator signature: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  if (recoveredAddress !== params.configuredEvaluatorAddress) {
+    throw new Error('Evaluator signature does not match the configured evaluator address');
+  }
+}
+
+function verifyClaimantSignature(params: {
+  signature?: string | null;
+  claimantAddress: string;
+  proof: ClaimCreationProof;
+}): void {
+  if (!params.signature) {
+    throw new Error('A valid claimant signature is required when no claimant auth token is supplied');
+  }
+
+  let recoveredAddress: string;
+  try {
+    recoveredAddress = ethers.verifyMessage(params.proof.message, params.signature).toLowerCase();
+  } catch (error) {
+    throw new Error(`Invalid claimant signature: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  if (recoveredAddress !== params.claimantAddress.toLowerCase()) {
+    throw new Error('Claimant signature does not match the protected purchase buyer wallet');
+  }
+}
+
+function assertClaimantAuthorization(params: {
+  protectedPurchaseId: number;
+  claimantAgentId: string;
+  claimantAddress: string;
+  claimType: ClaimType;
+  reasonText?: string | null;
+  claimantAuthToken?: string | null;
+  claimantSignature?: string | null;
+}): ClaimCreationProof {
+  const proof = buildClaimCreationProof({
+    protectedPurchaseId: params.protectedPurchaseId,
+    claimantAgentId: params.claimantAgentId,
+    claimantAddress: params.claimantAddress,
+    claimType: params.claimType,
+    reasonText: params.reasonText,
+  });
+  const configuredToken = readConfiguredToken('claimant');
+  const hasMatchingToken = Boolean(
+    configuredToken &&
+    params.claimantAuthToken &&
+    params.claimantAuthToken === configuredToken,
+  );
+  const hasSignature = Boolean(params.claimantSignature?.trim());
+
+  if (hasMatchingToken) {
+    return proof;
+  }
+
+  if (hasSignature) {
+    verifyClaimantSignature({
+      signature: params.claimantSignature,
+      claimantAddress: params.claimantAddress,
+      proof,
+    });
+    return proof;
+  }
+
+  if (configuredToken && isProtectedTokenRequired()) {
+    throw new Error('A valid claimant auth token or claimant signature is required in strict mainnet mode');
+  }
+
+  if (configuredToken) {
+    throw new Error('Invalid claimant auth token');
+  }
+
+  if (isProtectedTokenRequired()) {
+    throw new Error('A valid claimant signature is required in strict mainnet mode when no claimant auth token is configured');
+  }
+
+  return proof;
+}
+
+function assertEvaluatorAuthorization(params: {
+  claimId: number;
+  protectedPurchaseId: number;
+  configuredEvaluatorAddress: string;
+  decision: ClaimDecision;
+  decisionReason?: string | null;
+  evaluatorAuthToken?: string | null;
+  evaluatorSignature?: string | null;
+}): EvaluatorResolutionProof {
+  const proof = buildEvaluatorResolutionProof({
+    claimId: params.claimId,
+    protectedPurchaseId: params.protectedPurchaseId,
+    evaluatorAddress: params.configuredEvaluatorAddress,
+    decision: params.decision,
+    decisionReason: params.decisionReason,
+  });
+  const configuredToken = readConfiguredToken('evaluator');
+  const hasMatchingToken = Boolean(
+    configuredToken &&
+    params.evaluatorAuthToken &&
+    params.evaluatorAuthToken === configuredToken,
+  );
+  const hasSignature = Boolean(params.evaluatorSignature?.trim());
+
+  if (hasMatchingToken) {
+    return proof;
+  }
+
+  if (hasSignature) {
+    verifyEvaluatorSignature({
+      signature: params.evaluatorSignature,
+      configuredEvaluatorAddress: params.configuredEvaluatorAddress,
+      proof,
+    });
+    return proof;
+  }
+
+  if (configuredToken && isProtectedTokenRequired()) {
+    throw new Error('A valid evaluator auth token or evaluator signature is required in strict mainnet mode');
+  }
+
+  if (configuredToken) {
+    throw new Error('Invalid evaluator auth token');
+  }
+
+  if (isProtectedTokenRequired()) {
+    throw new Error('A valid evaluator signature is required in strict mainnet mode when no evaluator auth token is configured');
+  }
+
+  return proof;
+}
+
+export async function getEvaluatorResolutionProof(params: {
+  claimId: number;
+  decision: ClaimDecision;
+  decisionReason?: string | null;
+}): Promise<EvaluatorResolutionProof> {
+  const context = await loadClaimResolutionContext(params.claimId);
+  if (context.claim.status === 'resolved') {
+    throw new Error('Claim already resolved');
+  }
+
+  return buildEvaluatorResolutionProof({
+    claimId: context.claim.id,
+    protectedPurchaseId: context.purchase.id,
+    evaluatorAddress: context.configuredEvaluatorAddress,
+    decision: params.decision,
+    decisionReason: params.decisionReason,
+  });
+}
+
+export async function getClaimCreationProof(params: {
+  protectedPurchaseId: number;
+  claimType: ClaimType;
+  reasonText?: string | null;
+}): Promise<ClaimCreationProof> {
+  const { purchase, claimantAddress } = await loadClaimCreationContext(params.protectedPurchaseId);
+  return buildClaimCreationProof({
+    protectedPurchaseId: purchase.id,
+    claimantAgentId: purchase.buyerAgentId,
+    claimantAddress,
+    claimType: params.claimType,
+    reasonText: params.reasonText,
+  });
 }
 
 async function loadSellerToken(producerAgentId: string): Promise<number | null> {
@@ -137,8 +481,18 @@ export async function createProtectedPurchaseClaim(params: {
   reasonText?: string;
   evidence?: Record<string, unknown>;
   claimantAuthToken?: string | null;
+  claimantSignature?: string | null;
 }): Promise<ProtectedIntelPurchaseView> {
-  assertTokenGate('claimant', params.claimantAuthToken);
+  const { purchase, claimantAddress } = await loadClaimCreationContext(params.protectedPurchaseId);
+  assertClaimantAuthorization({
+    protectedPurchaseId: purchase.id,
+    claimantAgentId: purchase.buyerAgentId,
+    claimantAddress,
+    claimType: params.claimType,
+    reasonText: params.reasonText,
+    claimantAuthToken: params.claimantAuthToken,
+    claimantSignature: params.claimantSignature,
+  });
 
   await withTransaction(async (client) => {
     const purchaseResult = await client.query<{
@@ -163,7 +517,7 @@ export async function createProtectedPurchaseClaim(params: {
     }>(
       `SELECT *
        FROM protected_intel_purchases
-       WHERE id = $1
+      WHERE id = $1
        FOR UPDATE`,
       [params.protectedPurchaseId],
     );
@@ -233,40 +587,23 @@ export async function resolveProtectedPurchaseClaim(params: {
   decision: ClaimDecision;
   decisionReason?: string;
   evaluatorAuthToken?: string | null;
+  evaluatorSignature?: string | null;
 }): Promise<ProtectedIntelPurchaseView> {
-  assertTokenGate('evaluator', params.evaluatorAuthToken);
-
-  const pool = getPool();
-  const claimResult = await pool.query<ClaimRow>(
-    'SELECT * FROM purchase_claims WHERE id = $1',
-    [params.claimId],
-  );
-
-  if (claimResult.rows.length === 0) {
-    throw new Error('Claim not found');
-  }
-
-  const claim = mapClaimRow(claimResult.rows[0]);
+  const { claim, purchase, configuredEvaluatorAddress } = await loadClaimResolutionContext(params.claimId);
   if (claim.status === 'resolved') {
     throw new Error('Claim already resolved');
   }
 
-  const purchase = await getProtectedIntelPurchaseRecord(claim.protectedPurchaseId);
-  if (!purchase) {
-    throw new Error('Protected purchase not found');
-  }
-
-  const acpJobResult = await pool.query<{ evaluator_address: string }>(
-    `SELECT evaluator_address
-     FROM acp_jobs
-     WHERE id = $1`,
-    [purchase.principalAcpJobId ?? null],
-  );
-  const configuredEvaluatorAddress = acpJobResult.rows[0]?.evaluator_address?.toLowerCase() ?? null;
-
-  if (!configuredEvaluatorAddress) {
-    throw new Error('Protected purchase is missing an evaluator address');
-  }
+  const proof = assertEvaluatorAuthorization({
+    claimId: claim.id,
+    protectedPurchaseId: purchase.id,
+    configuredEvaluatorAddress,
+    decision: params.decision,
+    decisionReason: params.decisionReason,
+    evaluatorAuthToken: params.evaluatorAuthToken,
+    evaluatorSignature: params.evaluatorSignature,
+  });
+  const pool = getPool();
 
   if (claim.status === 'open') {
     await withTransaction(async (client) => {
@@ -309,7 +646,7 @@ export async function resolveProtectedPurchaseClaim(params: {
           params.claimId,
           params.decision,
           params.decisionReason ?? currentClaim.decisionReason ?? null,
-          configuredEvaluatorAddress,
+          proof.evaluatorAddress.toLowerCase(),
         ],
       );
 
@@ -362,7 +699,7 @@ export async function resolveProtectedPurchaseClaim(params: {
     protectedPurchaseId: purchase.id,
     decision: claim.decision ?? params.decision,
     decisionReason: params.decisionReason ?? claim.decisionReason ?? null,
-    evaluatorAddress: configuredEvaluatorAddress,
+    evaluatorAddress: proof.evaluatorAddress.toLowerCase(),
   });
 
   const sellerTokenId = await loadSellerToken(purchase.sellerAgentId);

@@ -1,5 +1,10 @@
 import { Router, type Router as RouterType } from 'express';
-import { createProtectedPurchaseClaim, resolveProtectedPurchaseClaim } from './claim-lifecycle.js';
+import {
+  createProtectedPurchaseClaim,
+  getClaimCreationProof,
+  getEvaluatorResolutionProof,
+  resolveProtectedPurchaseClaim,
+} from './claim-lifecycle.js';
 import { getProtectedIntelPurchaseView } from './protected-purchase.js';
 import { createIntelRiskQuote } from './quote-engine.js';
 import type { ClaimDecision, ClaimType } from './risk-types.js';
@@ -15,6 +20,12 @@ function asIsoString(value: string | null | undefined): string | null {
 function readRoleToken(req: { header(name: string): string | undefined }, headerName: string): string | null {
   const value = req.header(headerName)?.trim();
   return value ? value : null;
+}
+
+function readOptionalString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
 }
 
 function toQuoteResponse(quote: Awaited<ReturnType<typeof createIntelRiskQuote>>) {
@@ -112,9 +123,8 @@ router.post('/claims', async (req, res) => {
       reasonText?: string;
       evidence?: Record<string, unknown>;
     };
-    const claimantAuthToken =
-      readRoleToken(req, 'x-civilis-risk-claimant-token') ??
-      (typeof req.body?.claimantAuthToken === 'string' ? req.body.claimantAuthToken.trim() : null);
+    const claimantAuthToken = readRoleToken(req, 'x-civilis-risk-claimant-token');
+    const claimantSignature = readRoleToken(req, 'x-civilis-risk-claimant-signature');
 
     if (!protectedPurchaseId || !claimType) {
       return res.status(400).json({ error: 'protectedPurchaseId and claimType are required' });
@@ -126,6 +136,7 @@ router.post('/claims', async (req, res) => {
       reasonText,
       evidence,
       claimantAuthToken,
+      claimantSignature,
     });
 
     if (!view.claim) {
@@ -152,17 +163,46 @@ router.post('/claims', async (req, res) => {
   }
 });
 
+router.get('/purchases/:id/claim-proof', async (req, res) => {
+  try {
+    const protectedPurchaseId = Number(req.params.id);
+    const claimType = readOptionalString(req.query.claimType);
+    const reasonText = readOptionalString(req.query.reasonText);
+
+    if (!Number.isFinite(protectedPurchaseId) || claimType !== 'misleading_or_invalid_intel') {
+      return res.status(400).json({ error: 'protected purchase id and claimType are required' });
+    }
+
+    const proof = await getClaimCreationProof({
+      protectedPurchaseId,
+      claimType,
+      reasonText,
+    });
+
+    res.json({
+      protected_purchase_id: proof.protectedPurchaseId,
+      claimant_agent_id: proof.claimantAgentId,
+      claimant_address: proof.claimantAddress,
+      claim_type: proof.claimType,
+      reason_text: proof.reasonText,
+      reason_text_hash: proof.reasonTextHash,
+      message: proof.message,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(message.includes('not found') ? 404 : 400).json({ error: message });
+  }
+});
+
 router.post('/claims/:id/resolve', async (req, res) => {
   try {
     const claimId = Number(req.params.id);
     const { decision, decisionReason } = req.body as {
       decision?: ClaimDecision;
       decisionReason?: string;
-      evaluatorAuthToken?: string;
     };
-    const evaluatorAuthToken =
-      readRoleToken(req, 'x-civilis-risk-evaluator-token') ??
-      (typeof req.body?.evaluatorAuthToken === 'string' ? req.body.evaluatorAuthToken.trim() : null);
+    const evaluatorAuthToken = readRoleToken(req, 'x-civilis-risk-evaluator-token');
+    const evaluatorSignature = readRoleToken(req, 'x-civilis-risk-evaluator-signature');
 
     if (!Number.isFinite(claimId) || !decision) {
       return res.status(400).json({ error: 'claim id and decision are required' });
@@ -173,6 +213,7 @@ router.post('/claims/:id/resolve', async (req, res) => {
       decision,
       decisionReason,
       evaluatorAuthToken,
+      evaluatorSignature,
     });
 
     if (!view.claim) {
@@ -194,8 +235,44 @@ router.post('/claims/:id/resolve', async (req, res) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const status = message.includes('auth token') || message.includes('configured evaluator') ? 403 : 400;
+    const status =
+      message.includes('auth token') ||
+      message.includes('configured evaluator') ||
+      message.includes('evaluator signature')
+        ? 403
+        : 400;
     res.status(status).json({ error: message });
+  }
+});
+
+router.get('/claims/:id/resolve-proof', async (req, res) => {
+  try {
+    const claimId = Number(req.params.id);
+    const decision = readOptionalString(req.query.decision);
+    const decisionReason = readOptionalString(req.query.decisionReason);
+
+    if (!Number.isFinite(claimId) || (decision !== 'release' && decision !== 'refund')) {
+      return res.status(400).json({ error: 'claim id and decision are required' });
+    }
+
+    const proof = await getEvaluatorResolutionProof({
+      claimId,
+      decision,
+      decisionReason,
+    });
+
+    res.json({
+      claim_id: proof.claimId,
+      protected_purchase_id: proof.protectedPurchaseId,
+      evaluator_address: proof.evaluatorAddress,
+      decision: proof.decision,
+      decision_reason: proof.decisionReason,
+      decision_reason_hash: proof.decisionReasonHash,
+      message: proof.message,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(message.includes('not found') ? 404 : 400).json({ error: message });
   }
 });
 

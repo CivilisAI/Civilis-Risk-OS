@@ -2,7 +2,7 @@ import '../config/load-env.js';
 import { ethers } from 'ethers';
 import { getPool, initDB, withTransaction } from '../db/postgres.js';
 import { getACPClient } from '../erc8183/acp-client.js';
-import { getSharedProvider } from '../onchainos/shared-signers.js';
+import { getSharedProvider, getSharedSignerAddress } from '../onchainos/shared-signers.js';
 
 type DemoRole = 'buyer' | 'seller';
 
@@ -113,16 +113,70 @@ async function seedReferenceIntel(params: {
   sellerAgentId: string;
   buyerAgentId: string;
   price: number;
-}): Promise<number> {
+}): Promise<{ intelItemId: number; createdAtTick: number; expiresAtTick: number }> {
   const pool = getPool();
-  await pool.query(`DELETE FROM arena_matches`);
-  await pool.query(`DELETE FROM tick_snapshots`);
-  await pool.query(`DELETE FROM purchase_claims`);
-  await pool.query(`DELETE FROM protected_intel_purchases`);
-  await pool.query(`DELETE FROM risk_quotes`);
-  await pool.query(`DELETE FROM intel_purchases`);
-  await pool.query(`DELETE FROM acp_jobs`);
-  await pool.query(`DELETE FROM intel_items`);
+  const expiresAfterTicks = readOptionalInt('RISK_OS_DEMO_EXPIRES_AFTER_TICKS', 120) ?? 120;
+  const currentTickResult = await pool.query<{ tick: string }>(
+    'SELECT COALESCE(MAX(tick_number), 0) AS tick FROM economy_state',
+  );
+  const currentTick = Number.parseInt(currentTickResult.rows[0]?.tick ?? '0', 10) || 0;
+  const createdAtTick = Math.max(currentTick, 1);
+  const expiresAtTick = createdAtTick + Math.max(expiresAfterTicks, 30);
+  const priorDemoItems = await pool.query<{ id: number }>(
+    `SELECT id
+     FROM intel_items
+     WHERE producer_agent_id = $1
+       AND subject_agent_id = $2
+       AND content->>'why_it_matters' = 'Designed to exercise protected intel commerce and post-outcome repricing.'`,
+    [params.sellerAgentId, params.buyerAgentId],
+  );
+  const priorDemoItemIds = priorDemoItems.rows.map((row) => row.id);
+
+  if (priorDemoItemIds.length > 0) {
+    await pool.query(
+      `DELETE FROM purchase_claims
+       WHERE protected_purchase_id IN (
+         SELECT id
+         FROM protected_intel_purchases
+         WHERE intel_item_id = ANY($1::int[])
+       )`,
+      [priorDemoItemIds],
+    );
+    await pool.query(
+      `DELETE FROM protected_intel_purchases
+       WHERE intel_item_id = ANY($1::int[])`,
+      [priorDemoItemIds],
+    );
+    await pool.query(
+      `DELETE FROM risk_quotes
+       WHERE intel_item_id = ANY($1::int[])`,
+      [priorDemoItemIds],
+    );
+    await pool.query(
+      `DELETE FROM intel_purchases
+       WHERE intel_item_id = ANY($1::int[])`,
+      [priorDemoItemIds],
+    );
+    await pool.query(
+      `DELETE FROM intel_items
+       WHERE id = ANY($1::int[])`,
+      [priorDemoItemIds],
+    );
+  }
+
+  await pool.query(
+    `DELETE FROM acp_jobs
+     WHERE client_agent_id = $1
+       AND provider_agent_id = $2
+       AND category = 'intel_purchase'`,
+    [params.buyerAgentId, params.sellerAgentId],
+  );
+  await pool.query(
+    `DELETE FROM arena_matches
+     WHERE player_a_id = $1
+       AND player_b_id = $2`,
+    [params.buyerAgentId, params.sellerAgentId],
+  );
 
   await pool.query(
     `INSERT INTO intel_credit_scores (
@@ -194,6 +248,7 @@ async function seedReferenceIntel(params: {
 
   await pool.query(
     `INSERT INTO tick_snapshots (
+       tick_number,
        agent_balances,
        agent_reputations,
        active_arena_count,
@@ -208,8 +263,9 @@ async function seedReferenceIntel(params: {
        effective_average_arousal
      )
      SELECT
-       $1::jsonb,
+       $1 + series.step,
        $2::jsonb,
+       $3::jsonb,
        0,
        0,
        0.000000,
@@ -220,8 +276,22 @@ async function seedReferenceIntel(params: {
        0,
        0,
        0
-     FROM generate_series(1, 40)`,
+     FROM generate_series(0, 39) AS series(step)
+     ON CONFLICT (tick_number) DO UPDATE
+     SET agent_balances = EXCLUDED.agent_balances,
+         agent_reputations = EXCLUDED.agent_reputations,
+         active_arena_count = EXCLUDED.active_arena_count,
+         total_posts_today = EXCLUDED.total_posts_today,
+         total_x402_volume = EXCLUDED.total_x402_volume,
+         world_regime = EXCLUDED.world_regime,
+         active_modifier_count = EXCLUDED.active_modifier_count,
+         active_event_count = EXCLUDED.active_event_count,
+         average_valence = EXCLUDED.average_valence,
+         average_arousal = EXCLUDED.average_arousal,
+         effective_average_valence = EXCLUDED.effective_average_valence,
+         effective_average_arousal = EXCLUDED.effective_average_arousal`,
     [
+      Math.max(createdAtTick - 39, 1),
       JSON.stringify({
         [params.buyerAgentId]: '135.000000',
         [params.sellerAgentId]: '95.000000',
@@ -269,8 +339,8 @@ async function seedReferenceIntel(params: {
        0,
        false,
        'active',
-       120,
-       1
+       $5,
+       $6
      )
      RETURNING id`,
     [
@@ -278,10 +348,16 @@ async function seedReferenceIntel(params: {
       params.buyerAgentId,
       JSON.stringify(content),
       params.price.toFixed(6),
+      expiresAtTick,
+      createdAtTick,
     ],
   );
 
-  return insert.rows[0].id;
+  return {
+    intelItemId: insert.rows[0].id,
+    createdAtTick,
+    expiresAtTick,
+  };
 }
 
 async function printWalletFunding(config: DemoAgentConfig): Promise<void> {
@@ -312,6 +388,10 @@ async function main(): Promise<void> {
   await initDB();
   const buyer = loadAgentConfig('buyer');
   const seller = loadAgentConfig('seller');
+  const evaluatorAddress = getSharedSignerAddress('acp');
+  if (!evaluatorAddress) {
+    throw new Error('ACP evaluator signer address is unavailable');
+  }
   const price = Number(process.env.RISK_OS_DEMO_INTEL_PRICE ?? '0.250000');
   if (!Number.isFinite(price) || price <= 0) {
     throw new Error('RISK_OS_DEMO_INTEL_PRICE must be a positive number');
@@ -319,7 +399,7 @@ async function main(): Promise<void> {
 
   await upsertDemoAgent(buyer);
   await upsertDemoAgent(seller);
-  const intelItemId = await seedReferenceIntel({
+  const { intelItemId, createdAtTick, expiresAtTick } = await seedReferenceIntel({
     sellerAgentId: seller.agentId,
     buyerAgentId: buyer.agentId,
     price,
@@ -342,8 +422,14 @@ async function main(): Promise<void> {
       okxAccountId: seller.okxAccountId,
       erc8004TokenId: seller.erc8004TokenId,
     },
+    evaluator: {
+      address: evaluatorAddress,
+      resolutionPath: 'token_or_wallet_signature',
+    },
     intelItemId,
     price: price.toFixed(6),
+    createdAtTick,
+    expiresAtTick,
   }, null, 2));
 }
 

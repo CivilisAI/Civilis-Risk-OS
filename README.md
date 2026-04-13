@@ -55,7 +55,8 @@ If a reviewer only has a minute, read in this order:
 4. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
 5. [Mainnet Evidence](docs/mainnet-evidence.md)
 6. [API Examples](docs/api-examples.md)
-7. [Judge Demo Script](docs/judge-demo-script.md)
+7. [Championship Replay Mode](docs/championship-replay-mode.md)
+8. [Judge Demo Script](docs/judge-demo-script.md)
 
 ## Skill Contract
 
@@ -92,7 +93,15 @@ live reference integration.
 - protected principal is routed through a challengeable `ERC-8183` path
 - claim and evaluator actions are role-gated in the strict mainnet-backed proof
   environment
+- buyer claim creation can be prepared through a deterministic `claim-proof`
+  message that binds the request to the protected purchase buyer wallet
+- evaluator resolution can be authorized either through the strict proof
+  environment token gate or through a wallet-bound signature over a deterministic
+  resolution-proof message
 - refund and release both have captured mainnet-backed proof loops
+- the public external-consumer quickstart script has been validated against the
+  live proof environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
+  `resolve-proof`, `resolve`, and later repricing
 - later quotes reflect prior protected outcomes
 
 ### Non-goals in this submission
@@ -100,7 +109,7 @@ live reference integration.
 - partial refunds
 - decentralized arbitration
 - generalized protection across every commerce surface
-- wallet-signature-bound universal evaluator auth
+- wallet-signature-bound universal claimant/evaluator auth
 
 ## Project Introduction
 
@@ -192,13 +201,31 @@ The reusable submission surface is:
 
 - `POST /api/risk/quote/intel`
 - `POST /api/intel/items/:id/buy`
+- `GET /api/risk/purchases/:id/claim-proof`
 - `POST /api/risk/claims`
 - `POST /api/risk/claims/:id/resolve`
+- `GET /api/risk/claims/:id/resolve-proof`
 - `GET /api/risk/purchases/:id`
 
 The route names are intel-scoped in the current working implementation. The
 reusable claim is the **protection pattern**, not that every market type is
 already generalized.
+
+## Quickstart For Another Agent App
+
+This repo includes a minimal external consumer script:
+
+- [examples/external-consumer-quickstart.mjs](examples/external-consumer-quickstart.mjs)
+
+It lets another agent app or operator walk the same reusable flow without
+depending on the Civilis dashboard:
+
+- quote
+- challengeable buy
+- buyer claim-proof
+- claim
+- evaluator resolve-proof
+- release or refund
 
 ## External Consumer Story
 
@@ -211,13 +238,31 @@ An external consumer would:
 1. call `POST /api/risk/quote/intel` before settling an agent commerce action
 2. choose `instant` or `challengeable` based on the returned risk output
 3. create the protected purchase through `POST /api/intel/items/:id/buy`
-4. open a claim only if delivery quality fails the protected threshold
-5. let the evaluator resolve to `release` or `refund`
-6. reuse the next repriced quote for the same seller
+4. optionally fetch a deterministic `claim-proof` message for the buyer and sign
+   it with the buyer wallet before filing a claim
+5. open a claim only if delivery quality fails the protected threshold
+6. optionally fetch a deterministic `resolve-proof` message for the evaluator
+   and sign it with the evaluator wallet
+7. let the evaluator resolve to `release` or `refund`
+8. reuse the next repriced quote for the same seller
 
 That is the reusable skill claim for this submission:
 
 `any agent commerce app can wrap payment with a challengeable protection loop`
+
+## Clean Proof Environment
+
+The cleanest runtime used for the strict mainnet-backed proof loops keeps the
+full on-chain boot enabled but disables the world tick engine:
+
+- `AUTO_START_WORLD=false`
+- strict mainnet mode enabled
+- `x402` direct-wallet mode enabled
+- `RISK_OS_CLAIMANT_AUTH_TOKEN` and `RISK_OS_EVALUATOR_AUTH_TOKEN` configured
+
+This matters because the proof environment needs real `Agentic Wallet` and
+`ERC-8183` behavior, but it should not let unrelated world ticks expire or
+mutate the staged intel item during judge validation.
 
 ## Onchain OS Skill Usage
 
@@ -277,10 +322,12 @@ after the buyer has opened a claim, so the review follows the same role order
 as the protected workflow.
 
 For the strict mainnet-backed proof loops in this submission, buyer-side claim
-filing and evaluator-side resolution are role-gated through dedicated Risk OS
-auth tokens. This is still weaker than wallet-signature-bound universal auth,
-but it prevents the proof environment from running with anonymous claim or
-resolution actions.
+filing is role-gated through a dedicated claimant token. Evaluator resolution
+can use the strict proof-environment evaluator token or a wallet-bound
+signature over the `resolve-proof` message. This is still weaker than
+wallet-signature-bound universal auth across every role and surface, but it
+prevents the proof environment from running with anonymous claim or resolution
+actions.
 
 ## Deployment Addresses
 
@@ -324,7 +371,8 @@ feature.
 
 ## Verified Mainnet Proof
 
-This repository currently includes two clean mainnet-backed proof loops.
+This repository currently includes two clean mainnet-backed proof loops, plus a
+third wallet-signature-bound evaluator validation loop.
 
 ### Refund Loop
 
@@ -348,9 +396,25 @@ This repository currently includes two clean mainnet-backed proof loops.
 - repriced quote id: `14`
 - seller risk: `91 -> 79`
 
+### Wallet-Signature Evaluator Validation Loop
+
+- quote id: `19`
+- protected purchase id: `6`
+- local ACP job id: `8`
+- on-chain job id: `1959`
+- buy tx: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
+- claim id: `5`
+- signature-backed resolve status: `200`
+- repriced quote id: `20`
+- seller risk: `71 -> 87`
+
 The strongest current proof claim is:
 
 `quote -> challengeable buy -> claim -> release/refund -> later quote repricing`
+
+The strongest auth-depth add-on is:
+
+`claim -> resolve-proof message -> evaluator wallet signature -> refund -> later repricing`
 
 ## Repository Layout
 
@@ -378,7 +442,7 @@ This repository does **not** claim:
 - generalized protection for every market type
 - partial refunds
 - decentralized arbitration
-- wallet-signature-bound evaluator auth
+- wallet-signature-bound universal evaluator auth across every role and surface
 - on-chain premium collection
 - a fully capitalized underwriting reserve
 
