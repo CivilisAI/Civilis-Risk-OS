@@ -2,26 +2,16 @@
 
 **Civilis Risk OS** is a protection layer for agent commerce on X Layer.
 
-It focuses on one narrow but reusable pattern:
+It packages one narrow but reusable pattern:
 
 `risk quote -> challengeable buy -> claim -> evaluator release/refund -> later trust repricing`
 
-This repository is the project's **public reference repo**. It intentionally
-packages the current live proof, API contract, extracted reference
-implementation, and AI-readable skill surfaces in one place:
+The goal of this repository is simple:
 
-- project introduction and architecture
-- X Layer deployment addresses
-- Onchain OS / protocol usage
-- mainnet proof and claim boundaries
-- PRD and implementation plan
-- extracted reference implementation files
-- demo-wallet staging script used to reproduce the proof loops
-
-For Build X reviewers, this same repo also acts as the public evaluation
-source. The shortest review path is collected in
-[Build X Reviewer Guide](docs/build-x-reviewer-guide.md), while the top-level
-README stays product-first.
+- install the skill
+- call the runtime
+- integrate the protection loop into another agent product
+- inspect the public API contract and live X Layer references when needed
 
 ## Project Snapshot
 
@@ -30,45 +20,29 @@ README stays product-first.
 - **Primary chain:** X Layer mainnet (`chainId 196`)
 - **Core official stack:** `x402 Payment API`, `Agentic Wallet`,
   `ERC-8183 / ACP`, `ERC-8004`
-- **Current claim:** a protected commerce flow for agent transactions, not a
+- **Current scope:** a protected commerce flow for agent transactions, not a
   generalized insurance protocol
-
-## Repository Coverage
-
-This README includes the fields needed both for normal public review and for
-the Build X public-repo requirement:
-
-- **Project Introduction:** see [Project Introduction](#project-introduction)
-- **Architecture Overview:** see [Architecture Overview](#architecture-overview)
-- **Deployment Addresses:** see [Deployment Addresses](#deployment-addresses)
-- **Onchain OS Skill or Uniswap Skill Usage:** see
-  [Onchain OS Skill Usage](#onchain-os-skill-usage)
-- **Working Mechanism:** see [Working Mechanism](#working-mechanism)
-- **Team Members:** see [Team Members](#team-members)
-- **Positioning in the X Layer Ecosystem:** see
-  [Positioning in the X Layer Ecosystem](#positioning-in-the-x-layer-ecosystem)
 
 ## Quick Start
 
-If someone only has a minute, read in this order:
+If someone only has a minute, start here:
 
 1. [Project One Pager](docs/project-one-pager.md)
 2. [Runtime Quickstart](docs/runtime-quickstart.md)
 3. [External Consumer Guide](docs/external-consumer-guide.md)
-4. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
+4. [API Examples](docs/api-examples.md)
 5. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
 
-## Project 30-Second Read
+## Product In One Screen
 
 If someone only reads one screen, the intended takeaway is:
 
 - **What it is:** a reusable protection Skill for agent commerce on X Layer
-- **What is live and proven:** one full canonical protected-intel loop on
-  mainnet
-- **What is reusable beyond the reference integration:** a second lightweight
-  adapter proves the same pattern can normalize another commerce surface
-- **What is not overclaimed:** this repo does not claim generalized insurance,
-  decentralized arbitration, or a captured generic buyer wallet-signature proof
+- **What it ships:** installable runtime commands, API contract, schemas, and a
+  live reference integration
+- **What it helps with:** quoting risk, choosing challengeable settlement,
+  opening disputes, resolving outcomes, and repricing the next transaction
+- **What it is not:** a generalized insurance protocol or decentralized court
 
 The rest of the repo should be read through that frame.
 
@@ -93,7 +67,7 @@ npx civilis-risk-os-runtime help
 ```
 
 The clone-and-run path above and a fresh local package install were both
-verified for this submission. A direct GitHub package install is a natural next
+verified in this public repo. A direct GitHub package install is a natural next
 consumer path, but it is not claimed as verified evidence here.
 
 Then the narrow runtime actions are:
@@ -142,105 +116,26 @@ The direct entry is:
 The current package is intentionally narrow:
 
 - [civilis-risk-os-runtime](skills/civilis-risk-os-runtime/SKILL.md)
-- [civilis-risk-os-canonical-replay](skills/civilis-risk-os-canonical-replay/SKILL.md)
 - [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
-- [civilis-risk-os-proof-boundaries](skills/civilis-risk-os-proof-boundaries/SKILL.md)
 - [civilis-risk-os-integration-check](skills/civilis-risk-os-integration-check/SKILL.md)
 
 These skills are designed so another AI can:
 
 - directly call the runtime action surface
-- replay the strongest public proof path
 - integrate another commerce surface against the Risk OS contract
-- keep claims, demos, and docs strictly evidence-backed
+- validate whether an integration meets the minimum protected-commerce contract
 
 Quick index:
 
-- [AI Skill Pack](docs/ai-skill-pack.md)
 - [Runtime Quickstart](docs/runtime-quickstart.md)
 - [Runtime Tool Surface](docs/runtime-tool-surface.md)
 - [Hosted Runtime Onboarding](docs/hosted-runtime-onboarding.md)
 - [Integration Checklist](docs/integration-checklist.md)
 - [Project One Pager](docs/project-one-pager.md)
-- [Canonical Proof Verifier](examples/verify-canonical-proof.mjs)
 - [`npm run runtime -- help`](package.json)
-- minimal verifier scripts live in [`package.json`](package.json):
-  `verify:canonical-docs`, `verify:canonical-api`, `verify:canonical-onchain`,
-  `verify:canonical-full`, `verify:manifest`
-- [Project Manifest](project.manifest.json)
-- [Project Manifest Verifier](examples/verify-project-manifest.mjs)
 - [OpenAPI Contract](openapi/risk-os.openapi.yaml)
-- [Replay Lanes](docs/replay-lanes.md)
-- [Proof Environment Runbook](docs/proof-environment-runbook.md)
-
-## Canonical Evidence Policy
-
-This repo keeps one **canonical** proof path and may also retain older
-historical loops as secondary depth evidence.
-
-Canonical proof path:
-
-- `16 -> 34 -> 11 -> 10 -> 36`
-- funded principal:
-  `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
-- delivery submit:
-  `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
-- reject/refund:
-  `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
-
-Older hashes may still appear in evidence docs as historical depth loops. They
-are preserved intentionally, but the path above is the primary public proof
-story.
-
-## Public Reference Source Of Truth
-
-This public repo is the source of truth for the current public Risk OS release.
-
-- canonical replay hashes belong here first
-- historical loops may remain as depth evidence
-- private working material should not be treated as more authoritative than this
-  public repo
-
-## Skill Contract
-
-Civilis Risk OS is packaged as a **reusable protection Skill** with one narrow,
-live reference integration.
-
-## Direct Runtime Use
-
-If another AI should use Risk OS directly, the shortest path is:
-
-```bash
-npm install
-npm run runtime -- help
-```
-
-Then call:
-
-- `health`
-- `quote`
-- `buy`
-- `purchase`
-- `claim-proof`
-- `claim`
-- `resolve-proof`
-- `resolve`
-- `requote`
-
-The same runtime surface now works against:
-
-- a local strict proof environment
-- a hosted compatible base URL
-
-by changing only:
-
-- `--base-url`
-
-This is the strongest current Skills Arena claim beyond the live reference
-integration:
-
-**another AI can directly use the Risk OS protection pattern without first
-re-deriving the raw API workflow.**
+- [Runtime Environment Guide](docs/proof-environment-runbook.md)
+- [Live X Layer References](docs/canonical-proof-evidence.md)
 
 ### Inputs
 
@@ -289,7 +184,7 @@ re-deriving the raw API workflow.**
   claim-proof payloads because the current official Agentic Wallet CLI does not
   expose a generic message-sign command
 - the public external-consumer quickstart script has been validated against the
-  live proof environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
+  live runtime environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
   `resolve-proof`, `resolve`, and later repricing
 - the public repo also includes a second lightweight reference adapter for
   `The Square` paywalled intel unlocks, so the reusable claim no longer depends
@@ -304,9 +199,9 @@ capability** and **captured public proof**:
 
 | Surface | Current status |
 | --- | --- |
-| Independent Agentic Wallet actors for buyer / seller / evaluator | captured in the canonical replay |
+| Independent Agentic Wallet actors for buyer / seller / evaluator | captured in the primary live reference |
 | `x402-pay` off-chain signing through the current Agentic Wallet session | locally verified |
-| Buyer-side deterministic `claim-proof` message generation | captured in the canonical replay |
+| Buyer-side deterministic `claim-proof` message generation | captured in the primary live reference |
 | Evaluator-side wallet-bound `resolve-proof` authorization path | captured in a historical proof loop |
 | Generic buyer wallet-signature proof for arbitrary claim payloads | **not claimed** because the official Agentic Wallet CLI does not currently expose a generic message-sign command |
 
@@ -349,14 +244,14 @@ The loop is:
 
 ## Relationship to Civilis
 
-Civilis Risk OS should be read as an **extracted Skill layer** from the broader
-Civilis project, not as an unrelated new brand.
+Civilis Risk OS is an **extracted product layer** from the broader Civilis
+system, not an unrelated brand.
 
-- **Civilis** is the live multi-agent world and the Season 1 foundation
-- **Civilis Risk OS** is the Season 2 Build X project built from that
+- **Civilis** is the live multi-agent world and the original foundation
+- **Civilis Risk OS** is the standalone protection layer extracted from that
   foundation
-- **Civilis Intel Market** is the current reference integration that proves the
-  Skill in a live agent economy
+- **Civilis Intel Market** is the current reference integration for the live
+  agent-commerce loop
 
 Public background project:
 
@@ -364,7 +259,7 @@ Public background project:
 
 The intended relationship is:
 
-`Season 1 Civilis world -> extract reusable protection logic -> Season 2 Civilis Risk OS`
+`Civilis world -> extract reusable protection logic -> standalone Civilis Risk OS`
 
 ## Why This Skill Exists
 
@@ -469,7 +364,7 @@ An external consumer would:
 7. let the evaluator resolve to `release` or `refund`
 8. reuse the next repriced quote for the same seller
 
-That is the reusable skill claim for the current public release:
+That is the reusable skill contract for the current public release:
 
 `any agent commerce app can wrap payment with a challengeable protection loop`
 
@@ -481,19 +376,19 @@ commerce surface:
 It is intentionally labeled as a **reference adapter**, not as a second
 mainnet-proved live integration.
 
-## Clean Proof Environment
+## Runtime Environments
 
-The cleanest runtime used for the strict mainnet-backed proof loops keeps the
-full on-chain boot enabled but disables the world tick engine:
+The strict runtime used for live references keeps the on-chain path enabled but
+disables unrelated world ticking:
 
 - `AUTO_START_WORLD=false`
 - strict mainnet mode enabled
 - `x402` direct-wallet mode enabled
 - `RISK_OS_CLAIMANT_AUTH_TOKEN` and `RISK_OS_EVALUATOR_AUTH_TOKEN` configured
 
-This matters because the proof environment needs real `Agentic Wallet` and
-`ERC-8183` behavior, but it should not let unrelated world ticks expire or
-mutate the staged intel item during reviewer validation.
+This matters because the runtime needs real `Agentic Wallet` and `ERC-8183`
+behavior, but should not let unrelated world ticks mutate staged commerce items
+during integration or verification.
 
 ## Onchain OS Skill Usage
 
@@ -566,23 +461,23 @@ See:
 7. The outcome changes later quote results for the same seller.
 
 The reusable public surface is the API and orchestration flow above. The
-included dashboard files are a **role-scoped proof console** used
+included dashboard files are a **role-scoped reference UI** used
 to make the buyer path and evaluator path legible during review, not a claim
 that production role separation is already fully packaged as a standalone
 front-end product.
-In the current proof console, the evaluator path is intentionally activated only
+In the current reference UI, the evaluator path is intentionally activated only
 after the buyer has opened a claim, so the review follows the same role order
 as the protected workflow.
 
-For the strict mainnet-backed proof loops in this repo, buyer-side claim
+For the strict live runtime loops in this repo, buyer-side claim
 filing is role-gated through a dedicated claimant token. Evaluator resolution
-can use the strict proof-environment evaluator token or a wallet-bound
+can use the strict runtime evaluator token or a wallet-bound
 signature over the `resolve-proof` message. This is still weaker than
 wallet-signature-bound universal auth across every role and surface, but it
-prevents the proof environment from running with anonymous claim or resolution
+prevents the runtime from running with anonymous claim or resolution
 actions.
 
-Outside the strict proof environment, unauthenticated role actions remain
+Outside the strict runtime mode, unauthenticated role actions remain
 disabled by default. A developer must explicitly opt into a local bypass through
 `RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true`; that bypass is not part of the public
 project claim.
@@ -598,10 +493,9 @@ project claim.
 | `ERC8004ValidationRegistryV2` | `0x0CC71B9488AA74A8162790b65592792Ba52119fB` |
 | `USDT payment token` | `0x779Ded0c9e1022225f8E0630b35a9b54bE713736` |
 
-## Agentic Wallet Roles Used In Proof
+## Agentic Wallet Roles
 
-The strongest current replay uses staged Agentic Wallet actors that
-are independently controlled by the maintained proof session:
+The live reference loop uses independently controlled Agentic Wallet actors:
 
 | Role | Agent | Wallet |
 | --- | --- | --- |
@@ -609,8 +503,8 @@ are independently controlled by the maintained proof session:
 | seller | `fox` | `0x4f5dc690f366116bf6bc22f29e44f8d141bf38de` |
 | evaluator | `arbiter` | `0x400ea2f2af2732c4e2af9fb2f8616468ad49023d` |
 
-These are **proof-scoped actors**. They do not replace the broader
-live wallet map of the original Civilis world.
+These are the current public runtime actors for the reference loop. They do not
+replace the broader wallet map of the original Civilis world.
 
 ## Positioning in the X Layer Ecosystem
 
@@ -627,13 +521,13 @@ Layer agent stack:
 This is why the project is expressed as a Skill rather than as a generic app
 feature.
 
-## Verified Mainnet Proof
+## Live X Layer References
 
-This repository currently includes one canonical independent-wallet replay on
-the latest staged actor set, plus earlier complementary proof loops that add
-historical release depth and evaluator wallet-signature depth.
+This repository includes one primary live protected-commerce loop on X Layer,
+plus earlier complementary references for release depth and evaluator-signature
+depth.
 
-### Canonical Independent-Wallet Replay
+### Primary Live Loop
 
 - staged intel item id: `16`
 - quote id: `34`
@@ -642,7 +536,6 @@ historical release depth and evaluator wallet-signature depth.
 - on-chain job id: `2030`
 - funded principal tx: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
 - delivery submit tx: `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
-- buyer claim-proof actor: `sage` / `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9`
 - unauthenticated claim status: `403`
 - authenticated claim id: `10`
 - reject + refund tx: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
@@ -684,26 +577,17 @@ historical release depth and evaluator wallet-signature depth.
 - repriced quote id: `20`
 - seller risk: `71 -> 87`
 
-The strongest current proof claim is:
-
-`quote -> challengeable buy -> claim -> release/refund -> later quote repricing`
-
-The strongest auth-depth add-on is:
-
-`claim -> resolve-proof message -> evaluator wallet signature -> refund -> later repricing`
-
-And the strongest current actor-independence claim is:
-
-`independent buyer/seller/evaluator Agentic Wallet actors -> challengeable buy -> default claimant gating -> authenticated claim -> evaluator refund -> later repricing`
+For the complete transaction references, verification scripts, and full
+captured-path notes, use [Canonical Proof Evidence](docs/canonical-proof-evidence.md).
 
 ## Repository Layout
 
 | Path | Purpose |
 | --- | --- |
-| [`docs/`](docs) | public evidence, proof references, integration notes, and evaluation materials |
+| [`docs/`](docs) | product docs, integration notes, runtime guides, and platform review appendices |
 | [`specs/`](specs) | PRD and implementation plan |
 | [`reference/server/`](reference/server) | extracted reference implementation files from the working service |
-| [`reference/dashboard/`](reference/dashboard) | extracted reviewer-facing reference UI files |
+| [`reference/dashboard/`](reference/dashboard) | extracted reference UI files |
 
 ## What Is Included
 
@@ -713,7 +597,7 @@ And the strongest current actor-independence claim is:
 - working mechanics
 - team members
 - X Layer ecosystem positioning
-- mainnet evidence for both refund and release paths
+- live X Layer transaction references for refund and release paths
 
 ## What Is Not Claimed
 
@@ -733,7 +617,7 @@ Those are future extension directions, not current public facts.
 - `kb / CivilisAI`: product, architecture, and project direction
 - `Codex`: implementation, review, packaging, and evidence support
 
-## Build X Review Materials
+## Platform Review Appendix
 
 If you are reviewing this repo for Build X specifically, start here:
 

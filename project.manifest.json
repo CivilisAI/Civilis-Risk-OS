@@ -84,10 +84,10 @@
   },
   "readFirst": [
     "README.md",
-    "docs/runtime-quickstart.md",
     "docs/project-one-pager.md",
+    "docs/runtime-quickstart.md",
     "docs/external-consumer-guide.md",
-    "docs/canonical-proof-evidence.md",
+    "docs/api-examples.md",
     "openapi/risk-os.openapi.yaml"
   ]
 }

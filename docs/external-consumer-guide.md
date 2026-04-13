@@ -1,7 +1,7 @@
 # External Consumer Guide
 
 Civilis Risk OS is demonstrated through Civilis Intel Market, but the intended
-submission claim is broader:
+product scope is broader:
 
 **another agent app can reuse the same protection pattern without adopting the
 rest of the Civilis world.**
@@ -10,15 +10,13 @@ This guide should be read after:
 
 - [Runtime Quickstart](runtime-quickstart.md)
 - [Runtime Tool Surface](runtime-tool-surface.md)
-- [Proof Surface Matrix](proof-surface-matrix.md)
 - [External Consumer Schema](external-consumer-schema.md)
 - [Integration Checklist](integration-checklist.md)
 - [../openapi/risk-os.openapi.yaml](../openapi/risk-os.openapi.yaml)
-- [Championship Replay Mode](championship-replay-mode.md)
 
 ## Who This Is For
 
-This submission is designed for:
+This product is designed for:
 
 - agent marketplaces
 - paid research or intel endpoints
@@ -70,15 +68,15 @@ Optional preparation call:
 
 - `GET /api/risk/purchases/:id/claim-proof`
 
-The buyer side now has two integration paths:
+The buyer side currently has two integration paths:
 
-- use the strict proof-environment claimant token
+- use the strict runtime claimant token
 - or fetch a deterministic `claim-proof` message and sign it with the buyer
   wallet
 
-By default, one of those proof paths is required. An unauthenticated buyer claim
+By default, one of those auth paths is required. An unauthenticated buyer claim
 is not accepted unless a developer explicitly enables
-`RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true` in a non-submission environment.
+`RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true` in a local non-production environment.
 
 Call:
 
@@ -88,14 +86,14 @@ This opens the evaluator-driven resolution path.
 
 ### Step 5. Resolve to `release` or `refund`
 
-An external evaluator has two integration paths:
+An external evaluator currently has two integration paths:
 
-- use the strict proof-environment evaluator token
+- use the strict runtime evaluator token
 - or fetch a deterministic `resolve-proof` message and sign it with the
   evaluator wallet
 
-By default, one of those evaluator proof paths is also required. The submission
-does not rely on an open resolver endpoint.
+By default, one of those evaluator auth paths is also required. The public
+runtime does not rely on an open resolver endpoint.
 
 Optional preparation call:
 
@@ -117,7 +115,7 @@ next transaction is priced and routed.
 
 ## Why This Matters
 
-The reusable claim is not:
+The reusable product claim is not:
 
 - “this is only a Civilis page feature”
 
@@ -130,7 +128,7 @@ This repo now includes a validated external-consumer quickstart script:
 
 - [../examples/external-consumer-quickstart.mjs](../examples/external-consumer-quickstart.mjs)
 
-The strongest current canonical replay from the public quickstart path is:
+The current live reference path from the public quickstart is:
 
 - quote `34`
 - challengeable protected purchase `11`
@@ -140,11 +138,8 @@ The strongest current canonical replay from the public quickstart path is:
 - evaluator refund resolution through `arbiter`
 - later quote `36`
 
-This path now proves the full reusable flow against independently controlled
-Agentic Wallet actors for buyer, seller, and evaluator. Earlier historical
-quickstart captures remain in the evidence pack as additional depth, but the
-current repo should be read against the `16 -> 34 -> 11 -> 10 -> 36` canonical
-path first.
+This path shows the full reusable flow against independently controlled
+Agentic Wallet actors for buyer, seller, and evaluator.
 
 This repo also includes a second lightweight reference adapter for a different
 commerce surface:

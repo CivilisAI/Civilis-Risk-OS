@@ -9,10 +9,10 @@ It upgrades a payment flow into:
 
 `quote -> challengeable buy -> claim -> evaluator resolution -> later repricing`
 
-It now exists in two public forms:
+It is packaged in two complementary forms:
 
-- a proof-backed reference repo
-- a direct runtime skill surface another AI can call
+- a direct runtime surface another AI can call
+- a live reference integration that shows the protection loop end to end
 
 ## Why It Matters
 
@@ -27,21 +27,21 @@ What usually remains weak is what happens **after payment**:
 
 Civilis Risk OS is the narrow protection layer for that problem.
 
-## Canonical Actors
+## Runtime Roles
 
 - buyer: `sage` / `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9`
 - seller: `fox` / `0x4f5dc690f366116bf6bc22f29e44f8d141bf38de`
 - evaluator: `arbiter` / `0x400ea2f2af2732c4e2af9fb2f8616468ad49023d`
 
-## Canonical Proof Path
+## Primary Live Reference
 
-- replay item: `16`
+- reference item: `16`
 - quote: `34`
 - protected purchase: `11`
 - claim: `10`
 - later repriced quote: `36`
 
-Canonical hashes:
+Primary transaction references:
 
 - funded principal:
   `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
@@ -50,12 +50,12 @@ Canonical hashes:
 - reject/refund:
   `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
 
-## What Is Proven
+## What It Ships
 
 - one live protected-commerce loop on X Layer
 - independent buyer / seller / evaluator Agentic Wallet actors
 - challengeable settlement through `ERC-8183`
-- deterministic buyer claim-proof generation
+- deterministic buyer claim preparation
 - evaluator-driven refund / release
 - later quote repricing after protected outcomes
 - one second portability adapter for another commerce surface
@@ -68,18 +68,19 @@ Canonical hashes:
 - a second live mainnet settlement loop from the portability adapter
 - generic buyer wallet-signature proof for arbitrary claim payloads
 
-## Why It Fits Skills Arena
+## Why It Matters
 
-- it is a reusable Skill, not just a page feature
-- it is grounded in official Onchain OS capability boundaries
-- it includes AI-readable skills, example scripts, schemas, replay guidance, and
-  external consumer integration guidance
+- it is a reusable protection layer, not just a page feature
+- it sits on top of payment, wallet, escrow, and trust primitives already used
+  in agent commerce
+- it gives another AI a direct runtime interface instead of forcing every
+  integrator to re-derive the workflow from raw API calls
 
 ## Read Next
 
 1. [Runtime Quickstart](runtime-quickstart.md)
 2. [Runtime Tool Surface](runtime-tool-surface.md)
-3. [Proof Surface Matrix](proof-surface-matrix.md)
+3. [External Consumer Guide](external-consumer-guide.md)
 4. [Integration Checklist](integration-checklist.md)
 5. [External Consumer Schema](external-consumer-schema.md)
-6. [AI Skill Pack](ai-skill-pack.md)
+6. [API Examples](api-examples.md)
