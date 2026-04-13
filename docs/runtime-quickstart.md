@@ -29,8 +29,34 @@ From the public repo:
 git clone https://github.com/CivilisAI/Civilis-Risk-OS.git
 cd Civilis-Risk-OS
 npm install
+npm run demo
 npm run runtime -- help
 ```
+
+## Fastest Demo
+
+If someone only wants to prove that the package is executable, start with:
+
+```bash
+npm run demo
+```
+
+This performs:
+
+- runtime health
+- one live quote call
+- one structured JSON output
+
+Environment overrides:
+
+```bash
+RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3011
+RISK_OS_DEMO_ITEM_ID=1016
+RISK_OS_DEMO_BUYER=sage
+```
+
+If `RISK_OS_DEMO_ITEM_ID` is omitted, the demo automatically picks the first
+live reference item returned by the runtime.
 
 ## 1. Check Runtime Health
 

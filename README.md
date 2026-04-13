@@ -54,18 +54,9 @@ If someone only has a minute, read in this order:
 
 1. [Project One Pager](docs/project-one-pager.md)
 2. [Runtime Quickstart](docs/runtime-quickstart.md)
-3. [Runtime Tool Surface](docs/runtime-tool-surface.md)
-4. [Proof Surface Matrix](docs/proof-surface-matrix.md)
-5. [Replay Lanes](docs/replay-lanes.md)
-6. [External Consumer Schema](docs/external-consumer-schema.md)
-7. [External Consumer Guide](docs/external-consumer-guide.md)
-8. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
-9. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
-10. [Mainnet Evidence](docs/mainnet-evidence.md)
-11. [Project FAQ](docs/project-faq.md)
-12. [Release Readiness Audit](docs/release-readiness-audit.md)
-13. [Project Manifest](project.manifest.json)
-14. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
+3. [External Consumer Guide](docs/external-consumer-guide.md)
+4. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
+5. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
 
 ## Project 30-Second Read
 
@@ -89,6 +80,7 @@ If another AI should use Risk OS directly, copy this first:
 git clone https://github.com/CivilisAI/Civilis-Risk-OS.git
 cd Civilis-Risk-OS
 npm install
+npm run demo
 npm run runtime -- help
 ```
 
@@ -108,6 +100,12 @@ A concrete live-style example:
 
 ```bash
 npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 1016 --buyer sage
+```
+
+The fastest "does this actually work?" check is now:
+
+```bash
+npm run demo
 ```
 
 ## Runtime Skill

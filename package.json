@@ -8,6 +8,7 @@
     "civilis-risk-os-runtime": "examples/risk-os-runtime.mjs"
   },
   "scripts": {
+    "demo": "node examples/runtime-demo.mjs",
     "runtime": "node examples/risk-os-runtime.mjs",
     "runtime:help": "node examples/risk-os-runtime.mjs help",
     "verify:canonical-docs": "node examples/verify-canonical-proof.mjs",

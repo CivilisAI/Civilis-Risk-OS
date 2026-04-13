@@ -51,20 +51,36 @@ Always read:
 The fastest direct runtime surface is:
 
 ```bash
-node examples/risk-os-runtime.mjs help
+npm run demo
+npm run runtime -- help
 ```
 
-Common actions:
+## Direct Command Contract
+
+Use these commands as the primary runtime contract:
 
 ```bash
-node examples/risk-os-runtime.mjs health --base-url http://127.0.0.1:3021
-node examples/risk-os-runtime.mjs quote --item 16 --buyer sage --base-url http://127.0.0.1:3021
-node examples/risk-os-runtime.mjs buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url http://127.0.0.1:3021
-node examples/risk-os-runtime.mjs purchase --purchase 11 --base-url http://127.0.0.1:3021
-node examples/risk-os-runtime.mjs claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url http://127.0.0.1:3021
-node examples/risk-os-runtime.mjs resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url http://127.0.0.1:3021
-node examples/risk-os-runtime.mjs requote --item 16 --buyer sage --base-url http://127.0.0.1:3021
+npm run runtime -- health --base-url http://127.0.0.1:3021
+npm run runtime -- quote --item 16 --buyer sage --base-url http://127.0.0.1:3021
+npm run runtime -- buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url http://127.0.0.1:3021
+npm run runtime -- purchase --purchase 11 --base-url http://127.0.0.1:3021
+npm run runtime -- claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url http://127.0.0.1:3021
+npm run runtime -- resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url http://127.0.0.1:3021
+npm run runtime -- requote --item 16 --buyer sage --base-url http://127.0.0.1:3021
 ```
+
+## Minimal Usage Rule
+
+Another AI should not need to replay the full proof pack before using this skill.
+
+Default order:
+
+1. `npm run demo`
+2. `npm run runtime -- help`
+3. call the runtime action that matches the current role:
+   - buyer: `quote`, `buy`, `purchase`, `claim-proof`, `claim`
+   - evaluator: `resolve-proof`, `resolve`
+   - follow-up: `requote`
 
 ## Output Contract
 

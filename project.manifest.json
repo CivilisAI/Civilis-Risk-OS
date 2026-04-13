@@ -60,6 +60,7 @@
       "schemas/resolve.request.json"
     ],
     "examples": [
+      "examples/runtime-demo.mjs",
       "examples/risk-os-runtime.mjs",
       "examples/external-consumer-quickstart.mjs",
       "examples/paywalled-intel-unlock-adapter.mjs",
@@ -84,10 +85,9 @@
   "readFirst": [
     "README.md",
     "docs/runtime-quickstart.md",
-    "docs/build-x-reviewer-guide.md",
     "docs/project-one-pager.md",
-    "docs/proof-surface-matrix.md",
-    "docs/integration-checklist.md",
-    "docs/replay-lanes.md"
+    "docs/external-consumer-guide.md",
+    "docs/canonical-proof-evidence.md",
+    "openapi/risk-os.openapi.yaml"
   ]
 }
