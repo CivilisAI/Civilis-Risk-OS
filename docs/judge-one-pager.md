@@ -1,4 +1,4 @@
-# Judge One Pager
+# Project One Pager
 
 ## What It Is
 
@@ -63,7 +63,7 @@ Canonical hashes:
 - a second live mainnet settlement loop from the portability adapter
 - generic buyer wallet-signature proof for arbitrary claim payloads
 
-## Why It Is A Skills Arena Project
+## Why It Fits Skills Arena
 
 - it is a reusable Skill, not just a page feature
 - it is grounded in official Onchain OS capability boundaries

@@ -1,4 +1,4 @@
-# Judge FAQ
+# Project FAQ
 
 ## Is this just a Civilis page feature?
 

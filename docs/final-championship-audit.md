@@ -1,4 +1,4 @@
-# Final Championship Audit
+# Release Readiness Audit
 
 This document is the final pre-submission audit for the public Skills Arena
 repo.

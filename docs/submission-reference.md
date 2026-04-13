@@ -1,4 +1,4 @@
-# Submission Reference
+# Public Reference Pack
 
 This document is the public-safe reference pack for hackathon submission,
 review, and demo prep.

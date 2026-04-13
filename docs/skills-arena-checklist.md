@@ -1,4 +1,4 @@
-# Skills Arena Checklist
+# Build X Requirements Mapping
 
 This checklist maps the public Build X **Skills Arena** requirements directly to
 the materials in this submission repo.

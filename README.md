@@ -1,15 +1,14 @@
 # Civilis Risk OS
 
-**Civilis Risk OS** is the Build X Season 2 **Skills Arena** submission from
-CivilisAI.
+**Civilis Risk OS** is a protection layer for agent commerce on X Layer.
 
-It is a protection layer for agent commerce on X Layer. The current submission
-focuses on one narrow but reusable pattern:
+It focuses on one narrow but reusable pattern:
 
 `risk quote -> challengeable buy -> claim -> evaluator release/refund -> later trust repricing`
 
-This repository is a **standalone public submission repo** for the hackathon.
-It intentionally contains only the materials needed to review this Skill:
+This repository is the project's **public reference repo**. It intentionally
+packages the current live proof, API contract, extracted reference
+implementation, and AI-readable skill surfaces in one place:
 
 - project introduction and architecture
 - X Layer deployment addresses
@@ -19,21 +18,25 @@ It intentionally contains only the materials needed to review this Skill:
 - extracted reference implementation files
 - demo-wallet staging script used to reproduce the proof loops
 
-## Submission Snapshot
+For Build X reviewers, this same repo also acts as the public evaluation
+source. The shortest review path is collected in
+[Build X Reviewer Guide](docs/build-x-reviewer-guide.md), while the top-level
+README stays product-first.
 
-- **Arena:** Skills Arena
+## Project Snapshot
+
 - **Project type:** reusable protection Skill with a live reference integration
 - **Reference integration:** Civilis Intel Market
 - **Primary chain:** X Layer mainnet (`chainId 196`)
 - **Core official stack:** `x402 Payment API`, `Agentic Wallet`,
   `ERC-8183 / ACP`, `ERC-8004`
-- **Submission claim:** a protected commerce flow for agent transactions, not a
+- **Current claim:** a protected commerce flow for agent transactions, not a
   generalized insurance protocol
 
-## README Compliance Snapshot
+## Repository Coverage
 
-This README explicitly includes the fields requested by the Skills Arena
-submission rules:
+This README includes the fields needed both for normal public review and for
+the Build X public-repo requirement:
 
 - **Project Introduction:** see [Project Introduction](#project-introduction)
 - **Architecture Overview:** see [Architecture Overview](#architecture-overview)
@@ -45,39 +48,26 @@ submission rules:
 - **Positioning in the X Layer Ecosystem:** see
   [Positioning in the X Layer Ecosystem](#positioning-in-the-x-layer-ecosystem)
 
-## Judge Quick Path
+## Quick Start
 
-If a reviewer only has a minute, read in this order:
+If someone only has a minute, read in this order:
 
-1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
-2. [Judge One Pager](docs/judge-one-pager.md)
-3. [Scorecard](docs/scorecard.md)
-4. [Judge FAQ](docs/judge-faq.md)
-5. [Final Championship Audit](docs/final-championship-audit.md)
-6. [Proof Surface Matrix](docs/proof-surface-matrix.md)
-7. [Replay Lanes](docs/replay-lanes.md)
-8. [Integration Checklist](docs/integration-checklist.md)
-9. [External Consumer Schema](docs/external-consumer-schema.md)
-10. [External Consumer Guide](docs/external-consumer-guide.md)
-11. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
-12. [Submission Manifest](submission.manifest.json)
-13. [OnchainOS Skills Application Map](docs/onchainos-skills-application-map.md)
-14. [Security Preflight Extension](docs/security-preflight-extension.md)
-15. [Gateway Observability Extension](docs/gateway-observability-extension.md)
-16. [Proof Environment Runbook](docs/proof-environment-runbook.md)
-17. [AI Skill Pack](docs/ai-skill-pack.md)
-18. [Submission Reference](docs/submission-reference.md)
-19. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-20. [Why The Second Adapter Matters](docs/why-second-adapter-matters.md)
-21. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-22. [Mainnet Evidence](docs/mainnet-evidence.md)
-23. [API Examples](docs/api-examples.md)
-24. [Championship Replay Mode](docs/championship-replay-mode.md)
-25. [Judge Demo Script](docs/judge-demo-script.md)
+1. [Project One Pager](docs/judge-one-pager.md)
+2. [Proof Surface Matrix](docs/proof-surface-matrix.md)
+3. [Replay Lanes](docs/replay-lanes.md)
+4. [External Consumer Schema](docs/external-consumer-schema.md)
+5. [External Consumer Guide](docs/external-consumer-guide.md)
+6. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
+7. [Canonical Proof Evidence](docs/skills-arena-risk-os-evidence.md)
+8. [Mainnet Evidence](docs/mainnet-evidence.md)
+9. [Project FAQ](docs/judge-faq.md)
+10. [Release Readiness Audit](docs/final-championship-audit.md)
+11. [Project Manifest](submission.manifest.json)
+12. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
 
-## Judge 30-Second Read
+## Project 30-Second Read
 
-If a reviewer only reads one screen, the intended takeaway is:
+If someone only reads one screen, the intended takeaway is:
 
 - **What it is:** a reusable protection Skill for agent commerce on X Layer
 - **What is live and proven:** one full canonical protected-intel loop on
@@ -111,13 +101,13 @@ Quick index:
 
 - [AI Skill Pack](docs/ai-skill-pack.md)
 - [Integration Checklist](docs/integration-checklist.md)
-- [Judge One Pager](docs/judge-one-pager.md)
+- [Project One Pager](docs/judge-one-pager.md)
 - [Canonical Proof Verifier](examples/verify-canonical-proof.mjs)
 - minimal verifier scripts live in [`package.json`](package.json):
   `verify:canonical-docs`, `verify:canonical-api`, `verify:canonical-onchain`,
   `verify:canonical-full`, `verify:manifest`
-- [Submission Manifest](submission.manifest.json)
-- [Submission Manifest Verifier](examples/verify-submission-manifest.mjs)
+- [Project Manifest](submission.manifest.json)
+- [Project Manifest Verifier](examples/verify-submission-manifest.mjs)
 - [OpenAPI Contract](openapi/risk-os.openapi.yaml)
 - [Replay Lanes](docs/replay-lanes.md)
 - [Proof Environment Runbook](docs/proof-environment-runbook.md)
@@ -127,7 +117,7 @@ Quick index:
 This repo keeps one **canonical** proof path and may also retain older
 historical loops as secondary depth evidence.
 
-Canonical submission path:
+Canonical proof path:
 
 - `16 -> 34 -> 11 -> 10 -> 36`
 - funded principal:
@@ -138,21 +128,21 @@ Canonical submission path:
   `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
 
 Older hashes may still appear in evidence docs as historical depth loops. They
-are preserved intentionally, but the path above is the primary submission
+are preserved intentionally, but the path above is the primary public proof
 story.
 
-## Public Submission Source Of Truth
+## Public Reference Source Of Truth
 
-This public repo is the submission source of truth for Skills Arena.
+This public repo is the source of truth for the current public Risk OS release.
 
 - canonical replay hashes belong here first
 - historical loops may remain as depth evidence
 - private working material should not be treated as more authoritative than this
-  public repo when reviewing the submission
+  public repo
 
 ## Skill Contract
 
-Civilis Risk OS is submitted as a **reusable protection Skill** with one narrow,
+Civilis Risk OS is packaged as a **reusable protection Skill** with one narrow,
 live reference integration.
 
 ### Inputs
@@ -172,7 +162,7 @@ live reference integration.
 - `release` or `refund` resolution outcome
 - later quote repricing
 
-### Supported actions in this submission
+### Supported actions in the current public release
 
 - quote a protected intel purchase
 - execute a challengeable protected purchase
@@ -204,7 +194,7 @@ live reference integration.
 - the public external-consumer quickstart script has been validated against the
   live proof environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
   `resolve-proof`, `resolve`, and later repricing
-- the submission repo also includes a second lightweight reference adapter for
+- the public repo also includes a second lightweight reference adapter for
   `The Square` paywalled intel unlocks, so the reusable claim no longer depends
   on a single commerce surface
 - later quotes reflect prior protected outcomes, and the local protected
@@ -212,7 +202,7 @@ live reference integration.
 
 ### Capability vs Captured Proof
 
-To keep the submission strict, this repo distinguishes between **wallet
+To keep the proof boundary strict, this repo distinguishes between **wallet
 capability** and **captured public proof**:
 
 | Surface | Current status |
@@ -223,7 +213,7 @@ capability** and **captured public proof**:
 | Evaluator-side wallet-bound `resolve-proof` authorization path | captured in a historical proof loop |
 | Generic buyer wallet-signature proof for arbitrary claim payloads | **not claimed** because the official Agentic Wallet CLI does not currently expose a generic message-sign command |
 
-### Non-goals in this submission
+### Non-goals in the current public release
 
 - partial refunds
 - decentralized arbitration
@@ -234,7 +224,7 @@ capability** and **captured public proof**:
 
 The second adapter does **not** prove a second live mainnet settlement loop.
 
-It **does** prove something still important for Skills Arena:
+It **does** prove something still important:
 
 - the Risk OS contract can normalize another commerce surface
 - the protection primitive is not trapped inside Intel Market
@@ -252,7 +242,7 @@ For the shortest explanation of why it still matters, see:
 Civilis Risk OS addresses a missing layer in agent commerce: what happens after
 payment if the delivered output is disputed, low quality, or misleading.
 
-The submission does not try to solve every commerce type at once. Instead, it
+The project does not try to solve every commerce type at once. Instead, it
 demonstrates a narrow but reusable protection loop against a real commerce
 surface that already exists in Civilis.
 
@@ -266,7 +256,7 @@ Civilis Risk OS should be read as an **extracted Skill layer** from the broader
 Civilis project, not as an unrelated new brand.
 
 - **Civilis** is the live multi-agent world and the Season 1 foundation
-- **Civilis Risk OS** is the Season 2 Skills Arena submission built from that
+- **Civilis Risk OS** is the Season 2 Build X project built from that
   foundation
 - **Civilis Intel Market** is the current reference integration that proves the
   Skill in a live agent economy
@@ -328,12 +318,12 @@ Civilis Risk OS is composed of four layers:
    - resolved outcomes change later risk scores
    - future quote recommendations reflect prior protected outcomes
 
-## Skills Arena Positioning
+## Ecosystem Positioning
 
-This repo is packaged specifically for **Skills Arena**, not as a general
-snapshot of the broader Civilis world.
+This repo is packaged as a reusable public project, not as a general snapshot
+of the broader Civilis world.
 
-The reusable submission surface is:
+The reusable public surface is:
 
 - `POST /api/risk/quote/intel`
 - `POST /api/intel/items/:id/buy`
@@ -382,7 +372,7 @@ An external consumer would:
 7. let the evaluator resolve to `release` or `refund`
 8. reuse the next repriced quote for the same seller
 
-That is the reusable skill claim for this submission:
+That is the reusable skill claim for the current public release:
 
 `any agent commerce app can wrap payment with a challengeable protection loop`
 
@@ -406,7 +396,7 @@ full on-chain boot enabled but disables the world tick engine:
 
 This matters because the proof environment needs real `Agentic Wallet` and
 `ERC-8183` behavior, but it should not let unrelated world ticks expire or
-mutate the staged intel item during judge validation.
+mutate the staged intel item during reviewer validation.
 
 ## Onchain OS Skill Usage
 
@@ -421,7 +411,7 @@ capabilities:
 - `ERC-8004`
 - `X Layer mainnet (chainId 196)`
 
-No Uniswap MVP claim is made in this submission snapshot.
+No Uniswap MVP claim is made in this public snapshot.
 
 ## How The Official Stack Is Used
 
@@ -448,7 +438,7 @@ clearer:
 - `okx-security` owns token / tx / signature scanning
 
 That separation helps this repo stay rigorous. It lets us say exactly what this
-submission already uses, what it could extend next, and what it does **not**
+the project already uses, what it could extend next, and what it does **not**
 yet claim.
 
 See:
@@ -478,8 +468,8 @@ See:
 6. Evaluator resolves the claim to `release` or `refund`.
 7. The outcome changes later quote results for the same seller.
 
-The reusable submission surface is the API and orchestration flow above. The
-included dashboard files are a **judge-facing role-scoped proof console** used
+The reusable public surface is the API and orchestration flow above. The
+included dashboard files are a **role-scoped proof console** used
 to make the buyer path and evaluator path legible during review, not a claim
 that production role separation is already fully packaged as a standalone
 front-end product.
@@ -487,7 +477,7 @@ In the current proof console, the evaluator path is intentionally activated only
 after the buyer has opened a claim, so the review follows the same role order
 as the protected workflow.
 
-For the strict mainnet-backed proof loops in this submission, buyer-side claim
+For the strict mainnet-backed proof loops in this repo, buyer-side claim
 filing is role-gated through a dedicated claimant token. Evaluator resolution
 can use the strict proof-environment evaluator token or a wallet-bound
 signature over the `resolve-proof` message. This is still weaker than
@@ -498,7 +488,7 @@ actions.
 Outside the strict proof environment, unauthenticated role actions remain
 disabled by default. A developer must explicitly opt into a local bypass through
 `RISK_OS_ALLOW_UNAUTHENTICATED_DEV=true`; that bypass is not part of the public
-submission claim.
+project claim.
 
 ## Deployment Addresses
 
@@ -513,7 +503,7 @@ submission claim.
 
 ## Agentic Wallet Roles Used In Proof
 
-The strongest current submission replay uses staged Agentic Wallet actors that
+The strongest current replay uses staged Agentic Wallet actors that
 are independently controlled by the maintained proof session:
 
 | Role | Agent | Wallet |
@@ -522,7 +512,7 @@ are independently controlled by the maintained proof session:
 | seller | `fox` | `0x4f5dc690f366116bf6bc22f29e44f8d141bf38de` |
 | evaluator | `arbiter` | `0x400ea2f2af2732c4e2af9fb2f8616468ad49023d` |
 
-These are **submission-scoped proof actors**. They do not replace the broader
+These are **proof-scoped actors**. They do not replace the broader
 live wallet map of the original Civilis world.
 
 ## Positioning in the X Layer Ecosystem
@@ -537,7 +527,7 @@ Layer agent stack:
 - **Civilis Risk OS makes that commerce challengeable, refundable, and
   repriced**
 
-This is why the project is submitted as a Skill rather than as a generic app
+This is why the project is expressed as a Skill rather than as a generic app
 feature.
 
 ## Verified Mainnet Proof
@@ -613,14 +603,14 @@ And the strongest current actor-independence claim is:
 
 | Path | Purpose |
 | --- | --- |
-| [`docs/`](docs) | submission-safe evidence, proof references, and boundaries |
+| [`docs/`](docs) | public evidence, proof references, integration notes, and evaluation materials |
 | [`specs/`](specs) | PRD and implementation plan |
 | [`reference/server/`](reference/server) | extracted reference implementation files from the working service |
-| [`reference/dashboard/`](reference/dashboard) | extracted judge-facing reference UI files |
+| [`reference/dashboard/`](reference/dashboard) | extracted reviewer-facing reference UI files |
 
 ## What Is Included
 
-- a focused README that satisfies the hackathon submission requirements
+- a focused README that explains the project and covers the public repo requirement fields
 - deployment addresses
 - Onchain OS / X Layer usage
 - working mechanics
@@ -639,26 +629,24 @@ This repository does **not** claim:
 - on-chain premium collection
 - a fully capitalized underwriting reserve
 
-Those are future extension directions, not current submission facts.
+Those are future extension directions, not current public facts.
 
 ## Team Members
 
-- `kb / CivilisAI`: product, architecture, submission direction
+- `kb / CivilisAI`: product, architecture, and project direction
 - `Codex`: implementation, review, packaging, and evidence support
 
-## Recommended Reading Order
+## Build X Review Materials
 
-1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
-2. [External Consumer Guide](docs/external-consumer-guide.md)
-3. [PRD](specs/PRD.md)
-4. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-5. [Mainnet Evidence](docs/mainnet-evidence.md)
-6. [Submission Reference](docs/submission-reference.md)
-7. [API Examples](docs/api-examples.md)
-8. [Judge Demo Script](docs/judge-demo-script.md)
-9. [Implementation Plan](specs/IMPLEMENTATION_PLAN.md)
-10. [Reference Pack Notes](reference/README.md)
+If you are reviewing this repo for Build X specifically, start here:
+
+1. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
+2. [Build X Requirements Mapping](docs/skills-arena-checklist.md)
+3. [Canonical Proof Evidence](docs/skills-arena-risk-os-evidence.md)
+4. [Evaluation Mapping](docs/scorecard.md)
+5. [Release Readiness Audit](docs/final-championship-audit.md)
+6. [Public Reference Pack](docs/submission-reference.md)
 
 ## License
 
-This submission pack is released under the [MIT License](LICENSE).
+This public project repository is released under the [MIT License](LICENSE).

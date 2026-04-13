@@ -1,4 +1,4 @@
-# Civilis Risk OS Evidence
+# Canonical Proof Evidence
 
 This document collects the judge-facing evidence for the Build X Season 2
 Skills Arena submission artifact: **Civilis Risk OS**.

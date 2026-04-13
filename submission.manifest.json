@@ -74,8 +74,9 @@
     "secondLiveMainnetSettlementLoop": false
   },
   "readFirst": [
+    "README.md",
+    "docs/build-x-reviewer-guide.md",
     "docs/judge-one-pager.md",
-    "docs/final-championship-audit.md",
     "docs/proof-surface-matrix.md",
     "docs/integration-checklist.md",
     "docs/replay-lanes.md"

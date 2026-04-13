@@ -1,4 +1,4 @@
-# Scorecard
+# Evaluation Mapping
 
 This document maps Civilis Risk OS directly to the official Skills Arena scoring
 categories.
