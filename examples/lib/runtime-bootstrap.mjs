@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BUNDLED_RUNTIME_AUTH, BUNDLED_RUNTIME_BASE_URL, isLocalRuntimeUrl } from './bundled-runtime-profile.mjs';
@@ -8,14 +10,55 @@ import { requestJson } from './http-client.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
+const sessionStoreDir = path.join(os.homedir(), '.civilis-risk-os');
+const sessionStoreFile = path.join(sessionStoreDir, 'runtime-sessions.json');
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function normalizeBaseUrl(baseUrl) {
+  return baseUrl.replace(/\/$/, '');
+}
+
+function loadSessionStore() {
+  try {
+    return JSON.parse(fs.readFileSync(sessionStoreFile, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function saveSessionStore(store) {
+  fs.mkdirSync(sessionStoreDir, { recursive: true });
+  fs.writeFileSync(sessionStoreFile, JSON.stringify(store, null, 2));
+}
+
+function resolveRuntimeSession(baseUrl) {
+  const explicitSession = process.env.RISK_OS_RUNTIME_SESSION?.trim();
+  if (explicitSession) {
+    return explicitSession;
+  }
+
+  if (isLocalRuntimeUrl(baseUrl)) {
+    return '';
+  }
+
+  const key = normalizeBaseUrl(baseUrl);
+  const store = loadSessionStore();
+  if (typeof store[key] === 'string' && store[key].trim()) {
+    return store[key].trim();
+  }
+
+  const sessionId = crypto.randomUUID();
+  store[key] = sessionId;
+  saveSessionStore(store);
+  return sessionId;
+}
+
 export async function getRuntimeHealth(baseUrl) {
   try {
-    return await requestJson(`${baseUrl.replace(/\/$/, '')}/health`);
+    return await requestJson(`${normalizeBaseUrl(baseUrl)}/health`);
   } catch {
     return null;
   }
@@ -156,9 +199,11 @@ async function startBundledRuntime(baseUrl) {
         started: true,
         child,
         baseUrl,
+        requestBaseUrl: normalizeBaseUrl(baseUrl),
         runtimeRoot: repoRoot,
         runtimeEnvFile: null,
         auth: getBundledRuntimeAuth(),
+        sessionId: '',
         stop: cleanup,
       };
     }
@@ -179,15 +224,17 @@ export async function ensureRuntime(baseUrl) {
     const runtimeEnv = runtimeRoot ? loadRuntimeEnv(runtimeRoot) : { file: null, values: {} };
     const runtimeMode = String(currentHealth.checks?.mode ?? '');
     const bundled = runtimeMode.includes('bundled') || baseUrl === BUNDLED_RUNTIME_BASE_URL;
-    return {
-      started: false,
-      child: null,
-      baseUrl,
-      runtimeRoot,
-      runtimeEnvFile: runtimeEnv.file,
-      auth: bundled ? getBundledRuntimeAuth() : getRuntimeAuth(runtimeEnv.values),
-      stop() {},
-    };
+      return {
+        started: false,
+        child: null,
+        baseUrl,
+        requestBaseUrl: normalizeBaseUrl(baseUrl),
+        runtimeRoot,
+        runtimeEnvFile: runtimeEnv.file,
+        auth: bundled ? getBundledRuntimeAuth() : getRuntimeAuth(runtimeEnv.values),
+        sessionId: resolveRuntimeSession(baseUrl),
+        stop() {},
+      };
   }
 
   if (isLocalRuntimeUrl(baseUrl)) {
@@ -243,9 +290,11 @@ export async function ensureRuntime(baseUrl) {
         started: true,
         child,
         baseUrl,
+        requestBaseUrl: normalizeBaseUrl(baseUrl),
         runtimeRoot,
         runtimeEnvFile: runtimeEnv.file,
         auth: getRuntimeAuth(runtimeEnv.values),
+        sessionId: resolveRuntimeSession(baseUrl),
         stop: cleanup,
       };
     }
@@ -270,4 +319,12 @@ export function withDefaultRuntimeAuth(flags, runtime) {
     'evaluator-token': flags['evaluator-token'] || runtime.auth?.evaluatorToken || '',
     'evaluator-signature': flags['evaluator-signature'] || runtime.auth?.evaluatorSignature || '',
   };
+}
+
+export function withRuntimeRequestHeaders(headers, runtime) {
+  const normalized = new Headers(headers ?? {});
+  if (runtime?.sessionId) {
+    normalized.set('x-civilis-runtime-session', runtime.sessionId);
+  }
+  return normalized;
 }

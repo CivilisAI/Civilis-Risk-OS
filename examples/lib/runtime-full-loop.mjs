@@ -1,4 +1,4 @@
-import { ensureRuntime, withDefaultRuntimeAuth } from './runtime-bootstrap.mjs';
+import { ensureRuntime, withDefaultRuntimeAuth, withRuntimeRequestHeaders } from './runtime-bootstrap.mjs';
 import { requestJson } from './http-client.mjs';
 
 function pickString(value, fallback) {
@@ -14,15 +14,17 @@ function requireNumber(value, label) {
   return numeric;
 }
 
-async function fetchItems(baseUrl) {
-  const response = await requestJson(`${baseUrl}/api/intel/items`);
+async function fetchItems(baseUrl, runtime) {
+  const response = await requestJson(`${baseUrl}/api/intel/items`, {
+    headers: withRuntimeRequestHeaders(undefined, runtime),
+  });
   return Array.isArray(response?.items) ? response.items : [];
 }
 
-async function quoteItem(baseUrl, intelItemId, buyerAgentId) {
+async function quoteItem(baseUrl, intelItemId, buyerAgentId, runtime) {
   return requestJson(`${baseUrl}/api/risk/quote/intel`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: withRuntimeRequestHeaders({ 'content-type': 'application/json' }, runtime),
     body: JSON.stringify({
       intelItemId,
       buyerAgentId,
@@ -30,9 +32,9 @@ async function quoteItem(baseUrl, intelItemId, buyerAgentId) {
   });
 }
 
-async function resolveChallengeableQuote(baseUrl, buyerAgentId, requestedItemId = null) {
+async function resolveChallengeableQuote(baseUrl, buyerAgentId, runtime, requestedItemId = null) {
   if (requestedItemId) {
-    const quote = await quoteItem(baseUrl, requestedItemId, buyerAgentId);
+    const quote = await quoteItem(baseUrl, requestedItemId, buyerAgentId, runtime);
     if (quote.recommended_mode !== 'challengeable') {
       throw new Error(
         `Requested item ${requestedItemId} did not produce a challengeable quote (got ${quote.recommended_mode}).`,
@@ -44,7 +46,7 @@ async function resolveChallengeableQuote(baseUrl, buyerAgentId, requestedItemId 
     };
   }
 
-  const items = (await fetchItems(baseUrl)).sort((left, right) => {
+  const items = (await fetchItems(baseUrl, runtime)).sort((left, right) => {
     const leftPrice = Number(left?.price ?? Number.MAX_SAFE_INTEGER);
     const rightPrice = Number(right?.price ?? Number.MAX_SAFE_INTEGER);
     return leftPrice - rightPrice;
@@ -56,7 +58,7 @@ async function resolveChallengeableQuote(baseUrl, buyerAgentId, requestedItemId 
   const failures = [];
   for (const item of items.slice(0, 12)) {
     try {
-      const quote = await quoteItem(baseUrl, Number(item.id), buyerAgentId);
+      const quote = await quoteItem(baseUrl, Number(item.id), buyerAgentId, runtime);
       if (quote.recommended_mode === 'challengeable') {
         return {
           itemId: Number(item.id),
@@ -96,16 +98,20 @@ export async function runProtectedLoop({
   }, runtime);
 
   try {
-    const health = await requestJson(`${baseUrl}/health`);
+    const requestBaseUrl = runtime.requestBaseUrl || baseUrl;
+    const health = await requestJson(`${requestBaseUrl}/health`, {
+      headers: withRuntimeRequestHeaders(undefined, runtime),
+    });
     const selected = await resolveChallengeableQuote(
-      baseUrl,
+      requestBaseUrl,
       buyerAgentId,
+      runtime,
       itemId ? requireNumber(itemId, 'item') : null,
     );
 
-    const buy = await requestJson(`${baseUrl}/api/intel/items/${selected.itemId}/buy`, {
+    const buy = await requestJson(`${requestBaseUrl}/api/intel/items/${selected.itemId}/buy`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: withRuntimeRequestHeaders({ 'content-type': 'application/json' }, runtime),
       body: JSON.stringify({
         buyerAgentId,
         purchaseMode: 'challengeable',
@@ -114,23 +120,26 @@ export async function runProtectedLoop({
     });
 
     const protectedPurchaseId = requireNumber(buy.protected_purchase_id, 'protected purchase id');
-    const purchase = await requestJson(`${baseUrl}/api/risk/purchases/${protectedPurchaseId}`);
+    const purchase = await requestJson(`${requestBaseUrl}/api/risk/purchases/${protectedPurchaseId}`, {
+      headers: withRuntimeRequestHeaders(undefined, runtime),
+    });
 
     const claimProofParams = new URLSearchParams({
       claimType,
       reasonText: claimReason,
     });
     const claimProof = await requestJson(
-      `${baseUrl}/api/risk/purchases/${protectedPurchaseId}/claim-proof?${claimProofParams.toString()}`,
+      `${requestBaseUrl}/api/risk/purchases/${protectedPurchaseId}/claim-proof?${claimProofParams.toString()}`,
+      { headers: withRuntimeRequestHeaders(undefined, runtime) },
     );
 
-    const claim = await requestJson(`${baseUrl}/api/risk/claims`, {
+    const claim = await requestJson(`${requestBaseUrl}/api/risk/claims`, {
       method: 'POST',
-      headers: {
+      headers: withRuntimeRequestHeaders({
         'content-type': 'application/json',
         ...(authFlags['claimant-token'] ? { 'x-civilis-risk-claimant-token': authFlags['claimant-token'] } : {}),
         ...(authFlags['claimant-signature'] ? { 'x-civilis-risk-claimant-signature': authFlags['claimant-signature'] } : {}),
-      },
+      }, runtime),
       body: JSON.stringify({
         protectedPurchaseId,
         claimType,
@@ -147,23 +156,24 @@ export async function runProtectedLoop({
       decisionReason: decisionReason,
     });
     const resolveProof = await requestJson(
-      `${baseUrl}/api/risk/claims/${claimId}/resolve-proof?${resolveProofParams.toString()}`,
+      `${requestBaseUrl}/api/risk/claims/${claimId}/resolve-proof?${resolveProofParams.toString()}`,
+      { headers: withRuntimeRequestHeaders(undefined, runtime) },
     );
 
-    const resolution = await requestJson(`${baseUrl}/api/risk/claims/${claimId}/resolve`, {
+    const resolution = await requestJson(`${requestBaseUrl}/api/risk/claims/${claimId}/resolve`, {
       method: 'POST',
-      headers: {
+      headers: withRuntimeRequestHeaders({
         'content-type': 'application/json',
         ...(authFlags['evaluator-token'] ? { 'x-civilis-risk-evaluator-token': authFlags['evaluator-token'] } : {}),
         ...(authFlags['evaluator-signature'] ? { 'x-civilis-risk-evaluator-signature': authFlags['evaluator-signature'] } : {}),
-      },
+      }, runtime),
       body: JSON.stringify({
         decision,
         decisionReason,
       }),
     });
 
-    const requote = await quoteItem(baseUrl, selected.itemId, buyerAgentId);
+    const requote = await quoteItem(requestBaseUrl, selected.itemId, buyerAgentId, runtime);
 
     return {
       ok: true,

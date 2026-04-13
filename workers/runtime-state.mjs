@@ -322,11 +322,6 @@ export class RuntimeState {
         });
       }
 
-      if (request.method === 'POST' && url.pathname === '/admin/reset') {
-        await this.reset();
-        return json({ ok: true, reset: true });
-      }
-
       if (request.method === 'GET' && url.pathname === '/api/intel/items') {
         return json({
           items: state.items.map((item) => ({

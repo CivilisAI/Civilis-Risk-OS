@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { ensureRuntime } from './lib/runtime-bootstrap.mjs';
+import { ensureRuntime, withRuntimeRequestHeaders } from './lib/runtime-bootstrap.mjs';
 import { BUNDLED_RUNTIME_BASE_URL } from './lib/bundled-runtime-profile.mjs';
 import { requestJson } from './lib/http-client.mjs';
 
@@ -9,10 +9,12 @@ const buyer = process.env.RISK_OS_DEMO_BUYER || 'sage';
 const requestedItemId = process.env.RISK_OS_DEMO_ITEM_ID || null;
 
 async function main() {
-  const runtime = await ensureRuntime(baseUrl);
+    const runtime = await ensureRuntime(baseUrl);
   try {
-    const health = await requestJson(`${baseUrl}/health`);
-    const listingResponse = await requestJson(`${baseUrl}/api/intel/items`);
+    const requestHeaders = withRuntimeRequestHeaders(undefined, runtime);
+    const requestBaseUrl = runtime.requestBaseUrl || baseUrl;
+    const health = await requestJson(`${requestBaseUrl}/health`, { headers: requestHeaders });
+    const listingResponse = await requestJson(`${requestBaseUrl}/api/intel/items`, { headers: requestHeaders });
     const items = Array.isArray(listingResponse?.items) ? listingResponse.items : [];
     const selectedItem = requestedItemId
       ? items.find((item) => String(item.id) === String(requestedItemId))
@@ -22,11 +24,11 @@ async function main() {
       throw new Error('No eligible intel items were returned by the runtime.');
     }
 
-    const quote = await requestJson(`${baseUrl}/api/risk/quote/intel`, {
+    const quote = await requestJson(`${requestBaseUrl}/api/risk/quote/intel`, {
       method: 'POST',
-      headers: {
+      headers: withRuntimeRequestHeaders({
         'content-type': 'application/json',
-      },
+      }, runtime),
       body: JSON.stringify({
         intelItemId: Number(selectedItem.id),
         buyerAgentId: buyer,

@@ -91,6 +91,10 @@ environment variables and macOS system proxy detection, so the same command
 surface works in proxy-routed environments without requiring a separate manual
 network setup step.
 
+Hosted bundled mode also uses package-managed runtime sessions so each caller
+gets an isolated quote, purchase, claim, and resolution history instead of
+sharing one global public demo state.
+
 For a custom hosted-compatible deployment, an external AI or app still needs:
 
 - `base-url`

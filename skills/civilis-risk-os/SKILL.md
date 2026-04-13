@@ -87,6 +87,8 @@ The primary runtime command surface is:
   the package
 - in the public hosted bundled runtime, the package also auto-supplies bundled
   claimant and evaluator auth after the runtime identifies itself as bundled
+- in the public hosted bundled runtime, the package also auto-manages a runtime
+  session so protected-commerce state stays isolated per caller
 
 ## Command Examples
 

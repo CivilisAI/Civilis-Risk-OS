@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { ensureRuntime, withDefaultRuntimeAuth } from './lib/runtime-bootstrap.mjs';
+import { ensureRuntime, withDefaultRuntimeAuth, withRuntimeRequestHeaders } from './lib/runtime-bootstrap.mjs';
 import { BUNDLED_RUNTIME_BASE_URL } from './lib/bundled-runtime-profile.mjs';
 import { requestJson } from './lib/http-client.mjs';
 import { runProtectedLoop } from './lib/runtime-full-loop.mjs';
@@ -99,9 +99,12 @@ function getString(value, fallback, label) {
   return normalized;
 }
 
-async function request(baseUrl, path, options = {}) {
-  const normalizedBase = baseUrl.replace(/\/$/, '');
-  return requestJson(`${normalizedBase}${path}`, options);
+async function request(baseUrl, path, options = {}, runtime = null) {
+  const normalizedBase = runtime?.requestBaseUrl || baseUrl.replace(/\/$/, '');
+  return requestJson(`${normalizedBase}${path}`, {
+    ...options,
+    headers: withRuntimeRequestHeaders(options.headers, runtime),
+  });
 }
 
 async function run(command, flags) {
@@ -129,14 +132,14 @@ async function run(command, flags) {
   try {
     switch (command) {
       case 'health':
-        return await request(baseUrl, '/health');
+        return await request(baseUrl, '/health', {}, runtime);
       case 'quote': {
         const intelItemId = getNumber(normalizedFlags.item, 'item');
         return await request(baseUrl, '/api/risk/quote/intel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ intelItemId, buyerAgentId }),
-        });
+        }, runtime);
       }
       case 'buy': {
         const intelItemId = getNumber(normalizedFlags.item, 'item');
@@ -146,11 +149,11 @@ async function run(command, flags) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ buyerAgentId, purchaseMode, quoteId }),
-        });
+        }, runtime);
       }
       case 'purchase': {
         const purchaseId = getNumber(normalizedFlags.purchase, 'purchase');
-        return await request(baseUrl, `/api/risk/purchases/${purchaseId}`);
+        return await request(baseUrl, `/api/risk/purchases/${purchaseId}`, {}, runtime);
       }
       case 'claim-proof': {
         const purchaseId = getNumber(normalizedFlags.purchase, 'purchase');
@@ -159,7 +162,7 @@ async function run(command, flags) {
           claimType,
           reasonText: claimReason,
         });
-        return await request(baseUrl, `/api/risk/purchases/${purchaseId}/claim-proof?${params.toString()}`);
+        return await request(baseUrl, `/api/risk/purchases/${purchaseId}/claim-proof?${params.toString()}`, {}, runtime);
       }
       case 'claim': {
         const purchaseId = getNumber(normalizedFlags.purchase, 'purchase');
@@ -177,7 +180,7 @@ async function run(command, flags) {
             reasonText: claimReason,
             evidence: { source: 'risk-os-runtime-cli' },
           }),
-        });
+        }, runtime);
       }
       case 'resolve-proof': {
         const claimId = getNumber(normalizedFlags.claim, 'claim');
@@ -188,7 +191,7 @@ async function run(command, flags) {
         if (typeof normalizedFlags.reason === 'string' && normalizedFlags.reason.trim()) {
           params.set('decisionReason', normalizedFlags.reason.trim());
         }
-        return await request(baseUrl, `/api/risk/claims/${claimId}/resolve-proof?${params.toString()}`);
+        return await request(baseUrl, `/api/risk/claims/${claimId}/resolve-proof?${params.toString()}`, {}, runtime);
       }
       case 'resolve': {
         const claimId = getNumber(normalizedFlags.claim, 'claim');
@@ -209,7 +212,7 @@ async function run(command, flags) {
             ...(decision ? { decision } : {}),
             ...(resolutionReason ? { decisionReason: resolutionReason } : {}),
           }),
-        });
+        }, runtime);
       }
       case 'requote': {
         const intelItemId = getNumber(normalizedFlags.item, 'item');
@@ -217,7 +220,7 @@ async function run(command, flags) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ intelItemId, buyerAgentId }),
-        });
+        }, runtime);
       }
       case 'full-loop':
         return await runProtectedLoop({

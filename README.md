@@ -109,6 +109,10 @@ The runtime client supports standard `HTTP_PROXY` / `HTTPS_PROXY` style
 configuration and also detects the macOS system proxy automatically for hosted
 runtime calls when needed.
 
+Hosted bundled calls also use a package-managed runtime session so quote, buy,
+claim, resolve, and requote stay isolated and repeatable per caller instead of
+mutating a single shared public demo state.
+
 Current public hosted runtime:
 
 - `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
