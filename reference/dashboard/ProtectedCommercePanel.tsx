@@ -24,7 +24,7 @@ const DEFAULT_CLAIM_REASON = 'The delivered intel is misleading, incomplete, or 
 const DEFAULT_RESOLUTION_REASON = 'Evaluator reviewed the protected purchase outcome.'
 const CLAIM_TYPE = 'misleading_or_invalid_intel'
 const PROOF_BUYER_AGENT_IDS = ['oracle', 'sage']
-type WorkspaceView = 'split' | 'buyer' | 'evaluator'
+type WorkspaceView = 'buyer' | 'evaluator'
 
 function getModeTone(mode: IntelProtectionPurchaseMode | undefined) {
   if (mode === 'instant') return 'emerald'
@@ -391,8 +391,9 @@ export function ProtectedCommercePanel({
   const postOutcomeQuoteLabel = claimResolved
     ? (postOutcomeQuote ? (zh ? '已刷新 post-resolution re-quote' : 'Post-resolution Re-Quote Ready') : (zh ? '可刷新 post-resolution re-quote' : 'Ready to Refresh Post-resolution Re-Quote'))
     : (zh ? '等待 claim 裁决后再刷新' : 'Waiting for claim resolution')
-  const showBuyerWorkspace = workspaceView !== 'evaluator'
-  const showEvaluatorWorkspace = workspaceView !== 'buyer'
+  const evaluatorPathReady = Boolean(purchase?.claim?.claim_id)
+  const showBuyerWorkspace = workspaceView === 'buyer'
+  const showEvaluatorWorkspace = workspaceView === 'evaluator'
 
   return (
     <section className="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface)] p-4">
@@ -406,8 +407,8 @@ export function ProtectedCommercePanel({
           </h3>
           <p className="max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
             {zh
-              ? '以 Intel Market 作为参考接入，先给出风险报价，再让买方和评审在各自的工作台里完成保护性购买、申诉和裁决；结果回写后，重新报价的入口会被明确保留。'
-              : 'Using Intel Market as the reference integration, this skill quotes risk first, then lets buyer and evaluator work in separate workspaces for protected purchase, claim, and resolution; the post-outcome re-quote entry remains explicit instead of being implied.'}
+              ? '以 Intel Market 作为参考接入，先给出风险报价，再让买方和评审沿着分离的角色路径完成保护性购买、申诉和裁决；结果回写后，重新报价的入口会被明确保留。'
+              : 'Using Intel Market as the reference integration, this skill quotes risk first, then lets buyer and evaluator move through separate role-scoped workflows for protected purchase, claim, and resolution; the post-outcome re-quote entry remains explicit instead of being implied.'}
           </p>
         </div>
         <ProtocolBadge label={labelMode(purchaseMode, zh)} tone={getModeTone(purchaseMode)} />
@@ -430,32 +431,43 @@ export function ProtectedCommercePanel({
 
       <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
         <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-          {zh ? '工作台视角' : 'Workspace View'}
+          {zh ? '角色路径' : 'Role Path'}
         </span>
         {([
-          ['split', zh ? '双视角' : 'Split'],
-          ['buyer', zh ? '仅买方' : 'Buyer Only'],
-          ['evaluator', zh ? '仅评审' : 'Evaluator Only'],
+          ['buyer', zh ? '买方路径' : 'Buyer Path'],
+          ['evaluator', zh ? '评审路径' : 'Evaluator Path'],
         ] as Array<[WorkspaceView, string]>).map(([mode, label]) => {
           const active = workspaceView === mode
+          const disabled = mode === 'evaluator' && !evaluatorPathReady
           return (
             <button
               key={mode}
               type="button"
-              onClick={() => setWorkspaceView(mode)}
+              onClick={() => {
+                if (disabled) return
+                setWorkspaceView(mode)
+              }}
+              disabled={disabled}
               className={`rounded-full border px-3 py-1.5 font-mono text-[0.625rem] uppercase tracking-[0.18em] transition ${
                 active
                   ? 'border-[var(--border-gold)] bg-[var(--gold-wash)] text-[var(--gold)]'
-                  : 'border-[var(--border-primary)] text-[var(--text-dim)] hover:border-[var(--border-gold)] hover:text-[var(--gold)]'
+                  : disabled
+                    ? 'border-[var(--border-primary)] text-[var(--text-dim)] opacity-50 cursor-not-allowed'
+                    : 'border-[var(--border-primary)] text-[var(--text-dim)] hover:border-[var(--border-gold)] hover:text-[var(--gold)]'
               }`}
             >
               {label}
             </button>
           )
         })}
+        <span className="ml-auto text-xs leading-6 text-[var(--text-dim)]">
+          {zh
+            ? '同一时间只展示一个角色工作台；评审路径会在买方成功提交 claim 后才激活。'
+            : 'Only one role workspace is shown at a time; the evaluator path activates only after the buyer successfully opens a claim.'}
+        </span>
       </div>
 
-      <div className={`mt-5 grid gap-4 ${showBuyerWorkspace && showEvaluatorWorkspace ? 'xl:grid-cols-[1.05fr,0.95fr]' : ''}`}>
+      <div className="mt-5 grid gap-4">
         {showBuyerWorkspace ? (
         <div className="space-y-4">
           <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-4">
@@ -688,6 +700,15 @@ export function ProtectedCommercePanel({
                 >
                   {claimLoading ? (zh ? '提交中…' : 'Submitting…') : (zh ? '提交 claim' : 'File Claim')}
                 </button>
+                {purchase?.claim?.claim_id ? (
+                  <button
+                    type="button"
+                    onClick={() => setWorkspaceView('evaluator')}
+                    className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)]"
+                  >
+                    {zh ? '切到评审路径' : 'Continue As Evaluator'}
+                  </button>
+                ) : null}
               </div>
 
               {claimError ? <NoticeBanner title={zh ? '申诉错误' : 'Claim Error'} message={claimError} tone="error" /> : null}
@@ -722,6 +743,11 @@ export function ProtectedCommercePanel({
 
         {showEvaluatorWorkspace ? (
         <div className="space-y-4">
+          {!evaluatorPathReady ? (
+            <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-4">
+              <EmptyState label={zh ? '先在买方路径完成受保护购买并提交 claim，评审路径才会激活。' : 'Complete the protected purchase and open a claim in the buyer path before entering the evaluator path.'} />
+            </div>
+          ) : null}
           <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -741,6 +767,22 @@ export function ProtectedCommercePanel({
                 label={purchase?.evaluator_address ? (zh ? '已配置 evaluator' : 'Evaluator Set') : (zh ? '等待 evaluator' : 'Evaluator Pending')}
                 tone={purchase?.evaluator_address ? 'violet' : 'slate'}
               />
+            </div>
+
+            <div className="mt-3 rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                  {zh ? '评审视角说明' : 'Evaluator View Note'}
+                </p>
+                <span className="font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
+                  {zh ? 'Evaluator only' : 'Evaluator only'}
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
+                {zh
+                  ? '该路径只展示已发生的 protected purchase 与 claim 结果，不再暴露买方报价或购买控件。这样评审能看到明确的角色分离。'
+                  : 'This path only exposes the protected purchase and claim outcome state. Buyer quote and purchase controls are intentionally hidden so the review reads as a role-separated skill workflow.'}
+              </p>
             </div>
 
             {purchaseError ? <NoticeBanner title={zh ? '购买失败' : 'Purchase Error'} message={purchaseError} tone="error" /> : null}
@@ -880,11 +922,18 @@ export function ProtectedCommercePanel({
                     />
                   </label>
 
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void resolveClaim('release')}
-                      disabled={resolveLoading || !purchase?.claim || !purchase?.evaluator_address}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setWorkspaceView('buyer')}
+                    className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)]"
+                  >
+                    {zh ? '返回买方路径' : 'Back To Buyer Path'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void resolveClaim('release')}
+                      disabled={resolveLoading || !evaluatorPathReady || !purchase?.claim || !purchase?.evaluator_address}
                       className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {resolveLoading ? (zh ? '裁决中…' : 'Resolving…') : (zh ? '裁决放款' : 'Resolve Release')}
@@ -892,7 +941,7 @@ export function ProtectedCommercePanel({
                     <button
                       type="button"
                       onClick={() => void resolveClaim('refund')}
-                      disabled={resolveLoading || !purchase?.claim || !purchase?.evaluator_address}
+                      disabled={resolveLoading || !evaluatorPathReady || !purchase?.claim || !purchase?.evaluator_address}
                       className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {resolveLoading ? (zh ? '裁决中…' : 'Resolving…') : (zh ? '裁决退款' : 'Resolve Refund')}

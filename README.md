@@ -268,9 +268,13 @@ No Uniswap MVP claim is made in this submission snapshot.
 7. The outcome changes later quote results for the same seller.
 
 The reusable submission surface is the API and orchestration flow above. The
-included dashboard files are a **judge-facing proof console** used to make the
-flow legible during review, not a claim that production role separation is
-already fully packaged as a standalone front-end product.
+included dashboard files are a **judge-facing role-scoped proof console** used
+to make the buyer path and evaluator path legible during review, not a claim
+that production role separation is already fully packaged as a standalone
+front-end product.
+In the current proof console, the evaluator path is intentionally activated only
+after the buyer has opened a claim, so the review follows the same role order
+as the protected workflow.
 
 For the strict mainnet-backed proof loops in this submission, buyer-side claim
 filing and evaluator-side resolution are role-gated through dedicated Risk OS
