@@ -49,6 +49,7 @@
     "schemas": [
       "schemas/risk-quote.response.json",
       "schemas/protected-purchase.response.json",
+      "schemas/purchase-view.response.json",
       "schemas/claim.request.json",
       "schemas/resolve.request.json"
     ],

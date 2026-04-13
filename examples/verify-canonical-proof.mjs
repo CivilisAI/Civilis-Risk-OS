@@ -13,10 +13,15 @@ const HELP = `Civilis Risk OS canonical proof verifier
 Modes:
   default / offline-docs  Verify that canonical ids and hashes are consistent across public docs.
   health                  Also probe a live proof server health endpoint.
+  api                     Verify docs and query the canonical protected purchase from a live proof server.
+  onchain                 Verify docs and fetch receipts for canonical tx hashes from X Layer RPC.
+  full                    Run docs + health + api + onchain in one report.
 
 Optional env:
-  RISK_OS_VERIFY_MODE=offline-docs|health
+  RISK_OS_VERIFY_MODE=offline-docs|health|api|onchain|full
   RISK_OS_BASE_URL=http://127.0.0.1:3020
+  RISK_OS_RPC_URL=https://rpc.xlayer.tech
+  RISK_OS_VERIFY_VERBOSE=1
 `;
 
 const CANONICAL = {
@@ -100,8 +105,123 @@ async function verifyHealth() {
     mode: 'health',
     baseUrl,
     health,
-    healthError
+    healthError,
+    ok: docs.ok && !healthError
   };
+}
+
+async function verifyApi() {
+  const baseUrl = (process.env.RISK_OS_BASE_URL || 'http://127.0.0.1:3020').replace(/\/$/, '');
+  const docs = await verifyDocs();
+
+  let purchaseView = null;
+  let apiError = null;
+  try {
+    const response = await fetch(`${baseUrl}/api/risk/purchases/${CANONICAL.purchase}`);
+    const text = await response.text();
+    purchaseView = text ? JSON.parse(text) : null;
+    if (!response.ok) {
+      apiError = `${response.status} ${response.statusText}`;
+    }
+  } catch (error) {
+    apiError = error.message;
+  }
+
+  const apiChecks = {
+    purchaseIdMatches: purchaseView?.protected_purchase_id === Number(CANONICAL.purchase),
+    buyerMatches: purchaseView?.buyer_agent_id === 'sage',
+    sellerMatches: purchaseView?.seller_agent_id === 'fox',
+    quoteMatches: purchaseView?.quote_id === Number(CANONICAL.quote)
+  };
+  const apiFailures = Object.entries(apiChecks)
+    .filter(([, ok]) => !ok)
+    .map(([label]) => label);
+
+  return {
+    ...docs,
+    mode: 'api',
+    baseUrl,
+    purchaseView,
+    apiChecks,
+    apiError,
+    apiOk: !apiError && apiFailures.length === 0,
+    ok: docs.ok && !apiError && apiFailures.length === 0,
+    apiFailures
+  };
+}
+
+async function rpc(method, params) {
+  const rpcUrl = process.env.RISK_OS_RPC_URL || 'https://rpc.xlayer.tech';
+  const response = await fetch(rpcUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method,
+      params
+    })
+  });
+  const body = await response.json();
+  if (!response.ok || body.error) {
+    throw new Error(body.error?.message || `${response.status} ${response.statusText}`);
+  }
+  return { rpcUrl, result: body.result };
+}
+
+async function verifyOnchain() {
+  const docs = await verifyDocs();
+  const txEntries = Object.entries({
+    fundedPrincipal: CANONICAL.fundedTx,
+    deliverySubmit: CANONICAL.submitTx,
+    rejectRefund: CANONICAL.refundTx
+  });
+
+  const receipts = {};
+  const failures = [];
+  let rpcUrl = process.env.RISK_OS_RPC_URL || 'https://rpc.xlayer.tech';
+  const receiptSummary = {};
+
+  for (const [label, hash] of txEntries) {
+    try {
+      const receipt = await rpc('eth_getTransactionReceipt', [hash]);
+      rpcUrl = receipt.rpcUrl;
+      receipts[label] = receipt.result;
+      if (!receipt.result) {
+        failures.push(`${label} receipt missing`);
+        continue;
+      }
+      if (receipt.result.status !== '0x1') {
+        failures.push(`${label} receipt status ${receipt.result.status}`);
+      }
+      receiptSummary[label] = {
+        txHash: hash,
+        blockNumber: receipt.result.blockNumber,
+        status: receipt.result.status,
+        from: receipt.result.from,
+        to: receipt.result.to,
+        logCount: Array.isArray(receipt.result.logs) ? receipt.result.logs.length : 0
+      };
+    } catch (error) {
+      failures.push(`${label} receipt lookup failed: ${error.message}`);
+    }
+  }
+
+  const result = {
+    ...docs,
+    mode: 'onchain',
+    rpcUrl,
+    receiptSummary,
+    ok: docs.ok && failures.length === 0,
+    onchainOk: failures.length === 0,
+    onchainFailures: failures
+  };
+
+  if (process.env.RISK_OS_VERIFY_VERBOSE === '1') {
+    result.receipts = receipts;
+  }
+
+  return result;
 }
 
 async function main() {
@@ -114,6 +234,26 @@ async function main() {
 
   if (mode === 'health') {
     console.log(JSON.stringify(await verifyHealth(), null, 2));
+    return;
+  }
+
+  if (mode === 'api') {
+    console.log(JSON.stringify(await verifyApi(), null, 2));
+    return;
+  }
+
+  if (mode === 'onchain') {
+    console.log(JSON.stringify(await verifyOnchain(), null, 2));
+    return;
+  }
+
+  if (mode === 'full') {
+    console.log(JSON.stringify({
+      docs: await verifyDocs(),
+      health: await verifyHealth(),
+      api: await verifyApi(),
+      onchain: await verifyOnchain()
+    }, null, 2));
     return;
   }
 

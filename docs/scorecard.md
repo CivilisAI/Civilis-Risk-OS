@@ -64,7 +64,7 @@ categories.
 
 - one live canonical protected-commerce loop
 - one portability adapter beyond the reference integration
-- one canonical proof verifier
+- one canonical proof verifier with docs, API, and on-chain receipt modes
 - one OpenAPI contract
 - machine-readable schemas
 - clear proof boundaries and non-goals

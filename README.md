@@ -113,6 +113,9 @@ Quick index:
 - [Integration Checklist](docs/integration-checklist.md)
 - [Judge One Pager](docs/judge-one-pager.md)
 - [Canonical Proof Verifier](examples/verify-canonical-proof.mjs)
+- minimal verifier scripts live in [`package.json`](package.json):
+  `verify:canonical-docs`, `verify:canonical-api`, `verify:canonical-onchain`,
+  `verify:canonical-full`, `verify:manifest`
 - [Submission Manifest](submission.manifest.json)
 - [Submission Manifest Verifier](examples/verify-submission-manifest.mjs)
 - [OpenAPI Contract](openapi/risk-os.openapi.yaml)

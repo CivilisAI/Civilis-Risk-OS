@@ -56,11 +56,29 @@ The public verifier can check document consistency offline:
 node examples/verify-canonical-proof.mjs
 ```
 
-And it can also probe environment health when a live server is present:
+It can also probe progressively stronger public proof surfaces:
 
 ```bash
 RISK_OS_VERIFY_MODE=health RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
+RISK_OS_VERIFY_MODE=api RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
+RISK_OS_VERIFY_MODE=onchain node examples/verify-canonical-proof.mjs
+RISK_OS_VERIFY_MODE=full RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
 ```
+
+If you want a shorter reproducibility entrypoint, the public submission pack now
+ships a minimal `package.json` with matching scripts:
+
+```bash
+npm run verify:canonical-docs
+npm run verify:canonical-api
+npm run verify:canonical-onchain
+npm run verify:canonical-full
+npm run verify:manifest
+```
+
+The current canonical read model for live API verification is:
+
+- `GET /api/risk/purchases/{id}`
 
 ## Honest Boundary
 

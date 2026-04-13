@@ -126,6 +126,7 @@ The repo now includes several final-stage strengthening assets:
 - [Integration Checklist](integration-checklist.md)
 - [AI Skill Pack](ai-skill-pack.md)
 - [Canonical Proof Verifier](../examples/verify-canonical-proof.mjs)
+  with docs, API, and on-chain receipt modes
 - [Security Preflight Extension](security-preflight-extension.md)
 - [Gateway Observability Extension](gateway-observability-extension.md)
 

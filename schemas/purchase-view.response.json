@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/CivilisAI/Civilis-Risk-OS/schemas/purchase-view.response.json",
+  "title": "ProtectedPurchaseViewResponse",
+  "type": "object",
+  "required": [
+    "protected_purchase_id",
+    "buyer_agent_id",
+    "seller_agent_id",
+    "purchase_mode",
+    "status",
+    "principal_amount",
+    "premium_amount",
+    "created_at"
+  ],
+  "properties": {
+    "protected_purchase_id": { "type": "integer", "minimum": 1 },
+    "quote_id": { "type": ["integer", "null"], "minimum": 1 },
+    "intel_item_id": { "type": "integer", "minimum": 1 },
+    "buyer_agent_id": { "type": "string", "minLength": 1 },
+    "seller_agent_id": { "type": "string", "minLength": 1 },
+    "purchase_mode": {
+      "type": "string",
+      "enum": ["instant", "challengeable"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending_acp_job", "challenge_window", "claimed", "released", "refunded"]
+    },
+    "principal_amount": { "type": "string" },
+    "premium_amount": { "type": "string" },
+    "acp_job_id": { "type": ["integer", "null"], "minimum": 1 },
+    "evaluator_address": { "type": ["string", "null"] },
+    "challenge_deadline": { "type": ["string", "null"] },
+    "settled_at": { "type": ["string", "null"] },
+    "created_at": { "type": "string" },
+    "claim": {
+      "type": ["object", "null"],
+      "properties": {
+        "claim_id": { "type": "integer", "minimum": 1 },
+        "protected_purchase_id": { "type": "integer", "minimum": 1 },
+        "claimant_agent_id": { "type": "string" },
+        "claim_type": { "type": "string" },
+        "status": { "type": "string" },
+        "reason_text": { "type": ["string", "null"] },
+        "decision": { "type": ["string", "null"] },
+        "decision_reason": { "type": ["string", "null"] },
+        "evaluator_address": { "type": ["string", "null"] },
+        "created_at": { "type": ["string", "null"] },
+        "resolved_at": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

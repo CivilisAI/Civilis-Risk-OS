@@ -68,7 +68,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProtectedPurchaseResponse'
+                $ref: '#/components/schemas/ProtectedPurchaseExecutionResponse'
+  /api/risk/purchases/{id}:
+    get:
+      tags: [risk]
+      summary: Query the aggregated protected purchase view
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Protected purchase view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectedPurchaseViewResponse'
+        '404':
+          description: Protected purchase not found
   /api/risk/purchases/{id}/claim-proof:
     get:
       tags: [risk]
@@ -224,33 +243,127 @@ components:
             type: string
         expires_at:
           type: string
-    ProtectedPurchaseResponse:
+    ProtectedPurchaseExecutionResponse:
       type: object
       required:
         - success
+        - settlementMode
         - purchaseMode
-        - protectedPurchaseId
+        - protected_purchase_id
+        - buyer_agent_id
+        - seller_agent_id
+        - status
+        - principal_amount
+        - premium_amount
       properties:
         success:
           type: boolean
+        settlementMode:
+          type: string
+          enum: [record_only, acp_funded]
         purchaseMode:
           type: string
           enum: [instant, challengeable]
-        protectedPurchaseId:
+        acpJobId:
+          type:
+            - integer
+            - 'null'
+        onChainJobId:
+          type:
+            - integer
+            - 'null'
+        onChainTxHash:
+          type:
+            - string
+            - 'null'
+        protected_purchase_id:
           type: integer
-        intelPurchaseId:
+        quote_id:
           type:
             - integer
             - 'null'
-        principalAcpJobId:
+        intel_item_id:
+          type: integer
+        buyer_agent_id:
+          type: string
+        seller_agent_id:
+          type: string
+        status:
+          type: string
+          enum: [pending_acp_job, challenge_window, claimed, released, refunded]
+        principal_amount:
+          type: string
+        premium_amount:
+          type: string
+        evaluator_address:
           type:
-            - integer
+            - string
             - 'null'
-        challengeDeadline:
+        challenge_deadline:
           type:
             - string
             - 'null'
         content: {}
+        claim:
+          type:
+            - object
+            - 'null'
+    ProtectedPurchaseViewResponse:
+      type: object
+      required:
+        - protected_purchase_id
+        - buyer_agent_id
+        - seller_agent_id
+        - purchase_mode
+        - status
+        - principal_amount
+        - premium_amount
+        - created_at
+      properties:
+        protected_purchase_id:
+          type: integer
+        quote_id:
+          type:
+            - integer
+            - 'null'
+        intel_item_id:
+          type: integer
+        buyer_agent_id:
+          type: string
+        seller_agent_id:
+          type: string
+        purchase_mode:
+          type: string
+          enum: [instant, challengeable]
+        status:
+          type: string
+          enum: [pending_acp_job, challenge_window, claimed, released, refunded]
+        principal_amount:
+          type: string
+        premium_amount:
+          type: string
+        acp_job_id:
+          type:
+            - integer
+            - 'null'
+        evaluator_address:
+          type:
+            - string
+            - 'null'
+        challenge_deadline:
+          type:
+            - string
+            - 'null'
+        settled_at:
+          type:
+            - string
+            - 'null'
+        created_at:
+          type: string
+        claim:
+          type:
+            - object
+            - 'null'
     ClaimRequest:
       type: object
       required:

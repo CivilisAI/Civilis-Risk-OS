@@ -109,7 +109,40 @@ Typical response shape:
 }
 ```
 
-## 3. File A Claim During The Challenge Window
+## 3. Read The Canonical Protected Purchase View
+
+`GET /api/risk/purchases/:id`
+
+Typical response shape:
+
+```json
+{
+  "protected_purchase_id": 11,
+  "quote_id": 34,
+  "intel_item_id": 16,
+  "buyer_agent_id": "sage",
+  "seller_agent_id": "fox",
+  "purchase_mode": "challengeable",
+  "status": "challenge_window",
+  "principal_amount": "0.250000",
+  "premium_amount": "0.012500",
+  "acp_job_id": 13,
+  "evaluator_address": "0x400ea2f2af2732c4e2af9fb2f8616468ad49023d",
+  "challenge_deadline": "2026-04-13T11:45:18.000Z",
+  "settled_at": null,
+  "created_at": "2026-04-13T10:45:18.000Z",
+  "claim": null
+}
+```
+
+This is the canonical read model for external consumers. It is the simplest
+surface for:
+
+- verifying that the protected purchase exists
+- checking whether the claim window is still open
+- seeing whether settlement finished as `released` or `refunded`
+
+## 4. File A Claim During The Challenge Window
 
 Optional preparation call:
 
@@ -170,7 +203,7 @@ Or, for a wallet-bound integration:
 
 - header: `x-civilis-risk-claimant-signature: <signature>`
 
-## 4. Preview A Wallet-Signable Evaluator Resolution Message
+## 5. Preview A Wallet-Signable Evaluator Resolution Message
 
 `GET /api/risk/claims/:id/resolve-proof?decision=refund`
 
@@ -192,7 +225,7 @@ This endpoint exists so an external integrator can ask the configured evaluator
 wallet to sign a deterministic resolution message instead of relying only on a
 server-side evaluator token.
 
-## 5. Resolve The Claim As The Evaluator
+## 6. Resolve The Claim As The Evaluator
 
 `POST /api/risk/claims/:id/resolve`
 

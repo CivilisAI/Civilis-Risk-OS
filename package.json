@@ -1,0 +1,15 @@
+{
+  "name": "civilis-risk-os-submission-pack",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Public Skills Arena submission pack for Civilis Risk OS",
+  "license": "MIT",
+  "scripts": {
+    "verify:canonical-docs": "node examples/verify-canonical-proof.mjs",
+    "verify:canonical-health": "RISK_OS_VERIFY_MODE=health node examples/verify-canonical-proof.mjs",
+    "verify:canonical-api": "RISK_OS_VERIFY_MODE=api node examples/verify-canonical-proof.mjs",
+    "verify:canonical-onchain": "RISK_OS_VERIFY_MODE=onchain node examples/verify-canonical-proof.mjs",
+    "verify:canonical-full": "RISK_OS_VERIFY_MODE=full node examples/verify-canonical-proof.mjs",
+    "verify:manifest": "node examples/verify-submission-manifest.mjs"
+  }
+}

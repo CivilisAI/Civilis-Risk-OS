@@ -1,17 +1,49 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/CivilisAI/Civilis-Risk-OS/schemas/protected-purchase.response.json",
-  "title": "ProtectedPurchaseResponse",
+  "title": "ProtectedPurchaseExecutionResponse",
   "type": "object",
-  "required": ["success", "purchaseMode", "protectedPurchaseId"],
+  "required": [
+    "success",
+    "settlementMode",
+    "purchaseMode",
+    "protected_purchase_id",
+    "buyer_agent_id",
+    "seller_agent_id",
+    "status",
+    "principal_amount",
+    "premium_amount"
+  ],
   "properties": {
     "success": { "type": "boolean" },
-    "purchaseMode": { "type": "string", "enum": ["instant", "challengeable"] },
-    "protectedPurchaseId": { "type": "integer", "minimum": 1 },
-    "intelPurchaseId": { "type": ["integer", "null"], "minimum": 1 },
-    "principalAcpJobId": { "type": ["integer", "null"], "minimum": 1 },
-    "challengeDeadline": { "type": ["string", "null"] },
-    "content": {}
+    "settlementMode": {
+      "type": "string",
+      "enum": ["record_only", "acp_funded"]
+    },
+    "purchaseMode": {
+      "type": "string",
+      "enum": ["instant", "challengeable"]
+    },
+    "acpJobId": { "type": ["integer", "null"], "minimum": 1 },
+    "onChainJobId": { "type": ["integer", "null"], "minimum": 1 },
+    "onChainTxHash": { "type": ["string", "null"] },
+    "protected_purchase_id": { "type": "integer", "minimum": 1 },
+    "quote_id": { "type": ["integer", "null"], "minimum": 1 },
+    "intel_item_id": { "type": "integer", "minimum": 1 },
+    "buyer_agent_id": { "type": "string", "minLength": 1 },
+    "seller_agent_id": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["pending_acp_job", "challenge_window", "claimed", "released", "refunded"]
+    },
+    "principal_amount": { "type": "string" },
+    "premium_amount": { "type": "string" },
+    "evaluator_address": { "type": ["string", "null"] },
+    "challenge_deadline": { "type": ["string", "null"] },
+    "content": {},
+    "claim": {
+      "type": ["object", "null"]
+    }
   },
   "additionalProperties": true
 }
