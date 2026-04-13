@@ -294,8 +294,10 @@ Those are future extension directions, not current submission facts.
 2. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
 3. [Mainnet Evidence](docs/mainnet-evidence.md)
 4. [Submission Reference](docs/submission-reference.md)
-5. [Implementation Plan](specs/IMPLEMENTATION_PLAN.md)
-6. [Reference Pack Notes](reference/README.md)
+5. [API Examples](docs/api-examples.md)
+6. [Judge Demo Script](docs/judge-demo-script.md)
+7. [Implementation Plan](specs/IMPLEMENTATION_PLAN.md)
+8. [Reference Pack Notes](reference/README.md)
 
 ## License
 
