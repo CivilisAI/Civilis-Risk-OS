@@ -119,6 +119,19 @@ live reference integration.
 - later quotes reflect prior protected outcomes, and the local protected
   purchase state now records repricing sync status for recovery
 
+### Capability vs Captured Proof
+
+To keep the submission strict, this repo distinguishes between **wallet
+capability** and **captured public proof**:
+
+| Surface | Current status |
+| --- | --- |
+| Independent Agentic Wallet actors for buyer / seller / evaluator | captured in the canonical replay |
+| `x402-pay` off-chain signing through the current Agentic Wallet session | locally verified |
+| Buyer-side deterministic `claim-proof` message generation | captured in the canonical replay |
+| Evaluator-side wallet-bound `resolve-proof` authorization path | captured in a historical proof loop |
+| Generic buyer wallet-signature proof for arbitrary claim payloads | **not claimed** because the official Agentic Wallet CLI does not currently expose a generic message-sign command |
+
 ### Non-goals in this submission
 
 - partial refunds

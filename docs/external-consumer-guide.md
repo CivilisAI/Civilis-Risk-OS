@@ -139,6 +139,13 @@ commerce surface:
 That adapter is intentionally documented as a portability pattern, not as a
 second live mainnet-proved integration.
 
+The strongest way to read the adapter is:
+
+- **Intel Market** proves the live protected settlement loop
+- **The Square paywalled intel unlock** proves that another commerce surface can
+  normalize into the same Risk OS contract without inventing a weaker dispute
+  model
+
 ## Current Scope Boundaries
 
 This repo currently proves the pattern through one live reference integration:

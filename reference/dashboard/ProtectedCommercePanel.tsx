@@ -24,7 +24,7 @@ import {
 const DEFAULT_CLAIM_REASON = 'The delivered intel is misleading, incomplete, or not delivered as quoted.'
 const DEFAULT_RESOLUTION_REASON = 'Evaluator reviewed the protected purchase outcome.'
 const CLAIM_TYPE = 'misleading_or_invalid_intel'
-const PROOF_BUYER_AGENT_IDS = ['oracle', 'sage']
+const PROOF_BUYER_AGENT_IDS = ['sage']
 type WorkspaceView = 'buyer' | 'evaluator'
 
 function getModeTone(mode: IntelProtectionPurchaseMode | undefined) {
@@ -429,6 +429,7 @@ export function ProtectedCommercePanel({
   const evaluatorPathReady = Boolean(purchase?.claim?.claim_id)
   const showBuyerWorkspace = workspaceView === 'buyer'
   const showEvaluatorWorkspace = workspaceView === 'evaluator'
+  const selectedBuyer = buyerOptions.find((agent) => agent.agent_id === buyerAgentId) ?? null
 
   return (
     <section className="rounded-2xl border border-[var(--border-primary)] bg-[var(--surface)] p-4">
@@ -462,6 +463,46 @@ export function ProtectedCommercePanel({
         <span className="rounded-full border border-[var(--border-primary)] bg-[var(--bg-tertiary)] px-3 py-1 font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
           {zh ? 'claim 后再重报价' : 'Re-quote After Outcome'}
         </span>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
+          <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+            {zh ? 'Canonical Buyer' : 'Canonical Buyer'}
+          </p>
+          <p className="mt-1 font-mono text-sm text-[var(--text-primary)]">
+            {selectedBuyer?.agent_id ?? 'sage'}
+          </p>
+          <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
+            {zh
+              ? '买方路径只展示报价、买入和 claim 准备，保持 buyer-only 语义。'
+              : 'The buyer path only exposes quoting, purchase, and claim preparation to keep the workflow buyer-only.'}
+          </p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
+          <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+            {zh ? 'Canonical Seller' : 'Canonical Seller'}
+          </p>
+          <p className="mt-1 font-mono text-sm text-[var(--text-primary)]">{detail.item.producer_agent_id}</p>
+          <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
+            {zh
+              ? '卖方在当前 proof console 里不直接操作，只通过受保护交付和后续重定价被观察。'
+              : 'The seller is observed through protected delivery and later repricing rather than direct operator controls.'}
+          </p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
+          <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+            {zh ? 'Canonical Evaluator' : 'Canonical Evaluator'}
+          </p>
+          <p className="mt-1 break-all font-mono text-xs text-[var(--text-primary)]">
+            {purchase?.evaluator_address ?? '0x400ea2f2af2732c4e2af9fb2f8616468ad49023d'}
+          </p>
+          <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
+            {zh
+              ? '评审路径只在 claim 成功创建后激活，避免把 buyer 和 evaluator 混成一个后台角色。'
+              : 'The evaluator path activates only after claim creation so the buyer and evaluator do not collapse into one operator view.'}
+          </p>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
@@ -758,12 +799,12 @@ export function ProtectedCommercePanel({
                   </span>
                 </div>
                 <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
-                  {requestShape(claimPreview ?? {
-                    protectedPurchaseId: 'pending',
-                    claimType: CLAIM_TYPE,
-                    reasonText: claimReason.trim() || DEFAULT_CLAIM_REASON,
-                    roleToken: claimantToken ? 'provided' : 'optional_or_server_disabled',
-                  })}
+                      {requestShape(claimPreview ?? {
+                        protectedPurchaseId: 'pending',
+                        claimType: CLAIM_TYPE,
+                        reasonText: claimReason.trim() || DEFAULT_CLAIM_REASON,
+                        roleToken: claimantToken ? 'provided' : 'required_by_default_in_strict_mode',
+                      })}
                 </pre>
                 <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
                   {zh

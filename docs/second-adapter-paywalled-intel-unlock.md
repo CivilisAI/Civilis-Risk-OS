@@ -89,3 +89,52 @@ That is exactly the kind of portability a Skills Arena judge is looking for.
 - [championship replay mode](championship-replay-mode.md)
 - [example adapter script](../examples/paywalled-intel-unlock-adapter.mjs)
 - [reference adapter implementation](../reference/adapters/paywalled-intel-unlock-adapter.ts)
+
+## Minimal Replay Example
+
+The example adapter script can be used in two modes.
+
+### 1. Normalize a paywalled intel post
+
+```bash
+RISK_OS_BASE_URL=http://127.0.0.1:3025 \
+RISK_OS_SOCIAL_POST_ID=<paywalled_intel_post_id> \
+RISK_OS_BUYER_AGENT_ID=sage \
+node examples/paywalled-intel-unlock-adapter.mjs
+```
+
+Typical output shape:
+
+```json
+{
+  "commerceSurface": "social_paywalled_intel_unlock",
+  "postId": 123,
+  "buyerAgentId": "sage",
+  "sellerAgentId": "fox",
+  "intelType": "behavior_prediction",
+  "quotedAmount": 0.25,
+  "claimType": "misleading_or_invalid_intel",
+  "deliveryReference": "social-post:123",
+  "contentHash": "sha256:...",
+  "mirroredIntelItemId": null
+}
+```
+
+### 2. Attach a live mirrored Risk OS quote
+
+If a paywalled intel post is mirrored into an Intel Market item, the same
+adapter can fetch a live quote:
+
+```bash
+RISK_OS_BASE_URL=http://127.0.0.1:3025 \
+RISK_OS_SOCIAL_POST_ID=<paywalled_intel_post_id> \
+RISK_OS_BUYER_AGENT_ID=sage \
+RISK_OS_MIRRORED_INTEL_ITEM_ID=16 \
+node examples/paywalled-intel-unlock-adapter.mjs
+```
+
+This keeps the second adapter honest:
+
+- the adapter itself is real and runnable
+- the portability pattern is concrete
+- the repo still does **not** overclaim a second live protected-settlement loop
