@@ -53,17 +53,19 @@ the Build X public-repo requirement:
 If someone only has a minute, read in this order:
 
 1. [Project One Pager](docs/project-one-pager.md)
-2. [Proof Surface Matrix](docs/proof-surface-matrix.md)
-3. [Replay Lanes](docs/replay-lanes.md)
-4. [External Consumer Schema](docs/external-consumer-schema.md)
-5. [External Consumer Guide](docs/external-consumer-guide.md)
-6. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
-7. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
-8. [Mainnet Evidence](docs/mainnet-evidence.md)
-9. [Project FAQ](docs/project-faq.md)
-10. [Release Readiness Audit](docs/release-readiness-audit.md)
-11. [Project Manifest](project.manifest.json)
-12. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
+2. [Runtime Quickstart](docs/runtime-quickstart.md)
+3. [Runtime Tool Surface](docs/runtime-tool-surface.md)
+4. [Proof Surface Matrix](docs/proof-surface-matrix.md)
+5. [Replay Lanes](docs/replay-lanes.md)
+6. [External Consumer Schema](docs/external-consumer-schema.md)
+7. [External Consumer Guide](docs/external-consumer-guide.md)
+8. [OpenAPI Contract](openapi/risk-os.openapi.yaml)
+9. [Canonical Proof Evidence](docs/canonical-proof-evidence.md)
+10. [Mainnet Evidence](docs/mainnet-evidence.md)
+11. [Project FAQ](docs/project-faq.md)
+12. [Release Readiness Audit](docs/release-readiness-audit.md)
+13. [Project Manifest](project.manifest.json)
+14. [Build X Reviewer Guide](docs/build-x-reviewer-guide.md)
 
 ## Project 30-Second Read
 
@@ -79,13 +81,27 @@ If someone only reads one screen, the intended takeaway is:
 
 The rest of the repo should be read through that frame.
 
-## AI Skill Pack
+## Runtime Skill
 
-This repo now includes an AI-readable skill pack in the style of the official
-OKX `onchainos-skills` project.
+Civilis Risk OS now includes a **runtime-first Skill surface** in the style of
+the official OKX `onchainos-skills` package.
 
-The current pack is intentionally narrow:
+The most important shift is this:
 
+- the repo is no longer only “AI-readable”
+- another AI can now use a narrow runtime tool surface directly
+
+The direct entry is:
+
+- [Runtime Quickstart](docs/runtime-quickstart.md)
+- [Runtime Tool Surface](docs/runtime-tool-surface.md)
+- [Hosted Runtime Onboarding](docs/hosted-runtime-onboarding.md)
+- [runtime.tool-surface.json](runtime.tool-surface.json)
+- [`examples/risk-os-runtime.mjs`](examples/risk-os-runtime.mjs)
+
+The current package is intentionally narrow:
+
+- [civilis-risk-os-runtime](skills/civilis-risk-os-runtime/SKILL.md)
 - [civilis-risk-os-canonical-replay](skills/civilis-risk-os-canonical-replay/SKILL.md)
 - [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
 - [civilis-risk-os-proof-boundaries](skills/civilis-risk-os-proof-boundaries/SKILL.md)
@@ -93,6 +109,7 @@ The current pack is intentionally narrow:
 
 These skills are designed so another AI can:
 
+- directly call the runtime action surface
 - replay the strongest public proof path
 - integrate another commerce surface against the Risk OS contract
 - keep claims, demos, and docs strictly evidence-backed
@@ -100,9 +117,13 @@ These skills are designed so another AI can:
 Quick index:
 
 - [AI Skill Pack](docs/ai-skill-pack.md)
+- [Runtime Quickstart](docs/runtime-quickstart.md)
+- [Runtime Tool Surface](docs/runtime-tool-surface.md)
+- [Hosted Runtime Onboarding](docs/hosted-runtime-onboarding.md)
 - [Integration Checklist](docs/integration-checklist.md)
 - [Project One Pager](docs/project-one-pager.md)
 - [Canonical Proof Verifier](examples/verify-canonical-proof.mjs)
+- [`npm run runtime -- help`](package.json)
 - minimal verifier scripts live in [`package.json`](package.json):
   `verify:canonical-docs`, `verify:canonical-api`, `verify:canonical-onchain`,
   `verify:canonical-full`, `verify:manifest`
@@ -144,6 +165,42 @@ This public repo is the source of truth for the current public Risk OS release.
 
 Civilis Risk OS is packaged as a **reusable protection Skill** with one narrow,
 live reference integration.
+
+## Direct Runtime Use
+
+If another AI should use Risk OS directly, the shortest path is:
+
+```bash
+npm install
+npm run runtime -- help
+```
+
+Then call:
+
+- `health`
+- `quote`
+- `buy`
+- `purchase`
+- `claim-proof`
+- `claim`
+- `resolve-proof`
+- `resolve`
+- `requote`
+
+The same runtime surface now works against:
+
+- a local strict proof environment
+- a hosted compatible base URL
+
+by changing only:
+
+- `--base-url`
+
+This is the strongest current Skills Arena claim beyond the live reference
+integration:
+
+**another AI can directly use the Risk OS protection pattern without first
+re-deriving the raw API workflow.**
 
 ### Inputs
 

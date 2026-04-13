@@ -8,9 +8,10 @@ turning the whole repository into a hackathon-only artifact.
 
 1. [README](../README.md)
 2. [Project One Pager](project-one-pager.md)
-3. [Canonical Proof Evidence](canonical-proof-evidence.md)
-4. [Evaluation Mapping](evaluation-mapping.md)
-5. [Release Readiness Audit](release-readiness-audit.md)
+3. [Runtime Quickstart](runtime-quickstart.md)
+4. [Canonical Proof Evidence](canonical-proof-evidence.md)
+5. [Evaluation Mapping](evaluation-mapping.md)
+6. [Release Readiness Audit](release-readiness-audit.md)
 
 ## Requirement Mapping
 
@@ -23,6 +24,8 @@ turning the whole repository into a hackathon-only artifact.
   [README coverage](../README.md#repository-coverage)
 - Public machine-readable surfaces:
   [Project Manifest](../project.manifest.json),
+  [Runtime Tool Surface](runtime-tool-surface.md),
+  [Runtime Tool Manifest](../runtime.tool-surface.json),
   [OpenAPI Contract](../openapi/risk-os.openapi.yaml),
   [Schemas](../schemas)
 

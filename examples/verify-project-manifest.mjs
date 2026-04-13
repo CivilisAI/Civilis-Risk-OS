@@ -49,6 +49,13 @@ async function main() {
     await fs.access(path.join(repoRoot, file));
   }
 
+  if (manifest.surfaces.runtime) {
+    await fs.access(path.join(repoRoot, manifest.surfaces.runtime.cli));
+    await fs.access(path.join(repoRoot, manifest.surfaces.runtime.toolSurface));
+    await fs.access(path.join(repoRoot, manifest.surfaces.runtime.quickstart));
+    await fs.access(path.join(repoRoot, manifest.surfaces.runtime.hostedOnboarding));
+  }
+
   console.log(JSON.stringify({
     ok: failures.length === 0,
     failures,
@@ -56,7 +63,8 @@ async function main() {
       name: manifest.name,
       arena: manifest.arena,
       chainId: manifest.chain.chainId,
-      referenceIntegration: manifest.referenceIntegration
+      referenceIntegration: manifest.referenceIntegration,
+      runtimeCli: manifest.surfaces.runtime?.cli ?? null
     }
   }, null, 2));
 

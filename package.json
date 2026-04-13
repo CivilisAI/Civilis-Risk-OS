@@ -4,7 +4,12 @@
   "version": "0.1.0",
   "description": "Public reference repository for Civilis Risk OS",
   "license": "MIT",
+  "bin": {
+    "civilis-risk-os-runtime": "examples/risk-os-runtime.mjs"
+  },
   "scripts": {
+    "runtime": "node examples/risk-os-runtime.mjs",
+    "runtime:help": "node examples/risk-os-runtime.mjs help",
     "verify:canonical-docs": "node examples/verify-canonical-proof.mjs",
     "verify:canonical-health": "RISK_OS_VERIFY_MODE=health node examples/verify-canonical-proof.mjs",
     "verify:canonical-api": "RISK_OS_VERIFY_MODE=api node examples/verify-canonical-proof.mjs",

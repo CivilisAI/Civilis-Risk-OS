@@ -96,10 +96,13 @@ function requestShape(value: Record<string, unknown>) {
 export function ProtectedCommercePanel({
   detail,
   zh,
+  presentationMode = 'operator',
 }: {
   detail: IntelItemV2Detail
   zh: boolean
+  presentationMode?: 'operator' | 'public'
 }) {
+  const publicMode = presentationMode === 'public'
   const [buyerAgentId, setBuyerAgentId] = useState('')
   const [workspaceView, setWorkspaceView] = useState<WorkspaceView>('buyer')
   const [buyerOptions, setBuyerOptions] = useState<Agent[]>([])
@@ -234,7 +237,7 @@ export function ProtectedCommercePanel({
   async function previewPostOutcomeQuote() {
     const claimResolved = isIntelProtectionFinalStatus(purchase?.status) || isIntelProtectionFinalStatus(purchase?.claim?.status)
     if (!claimResolved) {
-      setPostOutcomeQuoteError(zh ? '先完成 claim 裁决，再刷新 post-resolution re-quote。' : 'Resolve the claim first, then refresh the post-resolution re-quote.')
+      setPostOutcomeQuoteError(zh ? '先完成 claim 裁决，再刷新结果后重报价。' : 'Resolve the claim first, then refresh the outcome-aware requote.')
       return
     }
 
@@ -424,7 +427,7 @@ export function ProtectedCommercePanel({
     : null
   const currentQuoteLabel = quote ? (zh ? '当前 quote' : 'Current Quote') : (zh ? '尚未生成 quote' : 'No current quote yet')
   const postOutcomeQuoteLabel = claimResolved
-    ? (postOutcomeQuote ? (zh ? '已刷新 post-resolution re-quote' : 'Post-resolution Re-Quote Ready') : (zh ? '可刷新 post-resolution re-quote' : 'Ready to Refresh Post-resolution Re-Quote'))
+    ? (postOutcomeQuote ? (zh ? '结果后重报价已就绪' : 'Outcome-Aware Requote Ready') : (zh ? '可刷新结果后重报价' : 'Ready to Refresh Outcome-Aware Requote'))
     : (zh ? '等待 claim 裁决后再刷新' : 'Waiting for claim resolution')
   const evaluatorPathReady = Boolean(purchase?.claim?.claim_id)
   const showBuyerWorkspace = workspaceView === 'buyer'
@@ -468,7 +471,7 @@ export function ProtectedCommercePanel({
       <div className="mt-4 grid gap-3 lg:grid-cols-3">
         <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
           <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-            {zh ? 'Canonical Buyer' : 'Canonical Buyer'}
+            {zh ? '买方角色' : 'Buyer Role'}
           </p>
           <p className="mt-1 font-mono text-sm text-[var(--text-primary)]">
             {selectedBuyer?.agent_id ?? 'sage'}
@@ -476,23 +479,23 @@ export function ProtectedCommercePanel({
           <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
             {zh
               ? '买方路径只展示报价、买入和 claim 准备，保持 buyer-only 语义。'
-              : 'The buyer path only exposes quoting, purchase, and claim preparation to keep the workflow buyer-only.'}
+              : 'This lane only exposes quoting, protected purchase, and claim preparation so the buyer flow stays clear.'}
           </p>
         </div>
         <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
           <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-            {zh ? 'Canonical Seller' : 'Canonical Seller'}
+            {zh ? '卖方角色' : 'Seller Role'}
           </p>
           <p className="mt-1 font-mono text-sm text-[var(--text-primary)]">{detail.item.producer_agent_id}</p>
           <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
             {zh
               ? '卖方在当前 proof console 里不直接操作，只通过受保护交付和后续重定价被观察。'
-              : 'The seller is observed through protected delivery and later repricing rather than direct operator controls.'}
+              : 'The seller is observed through delivery quality and later repricing rather than direct page controls.'}
           </p>
         </div>
         <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
           <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-            {zh ? 'Canonical Evaluator' : 'Canonical Evaluator'}
+            {zh ? '评审角色' : 'Evaluator Role'}
           </p>
           <p className="mt-1 break-all font-mono text-xs text-[var(--text-primary)]">
             {purchase?.evaluator_address ?? '0x400ea2f2af2732c4e2af9fb2f8616468ad49023d'}
@@ -500,14 +503,14 @@ export function ProtectedCommercePanel({
           <p className="mt-1 text-xs leading-6 text-[var(--text-secondary)]">
             {zh
               ? '评审路径只在 claim 成功创建后激活，避免把 buyer 和 evaluator 混成一个后台角色。'
-              : 'The evaluator path activates only after claim creation so the buyer and evaluator do not collapse into one operator view.'}
+              : 'The evaluator lane activates only after a claim is filed, so buyer and evaluator never collapse into one operator view.'}
           </p>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
         <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-          {zh ? '角色路径' : 'Role Path'}
+          {zh ? '工作流通道' : 'Workflow Lane'}
         </span>
         <span className="ml-auto text-xs leading-6 text-[var(--text-dim)]">
           {zh
@@ -672,19 +675,32 @@ export function ProtectedCommercePanel({
                 </button>
               ) : null}
             </div>
-            <div className="mt-4 rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
-              <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                {zh ? 'Buyer 请求形状' : 'Buyer Call Shape'}
-              </p>
-              <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
-                {requestShape(requestPreview)}
-              </pre>
-              <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
-                {zh
-                  ? '当选择“自动”时，实际 purchaseMode 会使用当前 quote 的推荐模式。'
-                  : 'When Auto is selected, the live purchaseMode follows the current quote’s recommendation.'}
-              </p>
-            </div>
+            {publicMode ? (
+              <div className="mt-4 rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+                <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                  {zh ? '买方动作摘要' : 'Buyer Action Summary'}
+                </p>
+                <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
+                  {zh
+                    ? '这个页面先给买方看风险报价，再按推荐模式发起受保护购买。更底层的请求体与 proof 细节保留在开发者文档和 Intel 参考接入页。'
+                    : 'This page shows the risk quote first, then lets the buyer trigger a protected purchase with the recommended mode. Low-level request shapes and proof payloads stay in the docs and the Intel reference route.'}
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+                <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                  {zh ? 'Buyer 请求形状' : 'Buyer Call Shape'}
+                </p>
+                <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
+                  {requestShape(requestPreview)}
+                </pre>
+                <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
+                  {zh
+                    ? '当选择“自动”时，实际 purchaseMode 会使用当前 quote 的推荐模式。'
+                    : 'When Auto is selected, the live purchaseMode follows the current quote’s recommendation.'}
+                </p>
+              </div>
+            )}
             {agentLoadError ? <NoticeBanner title={zh ? 'Agent 加载失败' : 'Agent Load Error'} message={agentLoadError} tone="warning" /> : null}
           </div>
 
@@ -788,14 +804,14 @@ export function ProtectedCommercePanel({
 
               <label className="block">
                 <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-                  {zh ? '买方保护令牌' : 'Buyer Protection Token'}
+                  {zh ? '买方访问令牌（如需要）' : 'Buyer Access Token (If Required)'}
                 </span>
                 <input
                   className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
                   type="password"
                   value={claimantToken}
                   onChange={(event) => setClaimantToken(event.target.value)}
-                  placeholder={zh ? '若服务端启用了 claim 鉴权，请在此输入' : 'Enter if the server has claim-role auth enabled'}
+                  placeholder={zh ? '只有 proof 环境启用了买方鉴权时才需要输入' : 'Only needed when the proof server requires buyer-role auth'}
                 />
               </label>
 
@@ -821,29 +837,42 @@ export function ProtectedCommercePanel({
 
               {claimError ? <NoticeBanner title={zh ? '申诉错误' : 'Claim Error'} message={claimError} tone="error" /> : null}
 
-              <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+              {publicMode ? (
+                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
                   <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                    {zh ? 'Claim 请求形状' : 'Claim Call Shape'}
+                    {zh ? '申诉阶段说明' : 'Claim Stage'}
                   </p>
-                  <span className="font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
-                    {zh ? 'Buyer only' : 'Buyer only'}
-                  </span>
+                  <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">
+                    {zh
+                      ? '买方在这里说明交付为何误导、缺失或未按约完成；只有 claim 创建后，评审通道才会解锁。'
+                      : 'The buyer explains why delivery was misleading, incomplete, or not delivered as quoted. The evaluator lane unlocks only after the claim is created.'}
+                  </p>
                 </div>
-                <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
-                      {requestShape(claimPreview ?? {
-                        protectedPurchaseId: 'pending',
-                        claimType: CLAIM_TYPE,
-                        reasonText: claimReason.trim() || DEFAULT_CLAIM_REASON,
-                        roleToken: claimantToken ? 'provided' : 'required_by_default_in_strict_mode',
-                      })}
-                </pre>
-                <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
-                  {zh
-                    ? 'claim 权限不再从 body 里的 claimant ID 推断；如果服务端启用了买方令牌门控，这里需要提供对应 token。'
-                    : 'Claim authority is no longer inferred from a claimant ID in the body; if the server enables buyer-token gating, this token is required.'}
-                </p>
-              </div>
+              ) : (
+                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                      {zh ? 'Claim 请求形状' : 'Claim Call Shape'}
+                    </p>
+                    <span className="font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
+                      {zh ? 'Buyer only' : 'Buyer only'}
+                    </span>
+                  </div>
+                  <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
+                        {requestShape(claimPreview ?? {
+                          protectedPurchaseId: 'pending',
+                          claimType: CLAIM_TYPE,
+                          reasonText: claimReason.trim() || DEFAULT_CLAIM_REASON,
+                          roleToken: claimantToken ? 'provided' : 'required_by_default_in_strict_mode',
+                        })}
+                  </pre>
+                  <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
+                    {zh
+                      ? 'claim 权限不再从 body 里的 claimant ID 推断；如果服务端启用了买方令牌门控，这里需要提供对应 token。'
+                      : 'Claim authority is no longer inferred from a claimant ID in the body; if the server enables buyer-token gating, this token is required.'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -952,20 +981,22 @@ export function ProtectedCommercePanel({
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
-                  <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                    {zh ? '购买形状' : 'Purchase Shape'}
-                  </p>
-                  <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
-                    {requestShape({
-                      protectedPurchaseId: purchase.protected_purchase_id,
-                      quoteId: purchase.quote_id,
-                      buyerAgentId: purchase.buyer_agent_id,
-                      purchaseMode: purchase.purchase_mode,
-                      status: purchase.status,
-                    })}
-                  </pre>
-                </div>
+                {!publicMode ? (
+                  <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+                    <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                      {zh ? '购买形状' : 'Purchase Shape'}
+                    </p>
+                    <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
+                      {requestShape({
+                        protectedPurchaseId: purchase.protected_purchase_id,
+                        quoteId: purchase.quote_id,
+                        buyerAgentId: purchase.buyer_agent_id,
+                        purchaseMode: purchase.purchase_mode,
+                        status: purchase.status,
+                      })}
+                    </pre>
+                  </div>
+                ) : null}
 
                 {activeClaim ? (
                   <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
@@ -988,91 +1019,102 @@ export function ProtectedCommercePanel({
                   <EmptyState label={zh ? '当前还没有 claim。你可以先在左侧发起申诉，再回到这里裁决。' : 'There is no claim yet. File it on the left, then return here to resolve.'} />
                 )}
 
-                <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
-                  <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                    {zh ? 'Resolution 请求形状' : 'Resolution Call Shape'}
-                  </p>
-                  <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
-                    {requestShape(resolvePreview ?? {
-                      claimId: 'pending',
-                      evaluatorAddress: purchase?.evaluator_address ?? null,
-                      decision: 'release',
-                      decisionReason: resolutionReason.trim() || DEFAULT_RESOLUTION_REASON,
-                      evaluatorToken: evaluatorToken ? 'provided' : 'required_if_server_gate_enabled',
-                      evaluatorSignature: evaluatorSignature ? 'provided' : 'optional_if_using_wallet_signature',
-                    })}
-                  </pre>
-                </div>
+                {!publicMode ? (
+                  <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
+                    <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                      {zh ? 'Resolution 请求形状' : 'Resolution Call Shape'}
+                    </p>
+                    <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
+                      {requestShape(resolvePreview ?? {
+                        claimId: 'pending',
+                        evaluatorAddress: purchase?.evaluator_address ?? null,
+                        decision: 'release',
+                        decisionReason: resolutionReason.trim() || DEFAULT_RESOLUTION_REASON,
+                        evaluatorToken: evaluatorToken ? 'provided' : 'required_if_server_gate_enabled',
+                        evaluatorSignature: evaluatorSignature ? 'provided' : 'optional_if_using_wallet_signature',
+                      })}
+                    </pre>
+                  </div>
+                ) : null}
 
                 <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--surface)] p-3">
                   <label className="block">
                     <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-                      {zh ? '评审裁决令牌' : 'Evaluator Resolution Token'}
+                      {zh ? '评审访问令牌（如需要）' : 'Evaluator Access Token (If Required)'}
                     </span>
                     <input
                       className="input mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
                       type="password"
                       value={evaluatorToken}
                       onChange={(event) => setEvaluatorToken(event.target.value)}
-                      placeholder={zh ? '若服务端启用了 evaluator 鉴权，请在此输入' : 'Enter if the server has evaluator-role auth enabled'}
+                      placeholder={zh ? '只有 proof 环境启用了评审鉴权时才需要输入' : 'Only needed when the proof server requires evaluator-role auth'}
                     />
                   </label>
+                  {!publicMode ? (
+                    <>
+                      <div className="mt-3 h-px bg-[var(--border-primary)]" />
 
-                  <div className="mt-3 h-px bg-[var(--border-primary)]" />
-
-                  <label className="mt-3 block">
-                    <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-                      {zh ? 'Evaluator Signature（可选）' : 'Evaluator Signature (Optional)'}
-                    </span>
-                    <textarea
-                      className="textarea mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
-                      value={evaluatorSignature}
-                      onChange={(event) => setEvaluatorSignature(event.target.value)}
-                      placeholder={zh ? '如果外部接入方使用钱包签名，这里粘贴 evaluator 签名。' : 'Paste the evaluator signature here when using wallet-bound proof.'}
-                    />
-                  </label>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void previewResolutionProof('release')}
-                      disabled={resolutionProofLoading || !purchase?.claim?.claim_id}
-                      className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {resolutionProofLoading ? (zh ? '生成中…' : 'Preparing…') : (zh ? '预览 Release 签名消息' : 'Preview Release Proof')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void previewResolutionProof('refund')}
-                      disabled={resolutionProofLoading || !purchase?.claim?.claim_id}
-                      className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {resolutionProofLoading ? (zh ? '生成中…' : 'Preparing…') : (zh ? '预览 Refund 签名消息' : 'Preview Refund Proof')}
-                    </button>
-                  </div>
-
-                  {resolutionProofError ? <NoticeBanner title={zh ? 'Proof 错误' : 'Proof Error'} message={resolutionProofError} tone="warning" /> : null}
-
-                  {resolutionProof ? (
-                    <div className="mt-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                          {zh ? '可签名的裁决消息' : 'Signable Resolution Proof'}
-                        </p>
-                        <span className="font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
-                          {labelDecision(resolutionProof.decision, zh)}
+                      <label className="mt-3 block">
+                        <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                          {zh ? 'Evaluator Signature（可选）' : 'Evaluator Signature (Optional)'}
                         </span>
+                        <textarea
+                          className="textarea mt-2 w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-input)] px-3 py-2.5 font-mono text-sm text-[var(--text-primary)]"
+                          value={evaluatorSignature}
+                          onChange={(event) => setEvaluatorSignature(event.target.value)}
+                          placeholder={zh ? '如果外部接入方使用钱包签名，这里粘贴 evaluator 签名。' : 'Paste the evaluator signature here when using wallet-bound proof.'}
+                        />
+                      </label>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void previewResolutionProof('release')}
+                          disabled={resolutionProofLoading || !purchase?.claim?.claim_id}
+                          className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {resolutionProofLoading ? (zh ? '生成中…' : 'Preparing…') : (zh ? '预览 Release 签名消息' : 'Preview Release Proof')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void previewResolutionProof('refund')}
+                          disabled={resolutionProofLoading || !purchase?.claim?.claim_id}
+                          className="rounded-lg border border-[var(--border-primary)] px-4 py-2 font-mono text-xs uppercase tracking-[0.18em] text-[var(--text-dim)] transition hover:border-[var(--border-gold)] hover:text-[var(--gold)] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {resolutionProofLoading ? (zh ? '生成中…' : 'Preparing…') : (zh ? '预览 Refund 签名消息' : 'Preview Refund Proof')}
+                        </button>
                       </div>
-                      <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--surface)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
-                        {resolutionProof.message}
-                      </pre>
-                      <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
-                        {zh
-                          ? '如果不用 evaluator token，外部接入方可以先签这条消息，再把签名随裁决请求一起提交。'
-                          : 'If an external integrator does not use an evaluator token, they can sign this message and attach the signature to the resolution request.'}
-                      </p>
-                    </div>
-                  ) : null}
+
+                      {resolutionProofError ? <NoticeBanner title={zh ? 'Proof 错误' : 'Proof Error'} message={resolutionProofError} tone="warning" /> : null}
+
+                      {resolutionProof ? (
+                        <div className="mt-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-tertiary)] p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                              {zh ? '可签名的裁决消息' : 'Signable Resolution Proof'}
+                            </p>
+                            <span className="font-mono text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-dim)]">
+                              {labelDecision(resolutionProof.decision, zh)}
+                            </span>
+                          </div>
+                          <pre className="mt-2 overflow-x-auto rounded-lg border border-[var(--border-primary)] bg-[var(--surface)] p-3 font-mono text-[0.72rem] leading-6 text-[var(--text-secondary)]">
+                            {resolutionProof.message}
+                          </pre>
+                          <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)]">
+                            {zh
+                              ? '如果不用 evaluator token，外部接入方可以先签这条消息，再把签名随裁决请求一起提交。'
+                              : 'If an external integrator does not use an evaluator token, they can sign this message and attach the signature to the resolution request.'}
+                          </p>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <p className="mt-3 text-xs leading-6 text-[var(--text-secondary)]">
+                      {zh
+                        ? '更底层的 evaluator 签名消息和 proof 载荷保留在文档与参考接入页里；这个公开入口只保留完成裁决所需的最少控件。'
+                        : 'Lower-level evaluator signature payloads stay in the docs and the reference route; this public entry keeps only the controls needed to finish resolution.'}
+                    </p>
+                  )}
 
                   <label className="block">
                     <span className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
@@ -1133,7 +1175,7 @@ export function ProtectedCommercePanel({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2">
             <p className="font-mono text-[0.55rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-              {zh ? 'post-resolution re-quote' : 'Post-resolution Re-Quote'}
+              {zh ? '结果后重报价' : 'Outcome-Aware Requote'}
             </p>
             <h4 className="font-display text-lg tracking-wider text-[var(--text-primary)]">
               {zh ? '结果后再跑一次 quote，不虚构 delta' : 'Run the quote again after the outcome, without pretending a delta'}
@@ -1206,8 +1248,8 @@ export function ProtectedCommercePanel({
             <EmptyState
               label={
                 zh
-                  ? 'claim 已裁决，post-resolution re-quote 槽位已解锁。点击右上角按钮，重新运行同一 quote 入口即可。'
-                  : 'The claim is resolved and the post-resolution re-quote slot is unlocked. Use the button above to rerun the same quote surface.'
+                  ? 'claim 已裁决，结果后重报价入口已解锁。点击右上角按钮，重新运行同一 quote 入口即可。'
+                  : 'The claim is resolved and the outcome-aware requote entry is unlocked. Use the button above to rerun the same quote surface.'
               }
             />
           )
@@ -1215,8 +1257,8 @@ export function ProtectedCommercePanel({
           <EmptyState
             label={
               zh
-                ? '等待 claim 裁决后，这里会成为 post-resolution re-quote 入口；当前不会提前伪造 outcome。'
-                : 'After claim resolution, this area becomes the post-resolution re-quote entry. No outcome is fabricated ahead of time.'
+                ? '等待 claim 裁决后，这里会成为结果后重报价入口；当前不会提前伪造 outcome。'
+                : 'After claim resolution, this area becomes the outcome-aware requote entry. No outcome is fabricated ahead of time.'
             }
           />
         )}

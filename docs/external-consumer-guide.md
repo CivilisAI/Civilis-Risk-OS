@@ -8,6 +8,8 @@ rest of the Civilis world.**
 
 This guide should be read after:
 
+- [Runtime Quickstart](runtime-quickstart.md)
+- [Runtime Tool Surface](runtime-tool-surface.md)
 - [Proof Surface Matrix](proof-surface-matrix.md)
 - [External Consumer Schema](external-consumer-schema.md)
 - [Integration Checklist](integration-checklist.md)
@@ -26,6 +28,11 @@ This submission is designed for:
 ## Reusable Consumer Pattern
 
 The current public surface is intel-scoped, but the protection loop is generic.
+
+The fastest way for another AI to use that loop is no longer to handcraft HTTP
+calls first. It is to start from the runtime wrapper:
+
+- [../examples/risk-os-runtime.mjs](../examples/risk-os-runtime.mjs)
 
 ### Step 1. Quote the seller risk before purchase
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Risk OS Runtime"
+  short_description: "Directly call Risk OS as a runtime protection tool"
+  default_prompt: "Use the Civilis Risk OS runtime skill to call the direct quote / protected buy / claim / resolve / requote surface with the correct buyer or evaluator role."

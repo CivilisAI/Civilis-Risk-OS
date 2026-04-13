@@ -1,0 +1,57 @@
+{
+  "name": "civilis-risk-os-runtime",
+  "type": "runtime-tool-surface",
+  "version": "0.1.0",
+  "baseUrlVariable": "RISK_OS_BASE_URL",
+  "actions": [
+    {
+      "name": "health",
+      "role": "neutral",
+      "inputs": []
+    },
+    {
+      "name": "quote",
+      "role": "buyer",
+      "inputs": ["item", "buyer"]
+    },
+    {
+      "name": "buy",
+      "role": "buyer",
+      "inputs": ["item", "buyer", "quote", "mode"]
+    },
+    {
+      "name": "purchase",
+      "role": "buyer",
+      "inputs": ["purchase"]
+    },
+    {
+      "name": "claim-proof",
+      "role": "buyer",
+      "inputs": ["purchase", "reason"]
+    },
+    {
+      "name": "claim",
+      "role": "buyer",
+      "inputs": ["purchase", "reason", "claimProofPath"]
+    },
+    {
+      "name": "resolve-proof",
+      "role": "evaluator",
+      "inputs": ["claim", "decision", "reason"]
+    },
+    {
+      "name": "resolve",
+      "role": "evaluator",
+      "inputs": ["claim", "decision", "reason", "evaluatorProofPath"]
+    },
+    {
+      "name": "requote",
+      "role": "buyer",
+      "inputs": ["item", "buyer"]
+    }
+  ],
+  "boundaries": {
+    "genericBuyerWalletSignatureCapturedProof": false,
+    "publicHostedProductionEndpointClaimed": false
+  }
+}

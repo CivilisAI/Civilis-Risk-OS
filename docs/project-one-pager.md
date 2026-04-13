@@ -9,6 +9,11 @@ It upgrades a payment flow into:
 
 `quote -> challengeable buy -> claim -> evaluator resolution -> later repricing`
 
+It now exists in two public forms:
+
+- a proof-backed reference repo
+- a direct runtime skill surface another AI can call
+
 ## Why It Matters
 
 Agent commerce already has payment and execution rails.
@@ -72,7 +77,9 @@ Canonical hashes:
 
 ## Read Next
 
-1. [Proof Surface Matrix](proof-surface-matrix.md)
-2. [Integration Checklist](integration-checklist.md)
-3. [External Consumer Schema](external-consumer-schema.md)
-4. [AI Skill Pack](ai-skill-pack.md)
+1. [Runtime Quickstart](runtime-quickstart.md)
+2. [Runtime Tool Surface](runtime-tool-surface.md)
+3. [Proof Surface Matrix](proof-surface-matrix.md)
+4. [Integration Checklist](integration-checklist.md)
+5. [External Consumer Schema](external-consumer-schema.md)
+6. [AI Skill Pack](ai-skill-pack.md)

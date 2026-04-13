@@ -4,15 +4,35 @@ This repo now includes an AI-readable skill pack in the style of the official
 OKX `onchainos-skills` package.
 
 The goal is not to add more marketing copy. The goal is to let another AI agent
-load a focused `SKILL.md` and then:
+either call Risk OS directly as a runtime tool or load a focused `SKILL.md`
+for a narrower supporting task.
 
-- replay the canonical protected-commerce proof path
-- integrate an external commerce surface into the Risk OS contract
-- classify what is proven, prepared, historical, or intentionally not claimed
+The strongest path is now:
+
+- install the repo
+- run the runtime CLI
+- call `quote / buy / claim / resolve / requote`
+- then fall back to narrower skills for replay, proof discipline, or adapter
+  design
 
 ## Included Skills
 
-### 1. `civilis-risk-os-canonical-replay`
+### 1. `civilis-risk-os-runtime`
+
+Use when an AI needs to:
+
+- directly call Risk OS as a runtime protection primitive
+- execute `quote`, `buy`, `purchase`, `claim`, `resolve`, and `requote`
+- switch between local proof env and hosted runtime modes by changing only the
+  base URL
+
+Entry:
+
+- [../skills/civilis-risk-os-runtime/SKILL.md](../skills/civilis-risk-os-runtime/SKILL.md)
+- [runtime-quickstart.md](runtime-quickstart.md)
+- [runtime-tool-surface.md](runtime-tool-surface.md)
+
+### 2. `civilis-risk-os-canonical-replay`
 
 Use when an AI needs to:
 
@@ -25,7 +45,7 @@ Entry:
 
 - [../skills/civilis-risk-os-canonical-replay/SKILL.md](../skills/civilis-risk-os-canonical-replay/SKILL.md)
 
-### 2. `civilis-risk-os-external-consumer`
+### 3. `civilis-risk-os-external-consumer`
 
 Use when an AI needs to:
 
@@ -38,7 +58,7 @@ Entry:
 
 - [../skills/civilis-risk-os-external-consumer/SKILL.md](../skills/civilis-risk-os-external-consumer/SKILL.md)
 
-### 3. `civilis-risk-os-proof-boundaries`
+### 4. `civilis-risk-os-proof-boundaries`
 
 Use when an AI needs to:
 
@@ -51,7 +71,7 @@ Entry:
 
 - [../skills/civilis-risk-os-proof-boundaries/SKILL.md](../skills/civilis-risk-os-proof-boundaries/SKILL.md)
 
-### 4. `civilis-risk-os-integration-check`
+### 5. `civilis-risk-os-integration-check`
 
 Use when an AI needs to:
 
@@ -66,11 +86,12 @@ Entry:
 ## Why This Matters
 
 The strongest long-term value of Civilis Risk OS is not only the demo UI or the
-mainnet hashes. It is the fact that another AI can learn a narrow, rigorous
-protected-commerce workflow and apply it without re-deriving the whole project.
+mainnet hashes. It is the fact that another AI can directly call a narrow,
+rigorous protected-commerce workflow without re-deriving the whole project.
 
-That is why the skill pack is split into:
+That is why the package is now split into:
 
+- one runtime skill for direct usage
 - one skill for replay
 - one skill for integration
 - one skill for proof discipline
@@ -83,6 +104,8 @@ bundle.**
 
 Pair this skill pack with:
 
+- [runtime-quickstart.md](runtime-quickstart.md)
+- [runtime-tool-surface.md](runtime-tool-surface.md)
 - [../openapi/risk-os.openapi.yaml](../openapi/risk-os.openapi.yaml)
 - [integration-checklist.md](integration-checklist.md)
 - [replay-lanes.md](replay-lanes.md)

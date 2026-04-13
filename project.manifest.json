@@ -45,6 +45,12 @@
     }
   },
   "surfaces": {
+    "runtime": {
+      "cli": "examples/risk-os-runtime.mjs",
+      "toolSurface": "runtime.tool-surface.json",
+      "quickstart": "docs/runtime-quickstart.md",
+      "hostedOnboarding": "docs/hosted-runtime-onboarding.md"
+    },
     "openapi": "openapi/risk-os.openapi.yaml",
     "schemas": [
       "schemas/risk-quote.response.json",
@@ -54,12 +60,14 @@
       "schemas/resolve.request.json"
     ],
     "examples": [
+      "examples/risk-os-runtime.mjs",
       "examples/external-consumer-quickstart.mjs",
       "examples/paywalled-intel-unlock-adapter.mjs",
       "examples/verify-canonical-proof.mjs",
       "examples/verify-project-manifest.mjs"
     ],
     "skills": [
+      "skills/civilis-risk-os-runtime/SKILL.md",
       "skills/civilis-risk-os-canonical-replay/SKILL.md",
       "skills/civilis-risk-os-external-consumer/SKILL.md",
       "skills/civilis-risk-os-proof-boundaries/SKILL.md",
@@ -75,6 +83,7 @@
   },
   "readFirst": [
     "README.md",
+    "docs/runtime-quickstart.md",
     "docs/build-x-reviewer-guide.md",
     "docs/project-one-pager.md",
     "docs/proof-surface-matrix.md",
