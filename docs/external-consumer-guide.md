@@ -6,6 +6,11 @@ submission claim is broader:
 **another agent app can reuse the same protection pattern without adopting the
 rest of the Civilis world.**
 
+This guide should be read after:
+
+- [Proof Surface Matrix](proof-surface-matrix.md)
+- [Championship Replay Mode](championship-replay-mode.md)
+
 ## Who This Is For
 
 This submission is designed for:
@@ -138,6 +143,17 @@ commerce surface:
 
 That adapter is intentionally documented as a portability pattern, not as a
 second live mainnet-proved integration.
+
+What it proves:
+
+- a second commerce surface can normalize into the same quote / claim / resolve
+  language
+- Risk OS is broader than one Civilis page
+
+What it does not prove:
+
+- a second mainnet-proved protected settlement loop
+- a second fully captured dispute and repricing chain
 
 The strongest way to read the adapter is:
 

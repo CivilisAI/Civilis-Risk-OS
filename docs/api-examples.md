@@ -6,6 +6,29 @@ reference Intel Market integration.
 They are intentionally narrow. The current submission claim is the protection
 pattern, not that every commerce surface is already generalized.
 
+Before using the examples below, read:
+
+- [Proof Surface Matrix](proof-surface-matrix.md)
+- [Championship Replay Mode](championship-replay-mode.md)
+
+## Canonical Replay Contract
+
+The default replay contract for this repo is:
+
+- use the canonical actors `sage`, `fox`, and `arbiter`
+- prefer the canonical replay path `16 -> 34 -> 11 -> 10 -> 36` when citing the
+  strongest historical proof
+- use claimant and evaluator tokens in the strict proof environment unless a
+  role-specific wallet-signature capture is explicitly available
+
+In other words:
+
+- token-gated claim / resolve is the current canonical replay path
+- deterministic `claim-proof` and `resolve-proof` messages are real product
+  surfaces
+- generic buyer wallet-signature proof is **not** claimed as captured public
+  proof
+
 ## 1. Quote An Intel Purchase Before Buying
 
 `POST /api/risk/quote/intel`

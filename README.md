@@ -51,14 +51,29 @@ If a reviewer only has a minute, read in this order:
 
 1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
 2. [Final Championship Audit](docs/final-championship-audit.md)
-3. [External Consumer Guide](docs/external-consumer-guide.md)
-4. [Submission Reference](docs/submission-reference.md)
-5. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
-6. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-7. [Mainnet Evidence](docs/mainnet-evidence.md)
-8. [API Examples](docs/api-examples.md)
-9. [Championship Replay Mode](docs/championship-replay-mode.md)
-10. [Judge Demo Script](docs/judge-demo-script.md)
+3. [Proof Surface Matrix](docs/proof-surface-matrix.md)
+4. [External Consumer Guide](docs/external-consumer-guide.md)
+5. [Submission Reference](docs/submission-reference.md)
+6. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+7. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+8. [Mainnet Evidence](docs/mainnet-evidence.md)
+9. [API Examples](docs/api-examples.md)
+10. [Championship Replay Mode](docs/championship-replay-mode.md)
+11. [Judge Demo Script](docs/judge-demo-script.md)
+
+## Judge 30-Second Read
+
+If a reviewer only reads one screen, the intended takeaway is:
+
+- **What it is:** a reusable protection Skill for agent commerce on X Layer
+- **What is live and proven:** one full canonical protected-intel loop on
+  mainnet
+- **What is reusable beyond the reference integration:** a second lightweight
+  adapter proves the same pattern can normalize another commerce surface
+- **What is not overclaimed:** this repo does not claim generalized insurance,
+  decentralized arbitration, or a captured generic buyer wallet-signature proof
+
+The rest of the repo should be read through that frame.
 
 ## Canonical Evidence Policy
 
@@ -78,6 +93,15 @@ Canonical submission path:
 Older hashes may still appear in evidence docs as historical depth loops. They
 are preserved intentionally, but the path above is the primary submission
 story.
+
+## Public Submission Source Of Truth
+
+This public repo is the submission source of truth for Skills Arena.
+
+- canonical replay hashes belong here first
+- historical loops may remain as depth evidence
+- private working material should not be treated as more authoritative than this
+  public repo when reviewing the submission
 
 ## Skill Contract
 
@@ -158,6 +182,19 @@ capability** and **captured public proof**:
 - decentralized arbitration
 - generalized protection across every commerce surface
 - wallet-signature-bound universal claimant/evaluator auth
+
+## What The Second Adapter Proves
+
+The second adapter does **not** prove a second live mainnet settlement loop.
+
+It **does** prove something still important for Skills Arena:
+
+- the Risk OS contract can normalize another commerce surface
+- the protection primitive is not trapped inside Intel Market
+- an external consumer can mirror into the same quote and dispute vocabulary
+
+That is why the repo presents the second adapter as a **portability proof**,
+not as a second mainnet-proved live integration.
 
 ## Project Introduction
 

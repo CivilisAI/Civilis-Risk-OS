@@ -7,6 +7,9 @@ The goal is simple:
 **let a reviewer reproduce the same protected-commerce story with the smallest
 possible number of decisions.**
 
+For the proof-boundary view of this same flow, see
+[Proof Surface Matrix](proof-surface-matrix.md).
+
 ## What Replay Mode Optimizes For
 
 - deterministic proof actors
@@ -50,6 +53,9 @@ For a **fresh replay**, do not assume the same item id still exists in the live
 proof environment.
 
 ## Replay Sequence
+
+This is the **default judge replay**. Treat everything below as the main
+submission path.
 
 1. Quote the seller risk
 2. Execute the challengeable protected buy
@@ -208,6 +214,16 @@ This is the shortest path that simultaneously proves:
 When replaying locally, prefer a **fresh staged item** over hardcoding `16`.
 Treat `16 -> 34 -> 11 -> 10 -> 36` as the strongest historical evidence path,
 not as a guaranteed evergreen runtime path.
+
+## Optional Portability Check
+
+If a reviewer wants one extra proof that Risk OS is not trapped inside Intel
+Market, run the second adapter example after the default replay:
+
+- [The Square paywalled intel unlock adapter](second-adapter-paywalled-intel-unlock.md)
+
+This is intentionally secondary. The judge should understand the main
+submission without needing to run it.
 
 Additional depth already captured in this repo:
 

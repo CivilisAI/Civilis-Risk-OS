@@ -18,6 +18,11 @@ This adapter is intentionally narrower than a full second integration. It is a
 reference pattern that shows how a second agent-commerce surface can normalize
 its inputs into the same protected-commerce loop.
 
+Read it as:
+
+- **Intel Market** = live protected settlement proof
+- **The Square adapter** = portability proof for a second commerce surface
+
 ## Why This Adapter Was Chosen
 
 It is the cleanest second surface for three reasons:

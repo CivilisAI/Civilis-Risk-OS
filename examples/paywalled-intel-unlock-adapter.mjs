@@ -2,7 +2,24 @@
 
 import { createHash } from 'node:crypto';
 
+const HELP = `Civilis Risk OS paywalled intel unlock adapter
+
+Purpose:
+  normalize a paywalled intel post into the Risk OS contract
+  optionally attach a live mirrored quote from Intel Market
+
+Core env:
+  RISK_OS_BASE_URL
+  RISK_OS_SOCIAL_POST_ID
+  RISK_OS_BUYER_AGENT_ID=sage
+
+Optional env:
+  RISK_OS_MIRRORED_INTEL_ITEM_ID
+  RISK_OS_ACTION=run|help
+`;
+
 const baseUrl = (process.env.RISK_OS_BASE_URL || 'http://127.0.0.1:3020').replace(/\/$/, '');
+const action = process.env.RISK_OS_ACTION || 'run';
 const postId = Number(process.env.RISK_OS_SOCIAL_POST_ID || '0');
 const buyerAgentId = process.env.RISK_OS_BUYER_AGENT_ID || 'sage';
 const mirroredIntelItemId = Number(process.env.RISK_OS_MIRRORED_INTEL_ITEM_ID || '0');
@@ -67,6 +84,11 @@ async function maybeAttachMirroredQuote(normalized) {
 }
 
 async function main() {
+  if (action === 'help') {
+    console.log(HELP);
+    return;
+  }
+
   if (!postId) {
     throw new Error('Set RISK_OS_SOCIAL_POST_ID to inspect a paywalled intel post');
   }

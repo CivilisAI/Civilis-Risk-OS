@@ -2,6 +2,10 @@
 
 This document collects the mainnet facts that are safe to cite publicly.
 
+For the strict separation between canonical proof, historical depth loops,
+message-prep surfaces, and non-claimed paths, see
+[Proof Surface Matrix](proof-surface-matrix.md).
+
 ## Contract Addresses
 
 | Contract | Address |
