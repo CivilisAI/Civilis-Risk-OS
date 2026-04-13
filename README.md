@@ -81,6 +81,7 @@ git clone https://github.com/CivilisAI/Civilis-Risk-OS.git
 cd Civilis-Risk-OS
 npm install
 npm run demo
+npm test
 npm run runtime -- help
 ```
 
@@ -113,6 +114,7 @@ The fastest "does this actually work?" check is now:
 
 ```bash
 npm run demo
+npm test
 ```
 
 ## Runtime Skill

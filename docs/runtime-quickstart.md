@@ -30,6 +30,7 @@ git clone https://github.com/CivilisAI/Civilis-Risk-OS.git
 cd Civilis-Risk-OS
 npm install
 npm run demo
+npm test
 npm run runtime -- help
 ```
 
@@ -46,6 +47,7 @@ If someone only wants to prove that the package is executable, start with:
 
 ```bash
 npm run demo
+npm test
 ```
 
 This performs:
