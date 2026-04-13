@@ -54,9 +54,12 @@ Primary transaction references:
 
 - one live protected-commerce loop on X Layer
 - independent buyer / seller / evaluator Agentic Wallet actors
+- live `okx-security` seller-wallet token scanning in the quote path
+- live `okx-dex-token` concentration and holder analytics in the quote path
 - challengeable settlement through `ERC-8183`
 - deterministic buyer claim preparation
 - evaluator-driven refund / release
+- optional AI evaluator advisory with `decision`, `reasoning`, and `confidence`
 - later quote repricing after protected outcomes
 - one second portability adapter for another commerce surface
 

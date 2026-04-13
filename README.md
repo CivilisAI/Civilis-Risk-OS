@@ -18,8 +18,9 @@ The goal of this repository is simple:
 - **Project type:** reusable protection Skill with a live reference integration
 - **Reference integration:** Civilis Intel Market
 - **Primary chain:** X Layer mainnet (`chainId 196`)
-- **Core official stack:** `x402 Payment API`, `Agentic Wallet`,
-  `Security`, `DEX Token Analytics`, `ERC-8183 / ACP`, `ERC-8004`
+- **Core official stack in the live reference runtime:** `x402 Payment API`,
+  `Agentic Wallet`, `Security`, `DEX Token Analytics`, `ERC-8183 / ACP`,
+  `ERC-8004`
 - **Current scope:** a protected commerce flow for agent transactions, not a
   generalized insurance protocol
 
@@ -45,6 +46,45 @@ If someone only reads one screen, the intended takeaway is:
 - **What it is not:** a generalized insurance protocol or decentralized court
 
 The rest of the repo should be read through that frame.
+
+## Live Official Modules
+
+The live reference runtime already uses these official capability surfaces:
+
+- `okx-x402-payment` for payment-gated intel purchase flow
+- `okx-agentic-wallet` for the buyer, seller, and evaluator identities
+- `okx-security` through
+  `onchainos security token-scan --address <sellerWallet> --chain xlayer`
+- `okx-dex-token` through
+  `onchainos token advanced-info --chain xlayer --address <token>`
+- `okx-dex-token` through
+  `onchainos token holders --chain xlayer --address <token>`
+- `ERC-8183 / ACP` for challengeable protected settlement
+- `ERC-8004` for identity, reputation, and validation inputs
+
+Reference implementation:
+
+- [`reference/server/risk/onchainos-quote-signals.ts`](reference/server/risk/onchainos-quote-signals.ts)
+- [`reference/server/risk/quote-engine.ts`](reference/server/risk/quote-engine.ts)
+
+## AI Evaluator Advisory
+
+The live reference runtime also supports an AI-assisted evaluator advisory
+path.
+
+When `RISK_OS_ENABLE_LLM_EVALUATOR=true` and an OpenAI-compatible `LLM_*`
+configuration is present, the evaluator can generate:
+
+- `decision`
+- `reasoning`
+- `confidence`
+
+Explicit evaluator decisions still win when they are supplied.
+
+Reference implementation:
+
+- [`reference/server/risk/claim-lifecycle.ts`](reference/server/risk/claim-lifecycle.ts)
+- [`reference/server/llm/text.ts`](reference/server/llm/text.ts)
 
 ## Install And Call The Skill
 
@@ -515,7 +555,6 @@ capabilities:
 - `okx-agentic-wallet`
 - `okx-security`
 - `okx-dex-token`
-- `okx-onchain-gateway` as the next most natural observability extension
 - `ERC-8183 / ACP`
 - `ERC-8004`
 - `X Layer mainnet (chainId 196)`
@@ -536,6 +575,21 @@ No Uniswap MVP claim is made in this public snapshot.
 - used as the chain identity surface for the staged mainnet proof loops
 - aligned to the official `okx-agentic-wallet` capability surface
 
+### `okx-security`
+
+- used in the live quote path through `onchainos security token-scan`
+- scans seller-wallet token holdings before final quote scoring
+- feeds seller-wallet token risk signals back into the quote adjustment set
+
+### `okx-dex-token`
+
+- used in the live quote path through
+  `onchainos token advanced-info --chain xlayer --address <token>`
+- used in the live quote path through
+  `onchainos token holders --chain xlayer --address <token>`
+- feeds token concentration and suspicious-holding signals back into the quote
+  adjustment set
+
 ### Why the official skill package matters here
 
 The official `okx/onchainos-skills` package makes the capability boundaries much
@@ -545,11 +599,10 @@ clearer:
 - `okx-x402-payment` owns x402 proof signing and payment replay
 - `okx-security` owns seller-wallet token safety scanning
 - `okx-dex-token` owns token concentration and holder analytics
-- `okx-onchain-gateway` owns simulation / gas / broadcast observability
 - `okx-security` also owns token / tx / signature scanning
 
 That separation helps this repo stay rigorous. It lets us say exactly what this
-project already uses, what it extends next, and what it does **not** yet claim.
+project already uses and what it does **not** yet claim.
 
 See:
 

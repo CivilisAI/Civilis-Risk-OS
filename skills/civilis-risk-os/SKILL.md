@@ -47,6 +47,28 @@ The same package also supports the public hosted bundled runtime at:
 - preparing and filing evaluator resolutions
 - querying post-outcome repricing
 
+## Live Official Modules In The Reference Runtime
+
+- `okx-x402-payment`
+- `okx-agentic-wallet`
+- `okx-security` via `onchainos security token-scan --address <sellerWallet> --chain xlayer`
+- `okx-dex-token` via `onchainos token advanced-info --chain xlayer --address <token>`
+- `okx-dex-token` via `onchainos token holders --chain xlayer --address <token>`
+- `ERC-8183 / ACP`
+- `ERC-8004`
+
+## AI Evaluator Advisory
+
+When the runtime has `RISK_OS_ENABLE_LLM_EVALUATOR=true` and a configured
+OpenAI-compatible `LLM_*` endpoint, `resolve-proof` and `resolve` may consume
+an evaluator advisory that returns:
+
+- `decision`
+- `reasoning`
+- `confidence`
+
+Explicit evaluator decisions still win when they are supplied.
+
 ## Do Not Use This Skill For
 
 - generalized insurance workflows
@@ -105,6 +127,18 @@ npm run runtime -- resolve-proof --claim 1
 npm run runtime -- requote --item 501 --buyer sage
 npm run verify:protected-loop
 ```
+
+## Command Contract
+
+- `quote` returns `riskScore`, `recommendedMode`, `premiumAmount`, and
+  quote reasoning
+- `buy` returns `protectedPurchaseId`, purchase mode, and protected commerce
+  state
+- `claim-proof` returns the deterministic buyer claim message and hash
+- `claim` returns the filed claim state
+- `resolve-proof` returns the evaluator resolution message and hash
+- `resolve` returns the final protected outcome and later repricing trigger
+- `requote` returns the next quote after protected outcome history is applied
 
 ## Output Contract
 

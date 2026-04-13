@@ -20,6 +20,20 @@
     "ERC-8183",
     "ERC-8004"
   ],
+  "liveReferenceModules": [
+    "okx-x402-payment",
+    "okx-agentic-wallet",
+    "okx-security: onchainos security token-scan --address <sellerWallet> --chain xlayer",
+    "okx-dex-token: onchainos token advanced-info --chain xlayer --address <token>",
+    "okx-dex-token: onchainos token holders --chain xlayer --address <token>",
+    "ERC-8183 / ACP",
+    "ERC-8004"
+  ],
+  "aiCapabilities": [
+    "llm-evaluator-advisory: decision",
+    "llm-evaluator-advisory: reasoning",
+    "llm-evaluator-advisory: confidence"
+  ],
   "canonicalActors": {
     "buyer": {
       "agentId": "sage",
