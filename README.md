@@ -84,6 +84,13 @@ npm run demo
 npm run runtime -- help
 ```
 
+Or install the package into another workspace and call the runtime directly:
+
+```bash
+npm install github:CivilisAI/Civilis-Risk-OS
+npx civilis-risk-os-runtime help
+```
+
 Then the narrow runtime actions are:
 
 - `health`

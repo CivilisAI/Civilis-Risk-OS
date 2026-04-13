@@ -1,9 +1,43 @@
 {
-  "name": "civilis-risk-os-public-reference",
-  "private": true,
+  "name": "civilis-risk-os",
   "version": "0.1.0",
-  "description": "Public reference repository for Civilis Risk OS",
+  "description": "Installable runtime skill and public reference repository for Civilis Risk OS",
   "license": "MIT",
+  "type": "module",
+  "homepage": "https://github.com/CivilisAI/Civilis-Risk-OS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CivilisAI/Civilis-Risk-OS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CivilisAI/Civilis-Risk-OS/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "civilis",
+    "risk-os",
+    "xlayer",
+    "onchainos",
+    "agentic-wallet",
+    "x402",
+    "erc-8183",
+    "erc-8004",
+    "skills-arena",
+    "agent-commerce"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE",
+    "docs",
+    "examples",
+    "openapi",
+    "schemas",
+    "skills",
+    "runtime.tool-surface.json",
+    "project.manifest.json"
+  ],
   "bin": {
     "civilis-risk-os-runtime": "examples/risk-os-runtime.mjs"
   },
@@ -11,6 +45,7 @@
     "demo": "node examples/runtime-demo.mjs",
     "runtime": "node examples/risk-os-runtime.mjs",
     "runtime:help": "node examples/risk-os-runtime.mjs help",
+    "verify:runtime": "node examples/runtime-demo.mjs && node examples/risk-os-runtime.mjs help",
     "verify:canonical-docs": "node examples/verify-canonical-proof.mjs",
     "verify:canonical-health": "RISK_OS_VERIFY_MODE=health node examples/verify-canonical-proof.mjs",
     "verify:canonical-api": "RISK_OS_VERIFY_MODE=api node examples/verify-canonical-proof.mjs",

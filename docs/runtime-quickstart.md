@@ -33,6 +33,13 @@ npm run demo
 npm run runtime -- help
 ```
 
+From another workspace:
+
+```bash
+npm install github:CivilisAI/Civilis-Risk-OS
+npx civilis-risk-os-runtime help
+```
+
 ## Fastest Demo
 
 If someone only wants to prove that the package is executable, start with:
