@@ -785,7 +785,7 @@ Those are future extension directions, not current public facts.
 
 ## Team Members
 
-- `Tim / CivilisAI`: product, architecture, implementation, packaging, and project direction
+- `KB / CivilisAI`: product, architecture, implementation, packaging, and project direction
 
 ## Platform Review Appendix
 
