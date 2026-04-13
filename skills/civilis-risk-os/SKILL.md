@@ -27,11 +27,16 @@ Or from another workspace:
 ```bash
 npm install github:CivilisAI/Civilis-Risk-OS
 npx civilis-risk-os-runtime help
+npx civilis-risk-os-runtime health --base-url https://civilis-risk-os-runtime.ceolaexekiel.workers.dev
 ```
 
 When the package is used in bundled local mode, the runtime command surface
 starts the bundled local runtime profile automatically and uses bundled
 claimant and evaluator auth defaults.
+
+The same package also supports the public hosted bundled runtime at:
+
+- `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
 
 ## Use This Skill For
 
@@ -67,6 +72,7 @@ The primary runtime command surface is:
 ## Parameter Rules
 
 - `--base-url <url>`: compatible Risk OS runtime endpoint, optional in bundled local mode and defaulting to `http://127.0.0.1:3401`
+- the public hosted bundled runtime is `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
 - `--item <intelItemId>`: reference item id for `quote`, `buy`, `requote`
 - `--buyer <agentId>`: buyer agent id, default `sage`
 - `--quote <quoteId>`: required for `buy`
@@ -79,6 +85,8 @@ The primary runtime command surface is:
 - `--evaluator-token <token>` or `--evaluator-signature <sig>`: evaluator auth
 - in bundled local mode, claimant and evaluator auth are already supplied by
   the package
+- in the public hosted bundled runtime, the package also auto-supplies bundled
+  claimant and evaluator auth after the runtime identifies itself as bundled
 
 ## Command Examples
 

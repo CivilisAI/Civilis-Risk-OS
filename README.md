@@ -88,23 +88,26 @@ for using the package.
 
 This package also supports a hosted deployment surface for direct public use.
 
-For Render:
+For Cloudflare Workers:
 
 ```bash
-build command: npm install
-start command: npm run runtime:hosted
-health check: /health
+npm install
+npm run runtime:cf:deploy
 ```
 
 The same runtime command surface works against the hosted URL:
 
 ```bash
-npx civilis-risk-os-runtime health --base-url <public-runtime-url>
-npx civilis-risk-os-runtime quote --base-url <public-runtime-url> --item 501 --buyer sage
+npx civilis-risk-os-runtime health --base-url https://civilis-risk-os-runtime.ceolaexekiel.workers.dev
+npx civilis-risk-os-runtime quote --base-url https://civilis-risk-os-runtime.ceolaexekiel.workers.dev --item 501 --buyer sage
 ```
 
 When hosted in this bundled profile, the public runtime keeps the same
 zero-friction command surface as the local bundled mode.
+
+Current public hosted runtime:
+
+- `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
 
 Then the narrow runtime actions are:
 

@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "baseUrlVariable": "RISK_OS_BASE_URL",
   "bundledProfileBaseUrl": "http://127.0.0.1:3401",
+  "publicHostedBaseUrl": "https://civilis-risk-os-runtime.ceolaexekiel.workers.dev",
   "actions": [
     {
       "name": "health",
@@ -58,6 +59,6 @@
   ],
   "boundaries": {
     "genericBuyerWalletSignatureCapturedProof": false,
-    "publicHostedProductionEndpointClaimed": false
+    "publicHostedProductionEndpointClaimed": true
   }
 }

@@ -44,21 +44,23 @@ That means:
 - same proof expectations
 - only `--base-url` changes
 
-## Render Web Service
+## Cloudflare Workers
 
-This repo includes a ready deployment file for Render:
+This repo includes a ready deployment file for Cloudflare Workers:
 
-- [render.yaml](../render.yaml)
+- [wrangler.toml](../wrangler.toml)
 
-Use these settings if you configure the service manually:
+Use these commands:
 
-- build command: `npm install`
-- start command: `npm run runtime:hosted`
-- health check path: `/health`
-- runtime: Node 20
+- `npm install`
+- `npm run runtime:cf:deploy`
 
 That deployment publishes the bundled runtime profile as a public hosted Skill
-surface.
+surface with the same public `health` and runtime API paths.
+
+Current public hosted runtime:
+
+- `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
 
 ## Minimal Hosted Requirements
 
@@ -75,7 +77,16 @@ A hosted Risk OS runtime should expose:
 
 ## Hosted Integrator Inputs
 
-A hosted external AI or app needs:
+For the public bundled hosted runtime, another AI only needs:
+
+- `base-url`
+- commerce item id
+- buyer actor id
+
+The package recognizes bundled-hosted mode and supplies bundled claimant and
+evaluator auth defaults automatically.
+
+For a custom hosted-compatible deployment, an external AI or app still needs:
 
 - `base-url`
 - buyer actor id
@@ -88,15 +99,15 @@ A hosted external AI or app needs:
 This public repo includes two valid ways to use the same Skill:
 
 - bundled local runtime: included, self-contained, and verified
-- hosted-compatible runtime: supported by the same command surface
-
-It still does not currently claim that a public production runtime URL has been
-published as part of the submission.
+- public hosted bundled runtime: published and supported by the same command
+  surface
+- hosted-compatible runtime: also supported when another deployment uses the
+  same contract
 
 That distinction matters:
 
 - bundled local runtime profile: **yes**
 - hosted-ready: **yes**
-- public hosted production endpoint claimed in this repo: **no**
+- public hosted production endpoint claimed in this repo: **yes**
 
 Keep that wording strict in demos and docs.

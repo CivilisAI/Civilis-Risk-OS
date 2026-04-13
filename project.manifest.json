@@ -51,6 +51,7 @@
       "cli": "examples/risk-os-runtime.mjs",
       "fullLoopVerifier": "examples/runtime-full-loop.mjs",
       "bundledProfile": "examples/bundled-runtime.mjs",
+      "publicHostedBaseUrl": "https://civilis-risk-os-runtime.ceolaexekiel.workers.dev",
       "toolSurface": "runtime.tool-surface.json",
       "quickstart": "docs/runtime-quickstart.md",
       "hostedOnboarding": "docs/hosted-runtime-onboarding.md"
@@ -95,7 +96,8 @@
     "partialRefunds": false,
     "generalizedInsuranceProtocol": false,
     "secondLiveMainnetSettlementLoop": false,
-    "llmEvaluatorVendorBackedLiveSettlementProof": false
+    "llmEvaluatorVendorBackedLiveSettlementProof": false,
+    "publicHostedProductionEndpointClaimed": true
   },
   "readFirst": [
     "README.md",

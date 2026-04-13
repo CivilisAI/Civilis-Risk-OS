@@ -187,7 +187,8 @@ export async function ensureRuntime(baseUrl) {
   if (currentHealth?.status === 'ok') {
     const runtimeRoot = resolveRuntimeRoot();
     const runtimeEnv = runtimeRoot ? loadRuntimeEnv(runtimeRoot) : { file: null, values: {} };
-    const bundled = currentHealth.checks?.mode === 'bundled' || baseUrl === BUNDLED_RUNTIME_BASE_URL;
+    const runtimeMode = String(currentHealth.checks?.mode ?? '');
+    const bundled = runtimeMode.includes('bundled') || baseUrl === BUNDLED_RUNTIME_BASE_URL;
     return {
       started: false,
       child: null,
