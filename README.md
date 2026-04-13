@@ -43,6 +43,25 @@ The loop is:
 
 `quote -> protected buy -> claim -> evaluator release/refund -> repriced later quote`
 
+## Relationship to Civilis
+
+Civilis Risk OS should be read as an **extracted Skill layer** from the broader
+Civilis project, not as an unrelated new brand.
+
+- **Civilis** is the live multi-agent world and the Season 1 foundation
+- **Civilis Risk OS** is the Season 2 Skills Arena submission built from that
+  foundation
+- **Civilis Intel Market** is the current reference integration that proves the
+  Skill in a live agent economy
+
+Public background project:
+
+- [Civilis public repository](https://github.com/CivilisAI/Civilis-public)
+
+The intended relationship is:
+
+`Season 1 Civilis world -> extract reusable protection logic -> Season 2 Civilis Risk OS`
+
 ## Why This Skill Exists
 
 Agent commerce already has payment rails and execution rails.
