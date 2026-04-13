@@ -107,7 +107,7 @@ env vars:
 
 ```bash
 RISK_OS_VERIFY_MODE=api \
-RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_BASE_URL=https://<strict-proof-runtime-url> \
 RISK_OS_VERIFY_ITEM_ID=<fresh_item_id> \
 RISK_OS_VERIFY_QUOTE_ID=<fresh_quote_id> \
 RISK_OS_VERIFY_PURCHASE_ID=<fresh_purchase_id> \
@@ -118,7 +118,7 @@ And for the combined live check:
 
 ```bash
 RISK_OS_VERIFY_MODE=full \
-RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_BASE_URL=https://<strict-proof-runtime-url> \
 RISK_OS_VERIFY_ITEM_ID=<fresh_item_id> \
 RISK_OS_VERIFY_QUOTE_ID=<fresh_quote_id> \
 RISK_OS_VERIFY_PURCHASE_ID=<fresh_purchase_id> \

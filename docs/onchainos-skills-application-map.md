@@ -18,7 +18,7 @@ This mapping is grounded in three sources:
    - `npx skills add okx/onchainos-skills`
    - `npx skills add okx/onchainos-skills -y -g`
 2. the local skill bundle already present in the Civilis working tree:
-   - `/Users/kb/Desktop/Civilis/skills/*`
+   - `skills/*`
 3. the currently installed `onchainos` CLI help surface, including:
    - `onchainos wallet --help`
    - `onchainos payment --help`

@@ -37,7 +37,7 @@ The strict proof environment does **not** mean:
 Use the health endpoint:
 
 ```bash
-curl -s http://127.0.0.1:3020/health
+curl -s https://<strict-proof-runtime-url>/health
 ```
 
 In a healthy strict proof environment, the important fields are:
@@ -59,10 +59,10 @@ node examples/verify-canonical-proof.mjs
 It can also probe progressively stronger public proof surfaces:
 
 ```bash
-RISK_OS_VERIFY_MODE=health RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
-RISK_OS_VERIFY_MODE=api RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
+RISK_OS_VERIFY_MODE=health RISK_OS_BASE_URL=https://<strict-proof-runtime-url> node examples/verify-canonical-proof.mjs
+RISK_OS_VERIFY_MODE=api RISK_OS_BASE_URL=https://<strict-proof-runtime-url> node examples/verify-canonical-proof.mjs
 RISK_OS_VERIFY_MODE=onchain node examples/verify-canonical-proof.mjs
-RISK_OS_VERIFY_MODE=full RISK_OS_BASE_URL=http://127.0.0.1:3020 node examples/verify-canonical-proof.mjs
+RISK_OS_VERIFY_MODE=full RISK_OS_BASE_URL=https://<strict-proof-runtime-url> node examples/verify-canonical-proof.mjs
 ```
 
 If you want a shorter reproducibility entrypoint, the public repo now
@@ -83,7 +83,7 @@ The current canonical read model for live API verification is:
 ## Latest Successful Live Verifier Run
 
 On `2026-04-13`, we re-ran the verifier successfully against a live strict proof
-environment on `http://127.0.0.1:3021`.
+environment on a maintained strict runtime endpoint.
 
 Because historical canonical purchase ids are not guaranteed to remain present
 forever in the maintained proof database, the successful live run used a fresh
@@ -100,7 +100,7 @@ Successful command:
 
 ```bash
 RISK_OS_VERIFY_MODE=full \
-RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_BASE_URL=https://<strict-proof-runtime-url> \
 RISK_OS_VERIFY_ITEM_ID=899 \
 RISK_OS_VERIFY_QUOTE_ID=2 \
 RISK_OS_VERIFY_PURCHASE_ID=1 \

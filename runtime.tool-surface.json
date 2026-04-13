@@ -3,7 +3,7 @@
   "type": "runtime-tool-surface",
   "version": "0.1.0",
   "baseUrlVariable": "RISK_OS_BASE_URL",
-  "bundledProfileBaseUrl": "http://127.0.0.1:3401",
+  "bundledProfileBaseUrl": "<bundled-local-runtime>",
   "publicHostedBaseUrl": "https://civilis-risk-os-runtime.ceolaexekiel.workers.dev",
   "actions": [
     {

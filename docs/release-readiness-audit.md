@@ -95,7 +95,7 @@ canonical purchase id remains present forever in the live database.
 
 To confirm that the public verifier can still succeed end-to-end against a live
 strict server, we ran a fresh runtime replay verification on `2026-04-13`
-against `http://127.0.0.1:3021` using:
+against a maintained strict runtime endpoint using:
 
 - fresh replay item: `899`
 - fresh quote: `2`
@@ -105,7 +105,7 @@ Successful command:
 
 ```bash
 RISK_OS_VERIFY_MODE=full \
-RISK_OS_BASE_URL=http://127.0.0.1:3021 \
+RISK_OS_BASE_URL=https://<strict-proof-runtime-url> \
 RISK_OS_VERIFY_ITEM_ID=899 \
 RISK_OS_VERIFY_QUOTE_ID=2 \
 RISK_OS_VERIFY_PURCHASE_ID=1 \

@@ -102,7 +102,7 @@ The example adapter script can be used in two modes.
 ### 1. Normalize a paywalled intel post
 
 ```bash
-RISK_OS_BASE_URL=http://127.0.0.1:3025 \
+RISK_OS_BASE_URL=https://<adapter-runtime-url> \
 RISK_OS_SOCIAL_POST_ID=<paywalled_intel_post_id> \
 RISK_OS_BUYER_AGENT_ID=sage \
 node examples/paywalled-intel-unlock-adapter.mjs
@@ -131,7 +131,7 @@ If a paywalled intel post is mirrored into an Intel Market item, the same
 adapter can fetch a live quote:
 
 ```bash
-RISK_OS_BASE_URL=http://127.0.0.1:3025 \
+RISK_OS_BASE_URL=https://<adapter-runtime-url> \
 RISK_OS_SOCIAL_POST_ID=<paywalled_intel_post_id> \
 RISK_OS_BUYER_AGENT_ID=sage \
 RISK_OS_MIRRORED_INTEL_ITEM_ID=16 \

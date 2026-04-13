@@ -60,13 +60,13 @@ npm run runtime -- help
 Use these commands as the primary runtime contract:
 
 ```bash
-npm run runtime -- health --base-url http://127.0.0.1:3021
-npm run runtime -- quote --item 16 --buyer sage --base-url http://127.0.0.1:3021
-npm run runtime -- buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url http://127.0.0.1:3021
-npm run runtime -- purchase --purchase 11 --base-url http://127.0.0.1:3021
-npm run runtime -- claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url http://127.0.0.1:3021
-npm run runtime -- resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url http://127.0.0.1:3021
-npm run runtime -- requote --item 16 --buyer sage --base-url http://127.0.0.1:3021
+npm run runtime -- health --base-url <compatible-runtime-url>
+npm run runtime -- quote --item 16 --buyer sage --base-url <compatible-runtime-url>
+npm run runtime -- buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url <compatible-runtime-url>
+npm run runtime -- purchase --purchase 11 --base-url <compatible-runtime-url>
+npm run runtime -- claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url <compatible-runtime-url>
+npm run runtime -- resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url <compatible-runtime-url>
+npm run runtime -- requote --item 16 --buyer sage --base-url <compatible-runtime-url>
 ```
 
 ## Minimal Usage Rule

@@ -65,7 +65,7 @@ This performs:
 Environment overrides:
 
 ```bash
-RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3401
+RISK_OS_DEMO_BASE_URL=<compatible-runtime-url>
 RISK_OS_DEMO_ITEM_ID=501
 RISK_OS_DEMO_BUYER=sage
 ```

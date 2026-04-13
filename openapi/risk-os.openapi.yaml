@@ -8,8 +8,10 @@ info:
     This spec covers the canonical protected-commerce flow:
     quote -> challengeable buy -> claim -> evaluator resolve -> later repricing.
 servers:
-  - url: http://127.0.0.1:3020
-    description: Local strict proof environment
+  - url: https://civilis-risk-os-runtime.ceolaexekiel.workers.dev
+    description: Public hosted bundled runtime
+  - url: https://<compatible-risk-os-runtime>
+    description: Compatible Risk OS runtime
 tags:
   - name: risk
   - name: intel

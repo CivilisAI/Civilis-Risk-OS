@@ -93,7 +93,7 @@ The primary runtime command surface is:
 
 ## Parameter Rules
 
-- `--base-url <url>`: compatible Risk OS runtime endpoint, optional in bundled local mode and defaulting to `http://127.0.0.1:3401`
+- `--base-url <url>`: compatible Risk OS runtime endpoint, optional in bundled local mode and defaulting to the bundled local runtime profile started by the package
 - the public hosted bundled runtime is `https://civilis-risk-os-runtime.ceolaexekiel.workers.dev`
 - `--item <intelItemId>`: reference item id for `quote`, `buy`, `requote`
 - `--buyer <agentId>`: buyer agent id, default `sage`

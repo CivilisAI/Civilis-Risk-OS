@@ -12,7 +12,7 @@ Use this mode when:
 
 Typical base URL:
 
-- `http://127.0.0.1:3021`
+- `<strict-proof-runtime-url>`
 
 ## 2. Hosted Runtime
 
