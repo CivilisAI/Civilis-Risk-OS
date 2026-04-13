@@ -131,7 +131,7 @@ This matters for Risk OS because it tells us not to blur:
 - protected agent-wallet execution
 - generic broadcast infrastructure
 
-### 3. Why `okx-security` is a meaningful next-step hardening layer
+### 3. Why `okx-security` matters in the current quote path
 
 The official skill docs treat security scanning as a distinct preflight surface:
 
@@ -140,7 +140,12 @@ The official skill docs treat security scanning as a distinct preflight surface:
 - signature scan
 - approval scan
 
-That means a future Risk OS hardening claim can be very concrete:
+That means the current Risk OS quote path can make a concrete claim:
+
+- scan the seller wallet for flagged token exposure before finalizing the quote
+- record the scan outcome as quote input rather than hand-waving it in docs
+
+It also leaves a clear next hardening step:
 
 - preflight the resolver signature request
 - preflight settlement txs before release/refund
@@ -189,10 +194,15 @@ Why it helps:
 
 ### D. `okx-dex-market` / `okx-dex-token` for quote enrichment
 
-Best use:
+Current use:
 
-- enrich future intel-risk quotes with token or market context when the item is
-  asset-related
+- enrich current risk quotes with token concentration context derived from the
+  detected associated token or the payment rail fallback token
+
+Best next use:
+
+- expand from token concentration into broader asset-related market context when
+  the item itself is asset-specific
 
 Why it helps:
 
@@ -201,8 +211,8 @@ Why it helps:
 
 Constraint:
 
-- do not mix this into the current canonical submission unless it is actually
-  implemented and proven
+- keep the current live claim narrow: token concentration is quote enrichment,
+  not a generalized market-intelligence layer
 
 ## What We Should Not Do
 

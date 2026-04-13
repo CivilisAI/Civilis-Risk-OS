@@ -37,12 +37,12 @@
     {
       "name": "resolve-proof",
       "role": "evaluator",
-      "inputs": ["claim", "decision", "reason"]
+      "inputs": ["claim", "decision?", "reason?"]
     },
     {
       "name": "resolve",
       "role": "evaluator",
-      "inputs": ["claim", "decision", "reason", "evaluatorProofPath"]
+      "inputs": ["claim", "decision?", "reason?", "evaluatorProofPath"]
     },
     {
       "name": "requote",

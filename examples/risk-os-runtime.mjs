@@ -26,8 +26,8 @@ Common flags:
   --purchase <protectedId>      Protected purchase id
   --claim <claimId>             Claim id
   --mode <instant|challengeable>
-  --decision <release|refund>
-  --reason <text>
+  --decision <release|refund>        Optional when the runtime can supply an evaluator advisory
+  --reason <text>                    Optional when proof/advisory generation supplies it
   --claim-type <type>
   --claimant-token <token>
   --claimant-signature <sig>
@@ -41,6 +41,7 @@ Examples:
   node examples/risk-os-runtime.mjs buy --item 16 --buyer sage --mode challengeable --quote 34 --base-url http://127.0.0.1:3011
   node examples/risk-os-runtime.mjs claim --purchase 11 --reason "delivery was misleading" --claimant-token <token> --base-url http://127.0.0.1:3011
   node examples/risk-os-runtime.mjs resolve --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token> --base-url http://127.0.0.1:3011
+  node examples/risk-os-runtime.mjs resolve-proof --claim 10 --base-url http://127.0.0.1:3011
 `;
 
 const DEFAULTS = {
@@ -108,9 +109,6 @@ async function run(command, flags) {
   const baseUrl = getString(flags['base-url'], DEFAULTS.baseUrl, 'base-url');
   const buyerAgentId = getString(flags.buyer, DEFAULTS.buyerAgentId, 'buyer agent id');
   const claimType = getString(flags['claim-type'], DEFAULTS.claimType, 'claim type');
-  const claimReason = getString(flags.reason, DEFAULTS.claimReason, 'reason');
-  const decision = getString(flags.decision, DEFAULTS.resolutionDecision, 'decision');
-  const resolutionReason = getString(flags.reason, DEFAULTS.resolutionReason, 'reason');
   const claimantToken = String(flags['claimant-token'] ?? DEFAULTS.claimantToken);
   const claimantSignature = String(flags['claimant-signature'] ?? DEFAULTS.claimantSignature);
   const evaluatorToken = String(flags['evaluator-token'] ?? DEFAULTS.evaluatorToken);
@@ -145,6 +143,7 @@ async function run(command, flags) {
     }
     case 'claim-proof': {
       const purchaseId = getNumber(flags.purchase, 'purchase');
+      const claimReason = getString(flags.reason, DEFAULTS.claimReason, 'reason');
       const params = new URLSearchParams({
         claimType,
         reasonText: claimReason,
@@ -153,6 +152,7 @@ async function run(command, flags) {
     }
     case 'claim': {
       const purchaseId = getNumber(flags.purchase, 'purchase');
+      const claimReason = getString(flags.reason, DEFAULTS.claimReason, 'reason');
       return request(baseUrl, '/api/risk/claims', {
         method: 'POST',
         headers: {
@@ -170,14 +170,23 @@ async function run(command, flags) {
     }
     case 'resolve-proof': {
       const claimId = getNumber(flags.claim, 'claim');
-      const params = new URLSearchParams({
-        decision,
-        decisionReason: resolutionReason,
-      });
+      const params = new URLSearchParams();
+      if (typeof flags.decision === 'string' && flags.decision.trim()) {
+        params.set('decision', flags.decision.trim());
+      }
+      if (typeof flags.reason === 'string' && flags.reason.trim()) {
+        params.set('decisionReason', flags.reason.trim());
+      }
       return request(baseUrl, `/api/risk/claims/${claimId}/resolve-proof?${params.toString()}`);
     }
     case 'resolve': {
       const claimId = getNumber(flags.claim, 'claim');
+      const decision = typeof flags.decision === 'string' && flags.decision.trim()
+        ? flags.decision.trim()
+        : null;
+      const resolutionReason = typeof flags.reason === 'string' && flags.reason.trim()
+        ? flags.reason.trim()
+        : null;
       return request(baseUrl, `/api/risk/claims/${claimId}/resolve`, {
         method: 'POST',
         headers: {
@@ -186,8 +195,8 @@ async function run(command, flags) {
           ...(evaluatorSignature ? { 'x-civilis-risk-evaluator-signature': evaluatorSignature } : {}),
         },
         body: JSON.stringify({
-          decision,
-          decisionReason: resolutionReason,
+          ...(decision ? { decision } : {}),
+          ...(resolutionReason ? { decisionReason: resolutionReason } : {}),
         }),
       });
     }

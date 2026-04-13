@@ -3,6 +3,7 @@ import { getPool, withTransaction } from '../db/postgres.js';
 import { getXLayerNetwork, isStrictOnchainMode } from '../config/xlayer.js';
 import { finalizeIntelPurchaseSettlement } from '../erc8183/hooks/intel-hook.js';
 import { reputationRegistry } from '../erc8004/reputation-registry.js';
+import { isLLMConfigured, llmText } from '../llm/text.js';
 import {
   getProtectedIntelPurchaseRecord,
   getProtectedIntelPurchaseView,
@@ -158,10 +159,26 @@ function isRoleProofRequired(): boolean {
   return true;
 }
 
+function isLLMEvaluatorEnabled(): boolean {
+  const value = process.env.RISK_OS_ENABLE_LLM_EVALUATOR?.trim().toLowerCase();
+  return value === '1' || value === 'true' || value === 'yes';
+}
+
+function readLLMModelLabel(): string {
+  return process.env.LLM_MODEL?.trim() || process.env.LLM_OBSERVER_MODEL?.trim() || 'configured_llm';
+}
+
 interface ClaimResolutionContext {
   claim: PurchaseClaimRecord;
   purchase: ProtectedIntelPurchaseRecord;
   configuredEvaluatorAddress: string;
+}
+
+interface EvaluatorDecisionAdvisory {
+  decision: ClaimDecision;
+  reasoning: string;
+  confidence: number;
+  model: string;
 }
 
 interface ClaimCreationContext {
@@ -237,6 +254,131 @@ async function loadClaimCreationContext(protectedPurchaseId: number): Promise<Cl
     purchase,
     claimantAddress,
   };
+}
+
+async function maybeGenerateEvaluatorDecisionAdvisory(
+  context: ClaimResolutionContext,
+): Promise<EvaluatorDecisionAdvisory | null> {
+  if (!isLLMEvaluatorEnabled() || !isLLMConfigured('observer')) {
+    return null;
+  }
+
+  const pool = getPool();
+  const intelResult = await pool.query<{
+    category: string;
+    content: Record<string, unknown>;
+  }>(
+    `SELECT category, content
+     FROM intel_items
+     WHERE id = $1`,
+    [context.purchase.intelItemId],
+  );
+
+  const intel = intelResult.rows[0];
+  if (!intel) {
+    return null;
+  }
+
+  const intelSummary = readIntelSummary(intel.content);
+  const intelData = readIntelData(intel.content);
+  const response = await llmText({
+    systemPrompt: [
+      'You are the evaluator advisor for Civilis Risk OS.',
+      'Return strict JSON only with keys decision, reasoning, confidence.',
+      'decision must be exactly "refund" or "release".',
+      'reasoning must be concise, concrete, and tied to the claim.',
+      'confidence must be a number between 0 and 1.',
+      'Refund only when the claim plausibly shows the intel was misleading, invalid, incomplete, or not delivered as quoted.',
+      'Release when the claim does not justify refunding the protected purchase.',
+    ].join(' '),
+    userPrompt: JSON.stringify({
+      protectedPurchaseId: context.purchase.id,
+      intelItemId: context.purchase.intelItemId,
+      intelCategory: intel.category,
+      intelSummary,
+      intelData,
+      claimType: context.claim.claimType,
+      claimReason: context.claim.reasonText,
+      purchaseMode: context.purchase.mode,
+      principalAmount: context.purchase.principalAmount,
+      premiumAmount: context.purchase.premiumAmount,
+    }),
+    maxTokens: 220,
+    temperature: 0.1,
+    retries: 1,
+    scope: 'observer',
+  });
+
+  if (!response) {
+    return null;
+  }
+
+  return parseEvaluatorDecisionAdvisory(response);
+}
+
+function parseEvaluatorDecisionAdvisory(raw: string): EvaluatorDecisionAdvisory | null {
+  const trimmed = raw.trim();
+  const jsonCandidate = extractFirstJsonObject(trimmed) ?? trimmed;
+
+  try {
+    const parsed = JSON.parse(jsonCandidate) as {
+      decision?: unknown;
+      reasoning?: unknown;
+      confidence?: unknown;
+    };
+    const decision = parsed.decision === 'refund' || parsed.decision === 'release'
+      ? parsed.decision
+      : null;
+    const reasoning = typeof parsed.reasoning === 'string' ? parsed.reasoning.trim() : '';
+    const confidence = readConfidence(parsed.confidence);
+
+    if (!decision || !reasoning || confidence == null) {
+      return null;
+    }
+
+    return {
+      decision,
+      reasoning,
+      confidence,
+      model: readLLMModelLabel(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function extractFirstJsonObject(value: string): string | null {
+  const start = value.indexOf('{');
+  const end = value.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) {
+    return null;
+  }
+  return value.slice(start, end + 1);
+}
+
+function readIntelSummary(content: Record<string, unknown>): string {
+  const summary = content.summary;
+  if (typeof summary === 'string' && summary.trim().length > 0) {
+    return summary.trim();
+  }
+  return JSON.stringify(content).slice(0, 800);
+}
+
+function readIntelData(content: Record<string, unknown>): Record<string, unknown> {
+  const data = content.data;
+  return data && typeof data === 'object' && !Array.isArray(data)
+    ? data as Record<string, unknown>
+    : {};
+}
+
+function readConfidence(value: unknown): number | null {
+  const raw = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN;
+  if (!Number.isFinite(raw)) {
+    return null;
+  }
+
+  const bounded = Math.max(0, Math.min(1, raw));
+  return Number(bounded.toFixed(4));
 }
 
 function verifyEvaluatorSignature(params: {
@@ -387,7 +529,7 @@ function assertEvaluatorAuthorization(params: {
 
 export async function getEvaluatorResolutionProof(params: {
   claimId: number;
-  decision: ClaimDecision;
+  decision?: ClaimDecision;
   decisionReason?: string | null;
 }): Promise<EvaluatorResolutionProof> {
   const context = await loadClaimResolutionContext(params.claimId);
@@ -395,12 +537,19 @@ export async function getEvaluatorResolutionProof(params: {
     throw new Error('Claim already resolved');
   }
 
+  const advisory = await maybeGenerateEvaluatorDecisionAdvisory(context);
+  const effectiveDecision = params.decision ?? advisory?.decision;
+  if (!effectiveDecision) {
+    throw new Error('A decision is required unless LLM evaluator advisory is enabled and configured');
+  }
+  const effectiveDecisionReason = params.decisionReason ?? advisory?.reasoning ?? null;
+
   return buildEvaluatorResolutionProof({
     claimId: context.claim.id,
     protectedPurchaseId: context.purchase.id,
     evaluatorAddress: context.configuredEvaluatorAddress,
-    decision: params.decision,
-    decisionReason: params.decisionReason,
+    decision: effectiveDecision,
+    decisionReason: effectiveDecisionReason,
   });
 }
 
@@ -662,7 +811,7 @@ export async function createProtectedPurchaseClaim(params: {
 
 export async function resolveProtectedPurchaseClaim(params: {
   claimId: number;
-  decision: ClaimDecision;
+  decision?: ClaimDecision;
   decisionReason?: string;
   evaluatorAuthToken?: string | null;
   evaluatorSignature?: string | null;
@@ -672,12 +821,23 @@ export async function resolveProtectedPurchaseClaim(params: {
     throw new Error('Claim already resolved');
   }
 
+  const advisory = await maybeGenerateEvaluatorDecisionAdvisory({
+    claim,
+    purchase,
+    configuredEvaluatorAddress,
+  });
+  const effectiveDecision = params.decision ?? claim.decision ?? advisory?.decision;
+  if (!effectiveDecision) {
+    throw new Error('A decision is required unless LLM evaluator advisory is enabled and configured');
+  }
+  const effectiveDecisionReason = params.decisionReason ?? claim.decisionReason ?? advisory?.reasoning ?? null;
+
   const proof = assertEvaluatorAuthorization({
     claimId: claim.id,
     protectedPurchaseId: purchase.id,
     configuredEvaluatorAddress,
-    decision: params.decision,
-    decisionReason: params.decisionReason,
+    decision: effectiveDecision,
+    decisionReason: effectiveDecisionReason,
     evaluatorAuthToken: params.evaluatorAuthToken,
     evaluatorSignature: params.evaluatorSignature,
   });
@@ -722,8 +882,8 @@ export async function resolveProtectedPurchaseClaim(params: {
          WHERE id = $1`,
         [
           params.claimId,
-          params.decision,
-          params.decisionReason ?? currentClaim.decisionReason ?? null,
+          effectiveDecision,
+          effectiveDecisionReason ?? currentClaim.decisionReason ?? null,
           proof.evaluatorAddress.toLowerCase(),
         ],
       );
@@ -738,25 +898,30 @@ export async function resolveProtectedPurchaseClaim(params: {
       await updateProtectedIntelPurchaseRecord({
         protectedPurchaseId: claim.protectedPurchaseId,
         metadata: {
-          settlementOutcome: params.decision,
+          settlementOutcome: effectiveDecision,
           settlementRequestedBy: 'claim_resolution',
           settlementRequestedAt: new Date().toISOString(),
           settlementLastError: null,
+          evaluatorAdvisoryDecision: advisory?.decision ?? null,
+          evaluatorAdvisoryConfidence: advisory?.confidence ?? null,
+          evaluatorAdvisoryModel: advisory?.model ?? null,
+          evaluatorAdvisoryApplied: params.decision == null && params.decisionReason == null && advisory != null,
+          evaluatorAdvisoryReasoning: advisory?.reasoning ?? null,
         },
       }, client);
     });
   }
 
-  if (claim.status === 'resolving' && claim.decision && claim.decision !== params.decision) {
+  if (claim.status === 'resolving' && claim.decision && claim.decision !== effectiveDecision) {
     throw new Error('Claim is already being resolved with a different decision');
   }
 
-  const settlementOutcome = (claim.decision ?? params.decision) === 'refund' ? 'refund' : 'release';
+  const settlementOutcome = effectiveDecision === 'refund' ? 'refund' : 'release';
   try {
     await finalizeIntelPurchaseSettlement({
       acpJobId: purchase.principalAcpJobId ?? 0,
       outcome: settlementOutcome,
-      reason: params.decisionReason ?? claim.decisionReason ?? `protected_intel_${settlementOutcome}_${purchase.id}`,
+      reason: effectiveDecisionReason ?? `protected_intel_${settlementOutcome}_${purchase.id}`,
     });
   } catch (error) {
     await updateProtectedIntelPurchaseRecord({
@@ -775,8 +940,8 @@ export async function resolveProtectedPurchaseClaim(params: {
   await persistClaimSettlementOutcome({
     claimId: params.claimId,
     protectedPurchaseId: purchase.id,
-    decision: claim.decision ?? params.decision,
-    decisionReason: params.decisionReason ?? claim.decisionReason ?? null,
+    decision: effectiveDecision,
+    decisionReason: effectiveDecisionReason,
     evaluatorAddress: proof.evaluatorAddress.toLowerCase(),
   });
 

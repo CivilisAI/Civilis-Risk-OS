@@ -204,8 +204,8 @@ router.post('/claims/:id/resolve', async (req, res) => {
     const evaluatorAuthToken = readRoleToken(req, 'x-civilis-risk-evaluator-token');
     const evaluatorSignature = readRoleToken(req, 'x-civilis-risk-evaluator-signature');
 
-    if (!Number.isFinite(claimId) || !decision) {
-      return res.status(400).json({ error: 'claim id and decision are required' });
+    if (!Number.isFinite(claimId) || (decision != null && decision !== 'release' && decision !== 'refund')) {
+      return res.status(400).json({ error: 'claim id is required and decision must be release or refund when provided' });
     }
 
     const view = await resolveProtectedPurchaseClaim({
@@ -251,13 +251,13 @@ router.get('/claims/:id/resolve-proof', async (req, res) => {
     const decision = readOptionalString(req.query.decision);
     const decisionReason = readOptionalString(req.query.decisionReason);
 
-    if (!Number.isFinite(claimId) || (decision !== 'release' && decision !== 'refund')) {
-      return res.status(400).json({ error: 'claim id and decision are required' });
+    if (!Number.isFinite(claimId) || (decision != null && decision !== 'release' && decision !== 'refund')) {
+      return res.status(400).json({ error: 'claim id is required and decision must be release or refund when provided' });
     }
 
     const proof = await getEvaluatorResolutionProof({
       claimId,
-      decision,
+      decision: decision ?? undefined,
       decisionReason,
     });
 

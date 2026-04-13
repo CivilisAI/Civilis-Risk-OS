@@ -68,8 +68,8 @@ The primary runtime command surface is:
 - `--purchase <protectedPurchaseId>`: required for `purchase`, `claim-proof`, `claim`
 - `--claim <claimId>`: required for `resolve-proof`, `resolve`
 - `--mode <instant|challengeable>`: settlement mode for `buy`
-- `--decision <release|refund>`: required for `resolve`
-- `--reason <text>`: required for `claim`, `resolve`, optional in proof prep
+- `--decision <release|refund>`: explicit evaluator outcome; optional for `resolve-proof` and `resolve` when the runtime has LLM evaluator advisory enabled
+- `--reason <text>`: required for `claim`, optional for `resolve-proof` and `resolve` when proof or advisory generation supplies it
 - `--claimant-token <token>` or `--claimant-signature <sig>`: buyer auth
 - `--evaluator-token <token>` or `--evaluator-signature <sig>`: evaluator auth
 
@@ -84,6 +84,7 @@ npm run runtime -- claim-proof --base-url http://127.0.0.1:3011 --purchase 11 --
 npm run runtime -- claim --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading" --claimant-token <token>
 npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold"
 npm run runtime -- resolve --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token>
+npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10
 npm run runtime -- requote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
 ```
 

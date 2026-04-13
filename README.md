@@ -19,7 +19,7 @@ The goal of this repository is simple:
 - **Reference integration:** Civilis Intel Market
 - **Primary chain:** X Layer mainnet (`chainId 196`)
 - **Core official stack:** `x402 Payment API`, `Agentic Wallet`,
-  `ERC-8183 / ACP`, `ERC-8004`
+  `Security`, `DEX Token Analytics`, `ERC-8183 / ACP`, `ERC-8004`
 - **Current scope:** a protected commerce flow for agent transactions, not a
   generalized insurance protocol
 
@@ -96,8 +96,8 @@ Then the narrow runtime actions are:
 | `purchase` | `--base-url`, `--purchase` | none |
 | `claim-proof` | `--base-url`, `--purchase`, `--reason` | `--claim-type` |
 | `claim` | `--base-url`, `--purchase`, `--reason` | `--claim-type`, `--claimant-token`, `--claimant-signature` |
-| `resolve-proof` | `--base-url`, `--claim`, `--decision`, `--reason` | none |
-| `resolve` | `--base-url`, `--claim`, `--decision`, `--reason` | `--evaluator-token`, `--evaluator-signature` |
+| `resolve-proof` | `--base-url`, `--claim` | `--decision`, `--reason` |
+| `resolve` | `--base-url`, `--claim` | `--decision`, `--reason`, `--evaluator-token`, `--evaluator-signature` |
 | `requote` | `--base-url`, `--item`, `--buyer` | none |
 
 A concrete live-style example:
@@ -197,8 +197,15 @@ Quick index:
 - evaluator resolution can be authorized either through the strict proof
   environment token gate or through a wallet-bound signature over a deterministic
   resolution-proof message
+- when `RISK_OS_ENABLE_LLM_EVALUATOR=true` and an `LLM_*` configuration is
+  present, evaluator proof generation and resolution can also consume an
+  AI-generated advisory decision and reasoning payload; explicit evaluator
+  decisions still win when they are supplied
 - risk quotes read mixed local + on-chain `ERC-8004` validation summaries when
   the validation registry is configured
+- risk quotes can also enrich seller-side scoring with live `okx-security`
+  wallet token scan results and `okx-dex-token` concentration signals when the
+  runtime has access to the Onchain OS CLI
 - refund and release both have captured mainnet-backed proof loops
 - current-session Agentic Wallet off-chain signing has been locally verified
   through successful `x402-pay` proof generation, which confirms that the
@@ -420,8 +427,9 @@ capabilities:
 
 - `okx-x402-payment`
 - `okx-agentic-wallet`
+- `okx-security`
+- `okx-dex-token`
 - `okx-onchain-gateway` as the next most natural observability extension
-- `okx-security` as the next most natural hardening extension
 - `ERC-8183 / ACP`
 - `ERC-8004`
 - `X Layer mainnet (chainId 196)`
@@ -449,12 +457,13 @@ clearer:
 
 - `okx-agentic-wallet` owns wallet identity and wallet-controlled execution
 - `okx-x402-payment` owns x402 proof signing and payment replay
+- `okx-security` owns seller-wallet token safety scanning
+- `okx-dex-token` owns token concentration and holder analytics
 - `okx-onchain-gateway` owns simulation / gas / broadcast observability
-- `okx-security` owns token / tx / signature scanning
+- `okx-security` also owns token / tx / signature scanning
 
 That separation helps this repo stay rigorous. It lets us say exactly what this
-the project already uses, what it could extend next, and what it does **not**
-yet claim.
+project already uses, what it extends next, and what it does **not** yet claim.
 
 See:
 

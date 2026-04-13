@@ -1,7 +1,8 @@
 import { getPool } from '../db/postgres.js';
 import { reputationRegistry } from '../erc8004/reputation-registry.js';
 import { validationRegistry } from '../erc8004/validation-registry.js';
-import { computeIntelRiskQuote, RISK_QUOTE_TTL_SECONDS } from './risk-policy.js';
+import { computeIntelRiskQuote, getProtectionTermsFromRisk, RISK_QUOTE_TTL_SECONDS } from './risk-policy.js';
+import { getOnchainOsQuoteSignals } from './onchainos-quote-signals.js';
 import type { RiskQuoteInput, RiskQuoteRecord } from './risk-types.js';
 
 interface QuoteSeedRow {
@@ -9,6 +10,8 @@ interface QuoteSeedRow {
   item_price: string;
   seller_agent_id: string;
   seller_token_id: number | null;
+  seller_wallet_address: string | null;
+  item_content: Record<string, unknown> | null;
 }
 
 interface CreditScoreRow {
@@ -50,7 +53,9 @@ export async function createIntelRiskQuote(params: RiskQuoteInput): Promise<Risk
        i.id AS intel_item_id,
        i.price AS item_price,
        i.producer_agent_id AS seller_agent_id,
-       a.erc8004_token_id AS seller_token_id
+       a.erc8004_token_id AS seller_token_id,
+       a.wallet_address AS seller_wallet_address,
+       i.content AS item_content
      FROM intel_items i
      JOIN agents a ON a.agent_id = i.producer_agent_id
      WHERE i.id = $1
@@ -115,6 +120,31 @@ export async function createIntelRiskQuote(params: RiskQuoteInput): Promise<Risk
     validationAverageScore: Number(validation.averageScore ?? 50),
     historicalRefundRate,
   });
+  const { signals: onchainOsSignals, adjustments: onchainOsAdjustments } = await getOnchainOsQuoteSignals({
+    sellerWalletAddress: seed.seller_wallet_address,
+    itemContent: seed.item_content,
+  });
+
+  const adjustedRiskScore = clampRisk(
+    computed.riskScore + onchainOsAdjustments.reduce((sum, adjustment) => sum + adjustment.delta, 0),
+  );
+  const adjustedTerms = getProtectionTermsFromRisk(adjustedRiskScore);
+  const adjustedQuote = {
+    ...computed,
+    riskScore: adjustedRiskScore,
+    recommendedMode: adjustedTerms.recommendedMode,
+    premiumBps: adjustedTerms.premiumBps,
+    premiumAmount: roundMoney((price * adjustedTerms.premiumBps) / 10_000),
+    claimWindowSeconds: adjustedTerms.claimWindowSeconds,
+    reasons: Array.from(
+      new Set([...computed.reasons, ...onchainOsAdjustments.map((adjustment) => adjustment.reason)]),
+    ),
+    inputs: {
+      ...computed.inputs,
+      onchainOsSignals,
+      onchainOsAdjustments,
+    },
+  };
 
   const expiresAt = new Date(Date.now() + RISK_QUOTE_TTL_SECONDS * 1000);
 
@@ -151,13 +181,13 @@ export async function createIntelRiskQuote(params: RiskQuoteInput): Promise<Risk
       intelItemId,
       buyerAgentId,
       seed.seller_agent_id,
-      computed.riskScore,
-      computed.recommendedMode,
-      computed.premiumBps,
-      computed.premiumAmount.toFixed(6),
-      computed.claimWindowSeconds,
-      JSON.stringify(computed.reasons),
-      JSON.stringify(computed.inputs),
+      adjustedQuote.riskScore,
+      adjustedQuote.recommendedMode,
+      adjustedQuote.premiumBps,
+      adjustedQuote.premiumAmount.toFixed(6),
+      adjustedQuote.claimWindowSeconds,
+      JSON.stringify(adjustedQuote.reasons),
+      JSON.stringify(adjustedQuote.inputs),
       expiresAt.toISOString(),
     ],
   );
@@ -172,4 +202,12 @@ export async function getRiskQuoteById(quoteId: number): Promise<RiskQuoteRecord
     [quoteId],
   );
   return result.rows[0] ? mapQuoteRecord(result.rows[0]) : null;
+}
+
+function roundMoney(value: number): number {
+  return Number(value.toFixed(6));
+}
+
+function clampRisk(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
 }

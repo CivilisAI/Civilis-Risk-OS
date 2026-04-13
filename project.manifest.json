@@ -15,6 +15,8 @@
   "officialStack": [
     "okx-agentic-wallet",
     "okx-x402-payment",
+    "okx-security",
+    "okx-dex-token",
     "ERC-8183",
     "ERC-8004"
   ],
@@ -81,7 +83,8 @@
     "decentralizedArbitration": false,
     "partialRefunds": false,
     "generalizedInsuranceProtocol": false,
-    "secondLiveMainnetSettlementLoop": false
+    "secondLiveMainnetSettlementLoop": false,
+    "llmEvaluatorVendorBackedLiveSettlementProof": false
   },
   "readFirst": [
     "README.md",

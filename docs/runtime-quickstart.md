@@ -104,8 +104,8 @@ npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
 | `purchase` | `--base-url`, `--purchase` | none |
 | `claim-proof` | `--base-url`, `--purchase`, `--reason` | `--claim-type` |
 | `claim` | `--base-url`, `--purchase`, `--reason` | `--claim-type`, `--claimant-token`, `--claimant-signature` |
-| `resolve-proof` | `--base-url`, `--claim`, `--decision`, `--reason` | none |
-| `resolve` | `--base-url`, `--claim`, `--decision`, `--reason` | `--evaluator-token`, `--evaluator-signature` |
+| `resolve-proof` | `--base-url`, `--claim` | `--decision`, `--reason` |
+| `resolve` | `--base-url`, `--claim` | `--decision`, `--reason`, `--evaluator-token`, `--evaluator-signature` |
 | `requote` | `--base-url`, `--item`, `--buyer` | none |
 
 ## 3. Create A Challengeable Protected Purchase
@@ -139,6 +139,11 @@ npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10 --d
 ```bash
 npm run runtime -- resolve --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token>
 ```
+
+If the runtime has `RISK_OS_ENABLE_LLM_EVALUATOR=true` and a configured
+OpenAI-compatible `LLM_*` endpoint, `resolve-proof` and `resolve` may omit
+`--decision` and `--reason`; the runtime will then use the evaluator advisory
+path instead of pretending a manual decision already exists.
 
 ## 7. Requote After Outcome
 
