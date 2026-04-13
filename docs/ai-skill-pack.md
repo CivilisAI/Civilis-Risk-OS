@@ -10,14 +10,15 @@ for a narrower supporting task.
 The strongest path is now:
 
 - install the repo
-- run the runtime CLI
+- start from the single primary Skill
+- run the bundled runtime CLI
 - call `quote / buy / claim / resolve / requote`
-- then fall back to narrower supporting skills only when the primary product
-  skill is not enough
+- only then fall back to bundled supporting modules when the primary product
+  Skill is not enough
 
-## Included Skills
+## Skill Structure
 
-### 1. `civilis-risk-os`
+### Primary product Skill: `civilis-risk-os`
 
 Use when an AI needs one primary, installable Skill entry for Civilis Risk OS.
 
@@ -35,7 +36,7 @@ Entry:
 - [runtime-quickstart.md](runtime-quickstart.md)
 - [runtime-tool-surface.md](runtime-tool-surface.md)
 
-### 2. Supporting: `civilis-risk-os-runtime`
+### Bundled supporting module: `civilis-risk-os-runtime`
 
 Use when an AI needs to:
 
@@ -50,7 +51,7 @@ Entry:
 - [runtime-quickstart.md](runtime-quickstart.md)
 - [runtime-tool-surface.md](runtime-tool-surface.md)
 
-### 3. Supporting: `civilis-risk-os-canonical-replay`
+### Bundled supporting module: `civilis-risk-os-canonical-replay`
 
 Use when an AI needs to:
 
@@ -63,7 +64,7 @@ Entry:
 
 - [../skills/civilis-risk-os-canonical-replay/SKILL.md](../skills/civilis-risk-os-canonical-replay/SKILL.md)
 
-### 4. Supporting: `civilis-risk-os-external-consumer`
+### Bundled supporting module: `civilis-risk-os-external-consumer`
 
 Use when an AI needs to:
 
@@ -76,7 +77,7 @@ Entry:
 
 - [../skills/civilis-risk-os-external-consumer/SKILL.md](../skills/civilis-risk-os-external-consumer/SKILL.md)
 
-### 5. Supporting: `civilis-risk-os-proof-boundaries`
+### Bundled supporting module: `civilis-risk-os-proof-boundaries`
 
 Use when an AI needs to:
 
@@ -89,7 +90,7 @@ Entry:
 
 - [../skills/civilis-risk-os-proof-boundaries/SKILL.md](../skills/civilis-risk-os-proof-boundaries/SKILL.md)
 
-### 6. Supporting: `civilis-risk-os-integration-check`
+### Bundled supporting module: `civilis-risk-os-integration-check`
 
 Use when an AI needs to:
 
@@ -107,10 +108,11 @@ The strongest long-term value of Civilis Risk OS is not only the demo UI or the
 mainnet hashes. It is the fact that another AI can directly call a narrow,
 rigorous protected-commerce workflow without re-deriving the whole project.
 
-That is why the package is now split into:
+That is why the package is now organized as:
 
-- one primary product skill
-- a small set of supporting skills for replay, integration, and proof discipline
+- one primary product Skill
+- a small set of bundled supporting modules for replay, integration, and proof
+  discipline
 
 This mirrors the most useful lesson from the official OKX package:
 

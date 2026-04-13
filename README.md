@@ -69,10 +69,16 @@ npx civilis-risk-os-runtime help
 The clone-and-run path above, a fresh local package install, and a direct
 GitHub package install were all verified in this public repo.
 
-`npm run demo` is the zero-friction check. If the configured runtime endpoint is
-not already reachable, the demo will try to auto-discover and auto-start a
-compatible local Civilis runtime through `RISK_OS_RUNTIME_ROOT` or a sibling
-`../Civilis` checkout. It never falls back to mock data.
+`npm run demo` is the zero-friction check. It starts the bundled local runtime
+profile automatically and returns a real quote without requiring another
+workspace or a pre-running backend.
+
+`npm run runtime -- ...` follows the same product contract:
+
+- bundled local mode starts automatically when no hosted runtime is supplied
+- claimant and evaluator auth defaults are bundled into that local runtime
+- explicit `--base-url` and auth material are only needed when you point the
+  CLI at another compatible hosted runtime
 
 Then the narrow runtime actions are:
 
@@ -85,25 +91,30 @@ Then the narrow runtime actions are:
 - `resolve-proof`
 - `resolve`
 - `requote`
+- `full-loop`
 
 ### Command parameters
 
 | Command | Required flags | Optional flags |
 | --- | --- | --- |
-| `health` | `--base-url` | none |
-| `quote` | `--base-url`, `--item`, `--buyer` | none |
-| `buy` | `--base-url`, `--item`, `--buyer`, `--quote`, `--mode` | none |
-| `purchase` | `--base-url`, `--purchase` | none |
-| `claim-proof` | `--base-url`, `--purchase`, `--reason` | `--claim-type` |
-| `claim` | `--base-url`, `--purchase`, `--reason` | `--claim-type`, `--claimant-token`, `--claimant-signature` |
-| `resolve-proof` | `--base-url`, `--claim` | `--decision`, `--reason` |
-| `resolve` | `--base-url`, `--claim` | `--decision`, `--reason`, `--evaluator-token`, `--evaluator-signature` |
-| `requote` | `--base-url`, `--item`, `--buyer` | none |
+| `health` | none | `--base-url` |
+| `quote` | `--item`, `--buyer` | `--base-url` |
+| `buy` | `--item`, `--buyer`, `--quote`, `--mode` | `--base-url` |
+| `purchase` | `--purchase` | `--base-url` |
+| `claim-proof` | `--purchase`, `--reason` | `--base-url`, `--claim-type` |
+| `claim` | `--purchase`, `--reason` | `--base-url`, `--claim-type`, `--claimant-token`, `--claimant-signature` |
+| `resolve-proof` | `--claim` | `--base-url`, `--decision`, `--reason` |
+| `resolve` | `--claim` | `--base-url`, `--decision`, `--reason`, `--evaluator-token`, `--evaluator-signature` |
+| `requote` | `--item`, `--buyer` | `--base-url` |
+| `full-loop` | none | `--base-url`, `--buyer`, `--item`, `--decision`, `--reason`, `--claimant-token`, `--claimant-signature`, `--evaluator-token`, `--evaluator-signature` |
+
+In bundled local mode, claimant and evaluator auth are already supplied by the
+runtime profile, so the loop can run without manual token copying.
 
 A concrete live-style example:
 
 ```bash
-npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 1016 --buyer sage
+npm run runtime -- quote --item 501 --buyer sage
 ```
 
 The fastest "does this actually work?" check is now:
@@ -112,6 +123,19 @@ The fastest "does this actually work?" check is now:
 npm run demo
 npm test
 ```
+
+The strongest mutating acceptance check is:
+
+```bash
+npm run verify:protected-loop
+```
+
+That command executes the full protected-commerce runtime path:
+
+`quote -> buy -> purchase -> claim-proof -> claim -> resolve-proof -> resolve -> requote`
+
+In bundled local mode it reuses the same auto-start runtime and bundled auth as
+`npm run demo` and `npm run runtime`.
 
 ## Runtime Skill
 
@@ -132,11 +156,11 @@ The direct entry is:
 - [runtime.tool-surface.json](runtime.tool-surface.json)
 - [`examples/risk-os-runtime.mjs`](examples/risk-os-runtime.mjs)
 
-The current package is intentionally narrow:
+The current package is intentionally narrow and centered on one primary Skill:
 
 - [civilis-risk-os](skills/civilis-risk-os/SKILL.md)
 
-Supporting skill references remain available for narrower tasks:
+Bundled supporting modules remain available for narrower tasks:
 
 - [civilis-risk-os-runtime](skills/civilis-risk-os-runtime/SKILL.md)
 - [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
@@ -184,6 +208,21 @@ Quick index:
 - file a buyer claim
 - resolve the claim as the evaluator
 - query the protected purchase state
+
+### Bundled local runtime profile
+
+The installable package now ships a local runtime profile so another AI can:
+
+- install the package
+- run `npm run demo`
+- run `npm test`
+- run `npm run verify:protected-loop`
+- call `npm run runtime -- ...`
+
+without first launching a separate Civilis service.
+
+The same command surface can still point at another compatible hosted runtime by
+passing `--base-url`.
 
 ### Current guarantees
 

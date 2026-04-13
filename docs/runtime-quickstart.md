@@ -16,6 +16,7 @@ The runtime CLI wraps the public Risk OS surface into a narrower tool contract:
 - `resolve-proof`
 - `resolve`
 - `requote`
+- `full-loop`
 
 Entry:
 
@@ -56,88 +57,86 @@ npm test
 This performs:
 
 - runtime health
-- one live quote call
+- one bundled quote call
 - one structured JSON output
-- runtime auto-discovery and auto-start when a linked local Civilis workspace is
-  available
+- bundled local runtime start
+- bundled claimant and evaluator auth
 
 Environment overrides:
 
 ```bash
-RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3011
-RISK_OS_DEMO_ITEM_ID=1016
+RISK_OS_DEMO_BASE_URL=http://127.0.0.1:3401
+RISK_OS_DEMO_ITEM_ID=501
 RISK_OS_DEMO_BUYER=sage
-RISK_OS_RUNTIME_ROOT=/absolute/path/to/Civilis
 ```
 
 If `RISK_OS_DEMO_ITEM_ID` is omitted, the demo automatically picks the first
 live reference item returned by the runtime.
 
-If `RISK_OS_DEMO_BASE_URL` is not reachable, the demo will try to auto-start a
-compatible runtime from:
-
-- `RISK_OS_RUNTIME_ROOT`
-- or a sibling `../Civilis` checkout if present
-
-If neither is available, the demo exits with a clear runtime discovery error
-instead of silently falling back to mock data.
+If `RISK_OS_DEMO_BASE_URL` is not reachable and points to a local address, the
+package starts the bundled runtime automatically instead of falling back to mock
+data.
 
 ## 1. Check Runtime Health
 
 ```bash
-npm run runtime -- health --base-url http://127.0.0.1:3011
+npm run runtime -- health
 ```
 
 ## 2. Quote A Listing
 
 ```bash
-npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
+npm run runtime -- quote --item 501 --buyer sage
 ```
 
 ## Command Parameter Table
 
 | Command | Required flags | Optional flags |
 | --- | --- | --- |
-| `health` | `--base-url` | none |
-| `quote` | `--base-url`, `--item`, `--buyer` | none |
-| `buy` | `--base-url`, `--item`, `--buyer`, `--quote`, `--mode` | none |
-| `purchase` | `--base-url`, `--purchase` | none |
-| `claim-proof` | `--base-url`, `--purchase`, `--reason` | `--claim-type` |
-| `claim` | `--base-url`, `--purchase`, `--reason` | `--claim-type`, `--claimant-token`, `--claimant-signature` |
-| `resolve-proof` | `--base-url`, `--claim` | `--decision`, `--reason` |
-| `resolve` | `--base-url`, `--claim` | `--decision`, `--reason`, `--evaluator-token`, `--evaluator-signature` |
-| `requote` | `--base-url`, `--item`, `--buyer` | none |
+| `health` | none | `--base-url` |
+| `quote` | `--item`, `--buyer` | `--base-url` |
+| `buy` | `--item`, `--buyer`, `--quote`, `--mode` | `--base-url` |
+| `purchase` | `--purchase` | `--base-url` |
+| `claim-proof` | `--purchase`, `--reason` | `--base-url`, `--claim-type` |
+| `claim` | `--purchase`, `--reason` | `--base-url`, `--claim-type`, `--claimant-token`, `--claimant-signature` |
+| `resolve-proof` | `--claim` | `--base-url`, `--decision`, `--reason` |
+| `resolve` | `--claim` | `--base-url`, `--decision`, `--reason`, `--evaluator-token`, `--evaluator-signature` |
+| `requote` | `--item`, `--buyer` | `--base-url` |
+| `full-loop` | none | `--base-url`, `--buyer`, `--item`, `--decision`, `--reason`, `--claimant-token`, `--claimant-signature`, `--evaluator-token`, `--evaluator-signature` |
+
+In bundled local mode, claimant and evaluator auth are already supplied by the
+local profile.
 
 ## 3. Create A Challengeable Protected Purchase
 
 ```bash
-npm run runtime -- buy --base-url http://127.0.0.1:3011 --item 16 --buyer sage --mode challengeable --quote 34
+npm run runtime -- buy --item 501 --buyer sage --mode challengeable --quote 1
 ```
 
 ## 4. Inspect Protected Purchase State
 
 ```bash
-npm run runtime -- purchase --base-url http://127.0.0.1:3011 --purchase 11
+npm run runtime -- purchase --purchase 1
 ```
 
 ## 5. Prepare And Open A Claim
 
 ```bash
-npm run runtime -- claim-proof --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading"
+npm run runtime -- claim-proof --purchase 1 --reason "delivery was misleading"
 ```
 
 ```bash
-npm run runtime -- claim --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading" --claimant-token <token>
+npm run runtime -- claim --purchase 1 --reason "delivery was misleading"
 ```
 
 ## 6. Prepare And Resolve As Evaluator
 
 ```bash
-npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold"
+npm run runtime -- resolve-proof --claim 1 --decision refund --reason "quality below threshold"
 ```
 
 ```bash
-npm run runtime -- resolve --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token>
+npm run runtime -- resolve --claim 1 --decision refund --reason "quality below threshold"
 ```
 
 If the runtime has `RISK_OS_ENABLE_LLM_EVALUATOR=true` and a configured
@@ -148,8 +147,28 @@ path instead of pretending a manual decision already exists.
 ## 7. Requote After Outcome
 
 ```bash
-npm run runtime -- requote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
+npm run runtime -- requote --item 501 --buyer sage
 ```
+
+## 8. Verify The Full Protected-Commerce Loop
+
+```bash
+npm run verify:protected-loop
+```
+
+This command runs:
+
+- `quote`
+- `buy`
+- `purchase`
+- `claim-proof`
+- `claim`
+- `resolve-proof`
+- `resolve`
+- `requote`
+
+In bundled local mode, it reuses the same auto-start runtime and bundled auth
+path as the rest of the runtime CLI.
 
 ## Why This Matters
 

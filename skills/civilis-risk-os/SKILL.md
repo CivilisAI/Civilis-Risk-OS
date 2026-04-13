@@ -29,6 +29,10 @@ npm install github:CivilisAI/Civilis-Risk-OS
 npx civilis-risk-os-runtime help
 ```
 
+When the package is used in bundled local mode, the runtime command surface
+starts the bundled local runtime profile automatically and uses bundled
+claimant and evaluator auth defaults.
+
 ## Use This Skill For
 
 - quoting seller risk before payment
@@ -58,10 +62,11 @@ The primary runtime command surface is:
 - `resolve-proof`
 - `resolve`
 - `requote`
+- `full-loop`
 
 ## Parameter Rules
 
-- `--base-url <url>`: compatible Risk OS runtime endpoint, default `http://127.0.0.1:3011`
+- `--base-url <url>`: compatible Risk OS runtime endpoint, optional in bundled local mode and defaulting to `http://127.0.0.1:3401`
 - `--item <intelItemId>`: reference item id for `quote`, `buy`, `requote`
 - `--buyer <agentId>`: buyer agent id, default `sage`
 - `--quote <quoteId>`: required for `buy`
@@ -72,20 +77,23 @@ The primary runtime command surface is:
 - `--reason <text>`: required for `claim`, optional for `resolve-proof` and `resolve` when proof or advisory generation supplies it
 - `--claimant-token <token>` or `--claimant-signature <sig>`: buyer auth
 - `--evaluator-token <token>` or `--evaluator-signature <sig>`: evaluator auth
+- in bundled local mode, claimant and evaluator auth are already supplied by
+  the package
 
 ## Command Examples
 
 ```bash
-npm run runtime -- health --base-url http://127.0.0.1:3011
-npm run runtime -- quote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
-npm run runtime -- buy --base-url http://127.0.0.1:3011 --item 16 --buyer sage --mode challengeable --quote 34
-npm run runtime -- purchase --base-url http://127.0.0.1:3011 --purchase 11
-npm run runtime -- claim-proof --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading"
-npm run runtime -- claim --base-url http://127.0.0.1:3011 --purchase 11 --reason "delivery was misleading" --claimant-token <token>
-npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold"
-npm run runtime -- resolve --base-url http://127.0.0.1:3011 --claim 10 --decision refund --reason "quality below threshold" --evaluator-token <token>
-npm run runtime -- resolve-proof --base-url http://127.0.0.1:3011 --claim 10
-npm run runtime -- requote --base-url http://127.0.0.1:3011 --item 16 --buyer sage
+npm run runtime -- health
+npm run runtime -- quote --item 501 --buyer sage
+npm run runtime -- buy --item 501 --buyer sage --mode challengeable --quote 1
+npm run runtime -- purchase --purchase 1
+npm run runtime -- claim-proof --purchase 1 --reason "delivery was misleading"
+npm run runtime -- claim --purchase 1 --reason "delivery was misleading"
+npm run runtime -- resolve-proof --claim 1 --decision refund --reason "quality below threshold"
+npm run runtime -- resolve --claim 1 --decision refund --reason "quality below threshold"
+npm run runtime -- resolve-proof --claim 1
+npm run runtime -- requote --item 501 --buyer sage
+npm run verify:protected-loop
 ```
 
 ## Output Contract
@@ -103,3 +111,14 @@ Always return:
 - [../../docs/runtime-tool-surface.md](../../docs/runtime-tool-surface.md)
 - [../../docs/external-consumer-guide.md](../../docs/external-consumer-guide.md)
 - [../../runtime.tool-surface.json](../../runtime.tool-surface.json)
+
+## Bundled Supporting Modules
+
+The primary install surface is this Skill. Bundled supporting modules are also
+available for narrower tasks:
+
+- `civilis-risk-os-runtime`
+- `civilis-risk-os-canonical-replay`
+- `civilis-risk-os-external-consumer`
+- `civilis-risk-os-proof-boundaries`
+- `civilis-risk-os-integration-check`

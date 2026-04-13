@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import { ensureRuntime, requestJson } from './lib/runtime-bootstrap.mjs';
+import { BUNDLED_RUNTIME_BASE_URL } from './lib/bundled-runtime-profile.mjs';
 
-const baseUrl = process.env.RISK_OS_DEMO_BASE_URL || 'http://127.0.0.1:3011';
+const baseUrl = process.env.RISK_OS_DEMO_BASE_URL || BUNDLED_RUNTIME_BASE_URL;
 const buyer = process.env.RISK_OS_DEMO_BUYER || 'sage';
 const requestedItemId = process.env.RISK_OS_DEMO_ITEM_ID || null;
 

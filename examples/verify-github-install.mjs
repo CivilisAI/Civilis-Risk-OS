@@ -14,13 +14,22 @@ async function main() {
   await execFileAsync('npm', ['init', '-y'], { cwd: tempRoot });
   await execFileAsync('npm', ['install', 'github:CivilisAI/Civilis-Risk-OS'], { cwd: tempRoot });
   const help = await execFileAsync('npx', ['civilis-risk-os-runtime', 'help'], { cwd: tempRoot });
+  const health = await execFileAsync('npx', ['civilis-risk-os-runtime', 'health'], { cwd: tempRoot });
+  const quote = await execFileAsync('npx', ['civilis-risk-os-runtime', 'quote', '--item', '501', '--buyer', 'sage'], {
+    cwd: tempRoot,
+  });
 
-  const ok = /Civilis Risk OS Runtime CLI/.test(help.stdout);
+  const healthResult = JSON.parse(health.stdout);
+  const quoteResult = JSON.parse(quote.stdout);
+  const ok =
+    /Civilis Risk OS Runtime CLI/.test(help.stdout) &&
+    healthResult?.status === 'ok' &&
+    typeof quoteResult?.quote_id === 'number';
 
   console.log(JSON.stringify({
     ok,
     tempRoot,
-    command: 'npm install github:CivilisAI/Civilis-Risk-OS && npx civilis-risk-os-runtime help',
+    command: 'npm install github:CivilisAI/Civilis-Risk-OS && npx civilis-risk-os-runtime help && npx civilis-risk-os-runtime health && npx civilis-risk-os-runtime quote --item 501 --buyer sage',
   }, null, 2));
 
   if (!ok) {

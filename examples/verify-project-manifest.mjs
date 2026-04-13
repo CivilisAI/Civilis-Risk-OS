@@ -51,9 +51,19 @@ async function main() {
 
   if (manifest.surfaces.runtime) {
     await fs.access(path.join(repoRoot, manifest.surfaces.runtime.cli));
+    await fs.access(path.join(repoRoot, manifest.surfaces.runtime.fullLoopVerifier));
+    await fs.access(path.join(repoRoot, manifest.surfaces.runtime.bundledProfile));
     await fs.access(path.join(repoRoot, manifest.surfaces.runtime.toolSurface));
     await fs.access(path.join(repoRoot, manifest.surfaces.runtime.quickstart));
     await fs.access(path.join(repoRoot, manifest.surfaces.runtime.hostedOnboarding));
+  }
+
+  if (manifest.surfaces.primarySkill) {
+    await fs.access(path.join(repoRoot, manifest.surfaces.primarySkill));
+  }
+
+  for (const file of manifest.surfaces.supportingSkills ?? []) {
+    await fs.access(path.join(repoRoot, file));
   }
 
   console.log(JSON.stringify({

@@ -29,22 +29,11 @@ test('runtime help exposes the direct command surface', async () => {
   assert.match(stdout, /\bclaim\b/);
   assert.match(stdout, /\bresolve\b/);
   assert.match(stdout, /\brequote\b/);
+  assert.match(stdout, /\bfull-loop\b/);
 });
 
-test('runtime demo returns live health and quote when the backend is reachable', async (t) => {
-  const baseUrl = process.env.RISK_OS_DEMO_BASE_URL || 'http://127.0.0.1:3011';
-
-  try {
-    const health = await fetch(`${baseUrl}/health`);
-    if (!health.ok) {
-      t.skip(`Runtime backend returned ${health.status} for ${baseUrl}/health`);
-      return;
-    }
-  } catch {
-    t.skip(`Runtime backend is not reachable at ${baseUrl}`);
-    return;
-  }
-
+test('runtime demo returns bundled health and quote without external setup', async () => {
+  const baseUrl = process.env.RISK_OS_DEMO_BASE_URL || 'http://127.0.0.1:3401';
   const { stdout } = await runNode('examples/runtime-demo.mjs', [], {
     RISK_OS_DEMO_BASE_URL: baseUrl,
   });
@@ -52,6 +41,7 @@ test('runtime demo returns live health and quote when the backend is reachable',
 
   assert.equal(result.ok, true);
   assert.equal(result.health.status, 'ok');
+  assert.equal(result.health.mode, 'bundled');
   assert.equal(typeof result.demo.itemId, 'number');
   assert.equal(typeof result.quote.quoteId, 'number');
   assert.equal(typeof result.quote.recommendedMode, 'string');
