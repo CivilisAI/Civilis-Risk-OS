@@ -80,3 +80,9 @@ This mirrors the most useful lesson from the official OKX package:
 
 **clear capability boundaries are more reusable than one giant “do everything”
 bundle.**
+
+Pair this skill pack with:
+
+- [../openapi/risk-os.openapi.yaml](../openapi/risk-os.openapi.yaml)
+- [integration-checklist.md](integration-checklist.md)
+- [replay-lanes.md](replay-lanes.md)

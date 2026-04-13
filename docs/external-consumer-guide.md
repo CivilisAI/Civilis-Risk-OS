@@ -10,6 +10,8 @@ This guide should be read after:
 
 - [Proof Surface Matrix](proof-surface-matrix.md)
 - [External Consumer Schema](external-consumer-schema.md)
+- [Integration Checklist](integration-checklist.md)
+- [../openapi/risk-os.openapi.yaml](../openapi/risk-os.openapi.yaml)
 - [Championship Replay Mode](championship-replay-mode.md)
 
 ## Who This Is For

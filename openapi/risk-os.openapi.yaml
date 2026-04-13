@@ -1,0 +1,280 @@
+openapi: 3.1.0
+info:
+  title: Civilis Risk OS API
+  version: 0.1.0
+  summary: Reusable protection surface for agent commerce on X Layer
+  description: >
+    Minimal public API contract for the Civilis Risk OS Skills Arena submission.
+    This spec covers the canonical protected-commerce flow:
+    quote -> challengeable buy -> claim -> evaluator resolve -> later repricing.
+servers:
+  - url: http://127.0.0.1:3020
+    description: Local strict proof environment
+tags:
+  - name: risk
+  - name: intel
+paths:
+  /api/risk/quote/intel:
+    post:
+      tags: [risk]
+      summary: Quote a protected intel purchase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [intelItemId, buyerAgentId]
+              properties:
+                intelItemId:
+                  type: integer
+                buyerAgentId:
+                  type: string
+      responses:
+        '200':
+          description: Risk quote created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskQuoteResponse'
+  /api/intel/items/{id}/buy:
+    post:
+      tags: [intel]
+      summary: Execute an intel purchase through the instant or challengeable path
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [buyerAgentId, purchaseMode, quoteId]
+              properties:
+                buyerAgentId:
+                  type: string
+                purchaseMode:
+                  type: string
+                  enum: [instant, challengeable]
+                quoteId:
+                  type: integer
+      responses:
+        '200':
+          description: Protected purchase executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectedPurchaseResponse'
+  /api/risk/purchases/{id}/claim-proof:
+    get:
+      tags: [risk]
+      summary: Fetch the deterministic buyer claim-proof message
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: claimType
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: reasonText
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Claim-proof prepared
+  /api/risk/claims:
+    post:
+      tags: [risk]
+      summary: File a protected claim as the buyer
+      parameters:
+        - in: header
+          name: x-civilis-risk-claimant-token
+          required: false
+          schema:
+            type: string
+        - in: header
+          name: x-civilis-risk-claimant-signature
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimRequest'
+      responses:
+        '200':
+          description: Claim created
+        '403':
+          description: Missing or invalid claimant proof
+  /api/risk/claims/{id}/resolve-proof:
+    get:
+      tags: [risk]
+      summary: Fetch the deterministic evaluator resolve-proof message
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: decision
+          required: true
+          schema:
+            type: string
+            enum: [release, refund]
+        - in: query
+          name: decisionReason
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resolve-proof prepared
+  /api/risk/claims/{id}/resolve:
+    post:
+      tags: [risk]
+      summary: Resolve a claim as the evaluator
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: x-civilis-risk-evaluator-token
+          required: false
+          schema:
+            type: string
+        - in: header
+          name: x-civilis-risk-evaluator-signature
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveRequest'
+      responses:
+        '200':
+          description: Claim resolved
+        '403':
+          description: Missing or invalid evaluator proof
+  /health:
+    get:
+      tags: [risk]
+      summary: Inspect proof environment readiness
+      responses:
+        '200':
+          description: Health payload
+components:
+  schemas:
+    RiskQuoteResponse:
+      type: object
+      required:
+        - quote_id
+        - intel_item_id
+        - buyer_agent_id
+        - seller_agent_id
+        - risk_score
+        - recommended_mode
+        - premium_bps
+        - premium_amount
+        - claim_window_seconds
+        - reasons
+        - expires_at
+      properties:
+        quote_id:
+          type: integer
+        intel_item_id:
+          type: integer
+        buyer_agent_id:
+          type: string
+        seller_agent_id:
+          type: string
+        risk_score:
+          type: integer
+        recommended_mode:
+          type: string
+          enum: [instant, challengeable]
+        premium_bps:
+          type: integer
+        premium_amount:
+          oneOf:
+            - type: number
+            - type: string
+        claim_window_seconds:
+          type: integer
+        reasons:
+          type: array
+          items:
+            type: string
+        expires_at:
+          type: string
+    ProtectedPurchaseResponse:
+      type: object
+      required:
+        - success
+        - purchaseMode
+        - protectedPurchaseId
+      properties:
+        success:
+          type: boolean
+        purchaseMode:
+          type: string
+          enum: [instant, challengeable]
+        protectedPurchaseId:
+          type: integer
+        intelPurchaseId:
+          type:
+            - integer
+            - 'null'
+        principalAcpJobId:
+          type:
+            - integer
+            - 'null'
+        challengeDeadline:
+          type:
+            - string
+            - 'null'
+        content: {}
+    ClaimRequest:
+      type: object
+      required:
+        - protectedPurchaseId
+        - claimType
+        - reasonText
+      properties:
+        protectedPurchaseId:
+          type: integer
+        claimType:
+          type: string
+          enum: [misleading_or_invalid_intel]
+        reasonText:
+          type: string
+        evidence:
+          type: object
+    ResolveRequest:
+      type: object
+      required:
+        - decision
+        - decisionReason
+      properties:
+        decision:
+          type: string
+          enum: [release, refund]
+        decisionReason:
+          type: string
