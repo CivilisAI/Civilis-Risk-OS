@@ -69,9 +69,9 @@ npx civilis-risk-os-runtime help
 The clone-and-run path above, a fresh local package install, and a direct
 GitHub package install were all verified in this public repo.
 
-`npm run demo` is the zero-friction check. It starts the bundled local runtime
-profile automatically and returns a real quote without requiring another
-workspace or a pre-running backend.
+`npm run demo` is the zero-friction product path. It starts the bundled local
+runtime profile automatically and returns a real quote without requiring
+another workspace, a pre-running backend, or manual auth setup.
 
 `npm run runtime -- ...` follows the same product contract:
 
@@ -79,6 +79,10 @@ workspace or a pre-running backend.
 - claimant and evaluator auth defaults are bundled into that local runtime
 - explicit `--base-url` and auth material are only needed when you point the
   CLI at another compatible hosted runtime
+
+The default installable product path is therefore self-contained for local
+direct use. Hosted mode is an optional deployment surface, not a requirement
+for using the package.
 
 Then the narrow runtime actions are:
 
@@ -166,7 +170,11 @@ Bundled supporting modules remain available for narrower tasks:
 - [civilis-risk-os-external-consumer](skills/civilis-risk-os-external-consumer/SKILL.md)
 - [civilis-risk-os-integration-check](skills/civilis-risk-os-integration-check/SKILL.md)
 
-These skills are designed so another AI can:
+These bundled modules sit under the same installable package. Another AI should
+start from the primary `civilis-risk-os` Skill first, then reach for a
+supporting module only when a narrower task needs it.
+
+Together they let another AI:
 
 - directly call the runtime action surface
 - integrate another commerce surface against the Risk OS contract

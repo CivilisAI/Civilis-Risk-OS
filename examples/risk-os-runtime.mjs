@@ -136,10 +136,10 @@ async function run(command, flags) {
   try {
     switch (command) {
       case 'health':
-        return request(baseUrl, '/health');
+        return await request(baseUrl, '/health');
       case 'quote': {
         const intelItemId = getNumber(normalizedFlags.item, 'item');
-        return request(baseUrl, '/api/risk/quote/intel', {
+        return await request(baseUrl, '/api/risk/quote/intel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ intelItemId, buyerAgentId }),
@@ -149,7 +149,7 @@ async function run(command, flags) {
         const intelItemId = getNumber(normalizedFlags.item, 'item');
         const quoteId = getNumber(normalizedFlags.quote, 'quote');
         const purchaseMode = getString(normalizedFlags.mode, DEFAULTS.purchaseMode, 'purchase mode');
-        return request(baseUrl, `/api/intel/items/${intelItemId}/buy`, {
+        return await request(baseUrl, `/api/intel/items/${intelItemId}/buy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ buyerAgentId, purchaseMode, quoteId }),
@@ -157,7 +157,7 @@ async function run(command, flags) {
       }
       case 'purchase': {
         const purchaseId = getNumber(normalizedFlags.purchase, 'purchase');
-        return request(baseUrl, `/api/risk/purchases/${purchaseId}`);
+        return await request(baseUrl, `/api/risk/purchases/${purchaseId}`);
       }
       case 'claim-proof': {
         const purchaseId = getNumber(normalizedFlags.purchase, 'purchase');
@@ -166,12 +166,12 @@ async function run(command, flags) {
           claimType,
           reasonText: claimReason,
         });
-        return request(baseUrl, `/api/risk/purchases/${purchaseId}/claim-proof?${params.toString()}`);
+        return await request(baseUrl, `/api/risk/purchases/${purchaseId}/claim-proof?${params.toString()}`);
       }
       case 'claim': {
         const purchaseId = getNumber(normalizedFlags.purchase, 'purchase');
         const claimReason = getString(normalizedFlags.reason, DEFAULTS.claimReason, 'reason');
-        return request(baseUrl, '/api/risk/claims', {
+        return await request(baseUrl, '/api/risk/claims', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ async function run(command, flags) {
         if (typeof normalizedFlags.reason === 'string' && normalizedFlags.reason.trim()) {
           params.set('decisionReason', normalizedFlags.reason.trim());
         }
-        return request(baseUrl, `/api/risk/claims/${claimId}/resolve-proof?${params.toString()}`);
+        return await request(baseUrl, `/api/risk/claims/${claimId}/resolve-proof?${params.toString()}`);
       }
       case 'resolve': {
         const claimId = getNumber(normalizedFlags.claim, 'claim');
@@ -205,7 +205,7 @@ async function run(command, flags) {
         const resolutionReason = typeof normalizedFlags.reason === 'string' && normalizedFlags.reason.trim()
           ? normalizedFlags.reason.trim()
           : null;
-        return request(baseUrl, `/api/risk/claims/${claimId}/resolve`, {
+        return await request(baseUrl, `/api/risk/claims/${claimId}/resolve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -220,14 +220,14 @@ async function run(command, flags) {
       }
       case 'requote': {
         const intelItemId = getNumber(normalizedFlags.item, 'item');
-        return request(baseUrl, '/api/risk/quote/intel', {
+        return await request(baseUrl, '/api/risk/quote/intel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ intelItemId, buyerAgentId }),
         });
       }
       case 'full-loop':
-        return runProtectedLoop({
+        return await runProtectedLoop({
           baseUrl,
           buyerAgentId,
           itemId: normalizedFlags.item ?? null,

@@ -1,4 +1,4 @@
-# Hosted Runtime Onboarding
+# Runtime Deployment Modes
 
 Civilis Risk OS is now packaged so another AI can point the same runtime tool
 surface at either:
@@ -6,7 +6,7 @@ surface at either:
 - a bundled local runtime profile
 - or a hosted compatible base URL
 
-## Bundled Local Profile
+## Default Product Path: Bundled Local Profile
 
 The default package path is now:
 
@@ -23,7 +23,15 @@ In that mode, another AI does **not** need to manually decide:
 
 The package handles that bundle-level wiring itself.
 
-## Hosted-Ready Principle
+This is the default product path:
+
+- install the package
+- run the bundled runtime commands
+- get a self-contained local runtime surface immediately
+
+No extra deployment decision is required for the default local use case.
+
+## Optional Deployment Mode: Hosted Runtime
 
 The runtime contract should not change just because the deployment surface
 changes.
@@ -49,7 +57,7 @@ A hosted Risk OS runtime should expose:
 - `POST /api/risk/claims/:id/resolve`
 - `GET /health`
 
-## Integrator Inputs
+## Hosted Integrator Inputs
 
 A hosted external AI or app needs:
 
@@ -59,10 +67,12 @@ A hosted external AI or app needs:
 - claimant proof path
 - commerce item id
 
-## Current Boundary
+## Product Boundary
 
-This public repo is **hosted-ready**, and it now includes a bundled local
-runtime path for direct installation and use.
+This public repo includes two valid ways to use the same Skill:
+
+- bundled local runtime: included, self-contained, and verified
+- hosted-compatible runtime: supported by the same command surface
 
 It still does not currently claim that a public production runtime URL has been
 published as part of the submission.
