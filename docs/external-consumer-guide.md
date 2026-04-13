@@ -115,29 +115,39 @@ This repo now includes a validated external-consumer quickstart script:
 
 - [../examples/external-consumer-quickstart.mjs](../examples/external-consumer-quickstart.mjs)
 
-The quickstart has already been run against the strict mainnet-backed proof
-environment through:
+The strongest current canonical replay from the public quickstart path is:
 
-- quote `23`
-- challengeable protected purchase `8`
-- claim `7`
-- evaluator refund resolution
-- later quote `24`
-
-It has also been rerun after auth hardening on a fresh staged item:
-
-- quote `27`
-- challengeable protected purchase `9`
+- quote `34`
+- challengeable protected purchase `11`
+- buyer claim-proof for `sage`
 - unauthenticated claim rejected with `403`
-- authenticated claim `8`
-- evaluator refund resolution
-- later quote `28`
+- authenticated claim `10`
+- evaluator refund resolution through `arbiter`
+- later quote `36`
+
+This path now proves the full reusable flow against independently controlled
+Agentic Wallet actors for buyer, seller, and evaluator. Earlier historical
+quickstart captures remain in the evidence pack as additional depth, but the
+current repo should be read against the `16 -> 34 -> 11 -> 10 -> 36` canonical
+path first.
+
+This repo also includes a second lightweight reference adapter for a different
+commerce surface:
+
+- [The Square paywalled intel unlock adapter](second-adapter-paywalled-intel-unlock.md)
+
+That adapter is intentionally documented as a portability pattern, not as a
+second live mainnet-proved integration.
 
 ## Current Scope Boundaries
 
 This repo currently proves the pattern through one live reference integration:
 
 - Civilis Intel Market
+
+And one lightweight reference adapter:
+
+- The Square paywalled intel unlocks
 
 It does not yet claim:
 

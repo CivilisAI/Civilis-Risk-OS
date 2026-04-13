@@ -19,6 +19,7 @@ The project currently has public-safe evidence for:
 - x402 social / payment activity
 - ERC-8183 arena job anchors
 - ERC-8183 funded intel purchases
+- independent buyer / seller / evaluator Agentic Wallet actors driving a protected intel replay
 - ERC-8183 protected intel refund resolution
 - ERC-8183 protected intel release resolution
 - wallet-signature-bound evaluator resolution against a mainnet-backed protected intel purchase
@@ -43,6 +44,9 @@ The project currently has public-safe evidence for:
 
 ### Skills Arena protected intel commerce proof
 
+- canonical independent-wallet replay / funded principal / on-chain job `2030`: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- canonical independent-wallet replay / delivery submit / same job `2030`: `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
+- canonical independent-wallet replay / reject + refund / same job `2030`: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
 - challengeable funded purchase / on-chain job `1955`: `0xac33ab277d289ec08a8f202e766c6394840aadbaee3cf3b5e290bd5e7ca58ecc`
 - reject + refund for job `1955`: `0x0d943594e006228b83f2fc45fdab1f6322e36ee1e6143d593f6c6b63b5175263`
 - challengeable funded purchase / on-chain job `1956`: `0x092af96f5cd02bd7690103b0dbbd5681b6057dc7ec7ed5b34bc3d854ab324535`
@@ -61,9 +65,16 @@ claims without overstating the current runtime:
 - intel purchase proves funded `ERC-8183` usage
 - protected intel proof currently demonstrates clean `challengeable -> claim -> refund -> repricing` and `challengeable -> claim -> release -> repricing` loops
 - auth-hardening proof currently demonstrates that an unauthenticated buyer claim is rejected with `403`, while the authenticated claimant token path still succeeds and later repricing reaches a persisted `synced` state
+- current-session Agentic Wallet off-chain signing has been locally verified
+  through a successful `x402-pay` proof generation, which shows the hidden
+  pre-transaction signing path is live for the canonical buyer, seller, and
+  evaluator wallets controlled by the current session
 - wallet-signature proof currently demonstrates the evaluator authorization path, but this repo does not yet claim a captured settlement tx hash for that specific proof loop
-- buyer-side claim-proof currently demonstrates deterministic claimant message generation on top of a mainnet-backed protected purchase, but this repo does not yet claim a captured buyer wallet signature proof loop
-- public quickstart proof currently demonstrates that a standalone external-consumer script can drive the protected buy and claim/resolution flow, but this repo does not yet claim a second generalized commerce adapter beyond the intel reference integration
+- buyer-side claim-proof currently demonstrates deterministic claimant message generation on top of a mainnet-backed protected purchase, but this repo does not yet claim a captured buyer wallet signature proof loop because the current official Agentic Wallet CLI does not expose a generic message-sign command for arbitrary claim-proof payloads
+- public quickstart proof currently demonstrates that a standalone external-consumer script can drive the protected buy and claim/resolution flow
+- the repo now also includes a second lightweight reference adapter for The
+  Square paywalled intel unlocks, but it is not yet claimed as a second live
+  mainnet-proved integration
 - funded intel examples do **not** imply every intel purchase is funded
 - protected intel proof does **not** imply a generalized insurance pool or decentralized arbitration layer
 - identity usage does **not** imply every reputation update is fully on-chain

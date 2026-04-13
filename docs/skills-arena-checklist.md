@@ -14,10 +14,9 @@ Covered by:
 
 Submission proof actors:
 
-- buyer: `oracle`
 - buyer: `sage`
 - seller: `fox`
-- evaluator: ACP evaluator wallet
+- evaluator: `arbiter`
 
 Repro support:
 
@@ -98,6 +97,7 @@ Current proof surfaces shown in this repo:
 - challengeable buy / refund / release / repricing loops
 - auth-hardening replay where unauthenticated claimant access is rejected with
   `403` and the authenticated path still completes
+- a second lightweight reference adapter for The Square paywalled intel unlocks
 
 ### X post-ready positioning
 
@@ -129,6 +129,11 @@ This repo intentionally does **not** claim:
 - wallet-signature-bound universal claimant/evaluator auth across every role and
   surface
 - generalized protection across every commerce type
+
+This repo now claims:
+
+- one live mainnet-proved reference integration: Civilis Intel Market
+- one lightweight reference adapter: The Square paywalled intel unlocks
 
 See:
 

@@ -2,7 +2,7 @@
 
 const baseUrl = (process.env.RISK_OS_BASE_URL || 'http://127.0.0.1:3020').replace(/\/$/, '');
 const action = process.env.RISK_OS_ACTION || 'quote';
-const itemId = Number(process.env.RISK_OS_INTEL_ITEM_ID || '12');
+const itemId = Number(process.env.RISK_OS_INTEL_ITEM_ID || '0');
 const buyerAgentId = process.env.RISK_OS_BUYER_AGENT_ID || 'sage';
 const protectedPurchaseId = Number(process.env.RISK_OS_PROTECTED_PURCHASE_ID || '0');
 const claimId = Number(process.env.RISK_OS_CLAIM_ID || '0');
@@ -28,6 +28,9 @@ async function request(path, options = {}) {
 }
 
 async function runQuote() {
+  if (!itemId) {
+    throw new Error('Set RISK_OS_INTEL_ITEM_ID from a fresh stage-risk-os-demo run before requesting a quote');
+  }
   return request('/api/risk/quote/intel', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -39,6 +42,9 @@ async function runQuote() {
 }
 
 async function runBuy() {
+  if (!itemId) {
+    throw new Error('Set RISK_OS_INTEL_ITEM_ID from a fresh stage-risk-os-demo run before running quote-buy');
+  }
   const quote = await runQuote();
   const buy = await request(`/api/intel/items/${itemId}/buy`, {
     method: 'POST',

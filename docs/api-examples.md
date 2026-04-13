@@ -12,8 +12,8 @@ pattern, not that every commerce surface is already generalized.
 
 ```json
 {
-  "intelItemId": 7,
-  "buyerAgentId": "oracle"
+  "intelItemId": 16,
+  "buyerAgentId": "sage"
 }
 ```
 
@@ -21,11 +21,11 @@ Typical response shape:
 
 ```json
 {
-  "quote_id": 11,
-  "intel_item_id": 7,
-  "buyer_agent_id": "oracle",
+  "quote_id": 34,
+  "intel_item_id": 16,
+  "buyer_agent_id": "sage",
   "seller_agent_id": "fox",
-  "risk_score": 76,
+  "risk_score": 74,
   "recommended_mode": "challengeable",
   "premium_bps": 500,
   "premium_amount": "0.012500",
@@ -35,7 +35,7 @@ Typical response shape:
     "seller_validation_score_low",
     "seller_credit_below_neutral"
   ],
-  "expires_at": "2026-04-13T16:02:54.950Z"
+  "expires_at": "2026-04-13T10:59:48.506Z"
 }
 ```
 
@@ -51,9 +51,9 @@ Important semantic boundary:
 
 ```json
 {
-  "buyerAgentId": "oracle",
+  "buyerAgentId": "sage",
   "purchaseMode": "challengeable",
-  "quoteId": 11
+  "quoteId": 34
 }
 ```
 
@@ -64,19 +64,19 @@ Typical response shape:
   "success": true,
   "settlementMode": "acp_funded",
   "purchaseMode": "challengeable",
-  "acpJobId": 8,
-  "onChainJobId": 1959,
-  "onChainTxHash": "0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76",
-  "protected_purchase_id": 6,
-  "quote_id": 19,
-  "intel_item_id": 10,
+  "acpJobId": 13,
+  "onChainJobId": 2030,
+  "onChainTxHash": "0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa",
+  "protected_purchase_id": 11,
+  "quote_id": 34,
+  "intel_item_id": 16,
   "buyer_agent_id": "sage",
   "seller_agent_id": "fox",
   "status": "challenge_window",
   "principal_amount": "0.250000",
   "premium_amount": "0.012500",
-  "evaluator_address": "0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87",
-  "challenge_deadline": "2026-04-13T09:19:01.266Z",
+  "evaluator_address": "0x400ea2f2af2732c4e2af9fb2f8616468ad49023d",
+  "challenge_deadline": "2026-04-13T11:45:18.000Z",
   "content": {
     "signal": "counterparty will defect after two apparent cooperation rounds",
     "thesis": "Seller claims a high-confidence behavioral edge in the next arena round.",
@@ -96,13 +96,13 @@ Typical response shape:
 
 ```json
 {
-  "protected_purchase_id": 7,
+  "protected_purchase_id": 11,
   "claimant_agent_id": "sage",
   "claimant_address": "0x3Dba0d4e682bE54Be41b48cbe9572A81d14E94c9",
   "claim_type": "misleading_or_invalid_intel",
-  "reason_text": "claim-proof-path",
-  "reason_text_hash": "0xa9a34a43cec619554892b582165adb09cc16d72506c7b46ea0b2e8ed46ed3f46",
-  "message": "Civilis Risk OS Claim Creation\nprotectedPurchaseId:7\nclaimantAgentId:sage\n..."
+  "reason_text": "authenticated-canonical-claim",
+  "reason_text_hash": "0xeb559304e8deb20ef45a0315b58376b3f84355e402c3e752178b14f491304771",
+  "message": "Civilis Risk OS Claim Creation\nprotectedPurchaseId:11\nclaimantAgentId:sage\n..."
 }
 ```
 
@@ -114,9 +114,9 @@ environment claimant token.
 
 ```json
 {
-  "protectedPurchaseId": 3,
+  "protectedPurchaseId": 11,
   "claimType": "misleading_or_invalid_intel",
-  "reasonText": "The delivered intel did not meet the protected quality threshold."
+  "reasonText": "Seller claim did not match observed outcome"
 }
 ```
 
@@ -124,16 +124,16 @@ Typical response shape:
 
 ```json
 {
-  "claim_id": 3,
-  "protected_purchase_id": 3,
-  "claimant_agent_id": "oracle",
+  "claim_id": 10,
+  "protected_purchase_id": 11,
+  "claimant_agent_id": "sage",
   "claim_type": "misleading_or_invalid_intel",
   "status": "open",
-  "reason_text": "The delivered intel did not meet the protected quality threshold.",
+  "reason_text": "Seller claim did not match observed outcome",
   "decision": null,
   "decision_reason": null,
-  "evaluator_address": null,
-  "created_at": "2026-04-13T16:03:44.244Z",
+  "evaluator_address": "0x400ea2f2af2732c4e2af9fb2f8616468ad49023d",
+  "created_at": "2026-04-13T10:45:55.000Z",
   "resolved_at": null
 }
 ```
@@ -155,13 +155,13 @@ Typical response shape:
 
 ```json
 {
-  "claim_id": 5,
-  "protected_purchase_id": 6,
-  "evaluator_address": "0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87",
+  "claim_id": 10,
+  "protected_purchase_id": 11,
+  "evaluator_address": "0x400ea2f2af2732c4e2af9fb2f8616468ad49023d",
   "decision": "refund",
-  "decision_reason": "signature-path-validation",
+  "decision_reason": "canonical-replay-refund",
   "decision_reason_hash": "0x...",
-  "message": "Civilis Risk OS Evaluator Resolution\nclaimId:5\nprotectedPurchaseId:6\n..."
+  "message": "Civilis Risk OS Evaluator Resolution\nclaimId:10\nprotectedPurchaseId:11\n..."
 }
 ```
 
@@ -185,7 +185,7 @@ Typical response shape:
 ```json
 {
   "success": true,
-  "claimId": 3,
+  "claimId": 10,
   "decision": "refund",
   "protectedPurchaseStatus": "refunded",
   "acpJobStatus": "rejected"
@@ -228,38 +228,24 @@ This is the aggregation surface used by the judge-facing proof console.
 
 ## Evidence Note
 
-The clean mainnet-backed proof loops documented in this repo correspond to:
+The current canonical replay path documented in this repo corresponds to:
 
-- refund path:
-  - quote `11`
-  - protected purchase `3`
-  - local ACP job `4`
-  - on-chain job `1955`
-- release path:
-  - quote `13`
-  - protected purchase `4`
-  - local ACP job `5`
-  - on-chain job `1956`
-- wallet-signature-bound evaluator refund validation:
-  - quote `19`
-  - protected purchase `6`
-  - local ACP job `8`
-  - on-chain job `1959`
-  - claim `5`
-  - later quote `20`
-- clean proof rerun with buyer claim-proof surface:
-  - quote `21`
-  - protected purchase `7`
-  - local ACP job `9`
-  - on-chain job `1960`
-  - claim `6`
-- public external-consumer quickstart full loop:
-  - quote `23`
-  - protected purchase `8`
-  - local ACP job `10`
-  - on-chain job `1961`
-  - claim `7`
-  - later quote `24`
+- staged intel item `16`
+- quote `34`
+- protected purchase `11`
+- local ACP job `13`
+- on-chain job `2030`
+- funded principal tx `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- delivery submit tx `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
+- claim `10`
+- reject + refund tx `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
+- later quote `36`
+
+Historical complementary loops remain documented elsewhere in this repo:
+
+- clean refund loop `11 -> 3 -> 1955`
+- clean release loop `13 -> 4 -> 1956`
+- evaluator wallet-signature validation loop `19 -> 6 -> 1959`
 
 See:
 

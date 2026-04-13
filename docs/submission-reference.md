@@ -21,6 +21,11 @@ For Build X Season 2 Skills Arena, the reusable submission artifact is
 quotes, challengeable settlement, claim handling, evaluator-backed refund or
 release, and later trust repricing to a live X Layer agent economy.
 
+The submission now packages that claim as:
+
+- one live reference integration: **Civilis Intel Market**
+- one lightweight reference adapter: **The Square paywalled intel unlocks**
+
 ### Short Description (ZH, submission-safe)
 
 Civilis 是一个运行在 X Layer 上的 AI Agent 文明世界。8 个持续存在的
@@ -97,10 +102,9 @@ to the Intel Market reference flow:
 
 | Role | Bound agent | Wallet |
 | --- | --- | --- |
-| buyer | `oracle` | `0x12cbe62954e39b7149534edd41822e3daca7d6ba` |
 | buyer | `sage` | `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9` |
 | seller | `fox` | `0x4f5dc690f366116bf6bc22f29e44f8d141bf38de` |
-| evaluator | ACP evaluator | `0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87` |
+| evaluator | `arbiter` | `0x400ea2f2af2732c4e2af9fb2f8616468ad49023d` |
 
 These are submission-scoped proof actors used to evidence the protected
 commerce loop. They do not replace the canonical Season 1 live world wallet map
@@ -132,6 +136,9 @@ Use these hashes as the primary public-safe evidence set.
 
 ### Skills Arena Protected Commerce Loop
 
+- Risk OS canonical replay / funded principal / job `2030`: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- Risk OS canonical replay / delivery submit / same job `2030`: `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
+- Risk OS canonical replay / reject + refund / same job `2030`: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
 - Risk OS challengeable buy / funded job `1955`: `0xac33ab277d289ec08a8f202e766c6394840aadbaee3cf3b5e290bd5e7ca58ecc`
 - Risk OS reject + refund / same job `1955`: `0x0d943594e006228b83f2fc45fdab1f6322e36ee1e6143d593f6c6b63b5175263`
 - Risk OS challengeable buy / funded job `1956`: `0x092af96f5cd02bd7690103b0dbbd5681b6057dc7ec7ed5b34bc3d854ab324535`
@@ -147,6 +154,8 @@ Use these hashes as the primary public-safe evidence set.
 - `intel_purchase` proves both:
   - x402 direct-wallet payment settlement
   - verified funded `ERC-8183` flows
+- `social_paywalled_intel_unlock` is currently packaged as a lightweight
+  reference adapter, not as a second mainnet-proved protection loop
 - not every intel purchase is currently funded
 - arena is not currently presented as fully funded ERC-8183 escrow
 - ERC-8004 identity is on mainnet, but reputation remains mixed between
@@ -165,13 +174,19 @@ protocol use on mainnet:
 
 For the Skills Arena `Civilis Risk OS` narrative, the strongest pair is:
 
-- protected buy: `0xac33ab277d289ec08a8f202e766c6394840aadbaee3cf3b5e290bd5e7ca58ecc`
-- protected refund: `0x0d943594e006228b83f2fc45fdab1f6322e36ee1e6143d593f6c6b63b5175263`
+- funded principal: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- protected refund: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
 
-The strongest expanded quartet is:
+The strongest expanded trio is:
 
-- protected buy / refund loop: `0xac33ab277d289ec08a8f202e766c6394840aadbaee3cf3b5e290bd5e7ca58ecc`
-- protected refund: `0x0d943594e006228b83f2fc45fdab1f6322e36ee1e6143d593f6c6b63b5175263`
+- funded principal / canonical replay: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- delivery submit / canonical replay: `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
+- protected refund / canonical replay: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
+
+The strongest expanded quartet adds historical release depth:
+
+- funded principal / canonical replay: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- protected refund / canonical replay: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
 - protected buy / release loop: `0x092af96f5cd02bd7690103b0dbbd5681b6057dc7ec7ed5b34bc3d854ab324535`
 - protected release: `0x3d6a7cc98592ff9b814dc315fd23458998c54b2a89795c7ad1f26939b85f5d1c`
 
@@ -179,17 +194,14 @@ For evaluator-auth depth, the current additional proof is:
 
 - signature-proof validation buy: `0xf77f8bbc5fa46c6da1f93076857823c5c1759025980f1639fab1f3b7c8086f76`
 
-For claimant-side proof depth, the current additional proof is:
+For claimant-side proof depth, the current canonical proof is captured through:
 
-- buyer claim-proof rerun buy: `0x8b0d5ffc9977b857e192a24f95fc9b7ea44b1d399bb328896f59d00fa5a9e2d1`
+- claim-proof on purchase `11` for buyer `sage`
+- authenticated claimant path `claim 10`
 
-For public reusable-consumer depth, the current additional proof is:
+For public reusable-consumer depth, the current canonical proof is:
 
-- external quickstart buy: `0xe2ec46b808757e6cbb2cc716bf13608e6e9246859a4dad4b0edaa477ec7889de`
-
-For auth-hardening depth, the current additional proof is:
-
-- authenticated claimant rerun buy: `0x90d21480a595a56f51c700af86a6478cdbb3f3a5f60137eb6a377b7e4f47ad8d`
+- external-consumer replay path `16 -> 34 -> 11 -> 10 -> 36`
 
 ### Recommended `X Layer Contract or Wallet Address`
 

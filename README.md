@@ -52,11 +52,12 @@ If a reviewer only has a minute, read in this order:
 1. [Skills Arena Checklist](docs/skills-arena-checklist.md)
 2. [External Consumer Guide](docs/external-consumer-guide.md)
 3. [Submission Reference](docs/submission-reference.md)
-4. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
-5. [Mainnet Evidence](docs/mainnet-evidence.md)
-6. [API Examples](docs/api-examples.md)
-7. [Championship Replay Mode](docs/championship-replay-mode.md)
-8. [Judge Demo Script](docs/judge-demo-script.md)
+4. [Second Adapter: The Square Paywalled Intel Unlock](docs/second-adapter-paywalled-intel-unlock.md)
+5. [Skills Arena Evidence](docs/skills-arena-risk-os-evidence.md)
+6. [Mainnet Evidence](docs/mainnet-evidence.md)
+7. [API Examples](docs/api-examples.md)
+8. [Championship Replay Mode](docs/championship-replay-mode.md)
+9. [Judge Demo Script](docs/judge-demo-script.md)
 
 ## Skill Contract
 
@@ -103,9 +104,18 @@ live reference integration.
 - risk quotes read mixed local + on-chain `ERC-8004` validation summaries when
   the validation registry is configured
 - refund and release both have captured mainnet-backed proof loops
+- current-session Agentic Wallet off-chain signing has been locally verified
+  through successful `x402-pay` proof generation, which confirms that the
+  underlying pre-transaction signing path is live even though this repo still
+  does not claim a captured buyer wallet-signature loop for arbitrary
+  claim-proof payloads because the current official Agentic Wallet CLI does not
+  expose a generic message-sign command
 - the public external-consumer quickstart script has been validated against the
   live proof environment for `quote`, `quote-buy`, `claim-proof`, `claim`,
   `resolve-proof`, `resolve`, and later repricing
+- the submission repo also includes a second lightweight reference adapter for
+  `The Square` paywalled intel unlocks, so the reusable claim no longer depends
+  on a single commerce surface
 - later quotes reflect prior protected outcomes, and the local protected
   purchase state now records repricing sync status for recovery
 
@@ -255,6 +265,14 @@ That is the reusable skill claim for this submission:
 
 `any agent commerce app can wrap payment with a challengeable protection loop`
 
+This repo now includes a second lightweight reference adapter for a different
+commerce surface:
+
+- [The Square paywalled intel unlock adapter](docs/second-adapter-paywalled-intel-unlock.md)
+
+It is intentionally labeled as a **reference adapter**, not as a second
+mainnet-proved live integration.
+
 ## Clean Proof Environment
 
 The cleanest runtime used for the strict mainnet-backed proof loops keeps the
@@ -352,14 +370,14 @@ submission claim.
 
 ## Agentic Wallet Roles Used In Proof
 
-The clean submission proof loops use staged Agentic Wallet actors:
+The strongest current submission replay uses staged Agentic Wallet actors that
+are independently controlled by the maintained proof session:
 
 | Role | Agent | Wallet |
 | --- | --- | --- |
-| buyer | `oracle` | `0x12cbe62954e39b7149534edd41822e3daca7d6ba` |
 | buyer | `sage` | `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9` |
 | seller | `fox` | `0x4f5dc690f366116bf6bc22f29e44f8d141bf38de` |
-| evaluator | ACP evaluator | `0x9fD22B0A6c66256a9D63bEBcdb9eeB25f34f8D87` |
+| evaluator | `arbiter` | `0x400ea2f2af2732c4e2af9fb2f8616468ad49023d` |
 
 These are **submission-scoped proof actors**. They do not replace the broader
 live wallet map of the original Civilis world.
@@ -381,9 +399,26 @@ feature.
 
 ## Verified Mainnet Proof
 
-This repository currently includes two clean mainnet-backed proof loops, plus a
-third wallet-signature-bound evaluator validation loop and a fourth auth-hardening
-rerun that proves default claimant gating and repricing durability.
+This repository currently includes one canonical independent-wallet replay on
+the latest staged actor set, plus earlier complementary proof loops that add
+historical release depth and evaluator wallet-signature depth.
+
+### Canonical Independent-Wallet Replay
+
+- staged intel item id: `16`
+- quote id: `34`
+- protected purchase id: `11`
+- local ACP job id: `13`
+- on-chain job id: `2030`
+- funded principal tx: `0x3626e79f734b6708d357e3556353617d4600bbb5d859ff47d1dc6846b76479fa`
+- delivery submit tx: `0x813b673060e0d0f7d88ebd466801049c76b662297820a6f23a066773b32d0260`
+- buyer claim-proof actor: `sage` / `0x3dba0d4e682be54be41b48cbe9572a81d14e94c9`
+- unauthenticated claim status: `403`
+- authenticated claim id: `10`
+- reject + refund tx: `0xc857156addb058461cb0eb04647eb896a3db54185e2fbcd09dd295b1bf236929`
+- repriced quote id: `36`
+- seller risk: `74 -> 89`
+- protected purchase metadata repricing state: `synced`
 
 ### Refund Loop
 
@@ -419,20 +454,6 @@ rerun that proves default claimant gating and repricing durability.
 - repriced quote id: `20`
 - seller risk: `71 -> 87`
 
-### Auth-Hardening Refund Loop
-
-- quote id: `27`
-- protected purchase id: `9`
-- local ACP job id: `11`
-- on-chain job id: `1962`
-- buy tx: `0x90d21480a595a56f51c700af86a6478cdbb3f3a5f60137eb6a377b7e4f47ad8d`
-- unauthenticated claim status: `403`
-- authenticated claim id: `8`
-- refund resolution status: `200`
-- repriced quote id: `28`
-- seller risk: `73 -> 89`
-- protected purchase metadata repricing state: `synced`
-
 The strongest current proof claim is:
 
 `quote -> challengeable buy -> claim -> release/refund -> later quote repricing`
@@ -440,6 +461,10 @@ The strongest current proof claim is:
 The strongest auth-depth add-on is:
 
 `claim -> resolve-proof message -> evaluator wallet signature -> refund -> later repricing`
+
+And the strongest current actor-independence claim is:
+
+`independent buyer/seller/evaluator Agentic Wallet actors -> challengeable buy -> default claimant gating -> authenticated claim -> evaluator refund -> later repricing`
 
 ## Repository Layout
 

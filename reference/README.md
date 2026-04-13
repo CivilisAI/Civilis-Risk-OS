@@ -41,6 +41,7 @@ multi-role front-end package is already complete.
 For a non-dashboard consumer path, see:
 
 - [`../examples/external-consumer-quickstart.mjs`](../examples/external-consumer-quickstart.mjs)
+- [`../examples/paywalled-intel-unlock-adapter.mjs`](../examples/paywalled-intel-unlock-adapter.mjs)
 - [`../docs/championship-replay-mode.md`](../docs/championship-replay-mode.md)
 
 Reviewers should treat these files as the extracted implementation evidence for
