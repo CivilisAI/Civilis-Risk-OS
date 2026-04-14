@@ -2,6 +2,23 @@
 
 **Civilis Risk OS** is an installable skill for protected agent commerce on X Layer.
 
+[![Chain](https://img.shields.io/badge/Chain-4b5563?style=flat-square)](https://www.okx.com/xlayer)
+[![X Layer (196)](https://img.shields.io/badge/X%20Layer%20(196)-2563eb?style=flat-square)](https://www.okx.com/xlayer)
+[![Standard](https://img.shields.io/badge/Standard-4b5563?style=flat-square)](https://eips.ethereum.org/EIPS/eip-8183)
+[![ERC-8183](https://img.shields.io/badge/ERC--8183-84cc16?style=flat-square)](https://eips.ethereum.org/EIPS/eip-8183)
+[![Standard](https://img.shields.io/badge/Standard-4b5563?style=flat-square)](https://eips.ethereum.org/EIPS/eip-8004)
+[![ERC-8004](https://img.shields.io/badge/ERC--8004-84cc16?style=flat-square)](https://eips.ethereum.org/EIPS/eip-8004)
+[![Protocol](https://img.shields.io/badge/Protocol-4b5563?style=flat-square)](https://web3.okx.com/zh-hans/onchainos/dev-docs/payments/x402-introduction)
+[![x402](https://img.shields.io/badge/x402-f97316?style=flat-square)](https://web3.okx.com/zh-hans/onchainos/dev-docs/payments/x402-introduction)
+[![TEE](https://img.shields.io/badge/TEE-374151?style=flat-square)](https://web3.okx.com/zh-hans/onchainos)
+[![Agentic Wallet](https://img.shields.io/badge/Agentic%20Wallet-2563eb?style=flat-square)](https://web3.okx.com/zh-hans/onchainos/dev-docs/home/agentic-wallet-overview)
+[![Security](https://img.shields.io/badge/Security-111827?style=flat-square)](https://web3.okx.com/zh-hans/onchainos/dev-docs/cli/okx-security)
+[![DEX Token](https://img.shields.io/badge/DEX%20Token-111827?style=flat-square)](https://web3.okx.com/zh-hans/onchainos/dev-docs/cli/okx-dex-token)
+[![Runtime](https://img.shields.io/badge/Runtime-111827?style=flat-square)](https://web3.okx.com/zh-hans/onchainos)
+[![Onchain OS](https://img.shields.io/badge/Onchain%20OS-111827?style=flat-square)](https://web3.okx.com/zh-hans/onchainos)
+[![Hosted Runtime](https://img.shields.io/badge/Public%20Hosted%20Runtime-0f172a?style=flat-square)](https://civilis-risk-os-runtime.ceolaexekiel.workers.dev)
+[![Civilis Public](https://img.shields.io/badge/Civilis%20Public-111827?style=flat-square)](https://github.com/CivilisAI/Civilis-public)
+
 It packages one narrow but reusable pattern:
 
 `quote -> buy -> claim -> resolve -> requote`
